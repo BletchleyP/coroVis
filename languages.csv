@@ -1,0 +1,71 @@
+keyword;de;en;fr
+flag;iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAANklEQVRIie3NMQ0AMBDDQPPHVk4uhE6RXt8MXn2oJIvOFwGAiQoMAgQjFRgEHIxU4CcgWIFnF71AVopWPAqbAAAAAElFTkSuQmCC;iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACOUlEQVRIx+2VT0iTcRjHB0FXIRAPw5swEDyNoGAQHgQrCPTSSTIkyINEoCDYQbqMhKAOQekhkXrtz8VKmJsH04NETFSWUVPM6M9imKhDUtN99fOb73q3ObdDggcfeC7v3mef3/s+3+/3dUlyHWa7jgFFAb40NGg7kVB86Y8u3gjI5X2U08mkNFlSovDuyNbyssovPM25x9f0StGHvZouK9NiX5/SgIXrzYpUVGgtHOai7lkRnTzTUzTgxOlu3b4/qvkrjfro9Wp9dlZ7lQKcu/Zac48tTZWW6ldXl/ll8vOiPPXPCwLc559ozBrWB49H39ralNzY0O+VdV26OfQPwI2nqns1+GJcn3w+RWtr9TceV2JtU42dI3kBda1BLdy5q2m3WyuBgDnY24mfBspMBsDuFv+YvnbcSg2FQmboWXAuB2D1vzMHidbUaDMW09Z2Uh0P3me81n0BdNXll4pYbwzke3u7eWzz2hyAmcpKxfx+c33+x6rOXh3IWXoawOmKKSegyEoB7MH/3WnAYfw5h3Y6uWDxWhyDBWvvte+/ZBbG4igWyUKzASweASAEBIEw8i7ZeRGpITmkhwSRIpJ0Ajgd0qWQMhCkjcTzAjAHJjFDu6ZhCBNhJkyVDWAGE2JGTMlBMClmxbQZAGyNvXls7I7tsb/tyHwAmjghVihihrghdoifjCUTUAQVgUVwEWD2nxwEoAlGApIiMAlOAjQNIFqJWKKWyM1eViGA3UQ9kU/08wk4/mQeDcAOGLVAx2wmAaAAAAAASUVORK5CYII=;iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAANUlEQVRIiWP4//8/Ay0xTQ0fRhYwhC75jwsTAu8dTXHiUQtGLRi1YNSCUQuGlgW0xKMWEMQARV2D+0evqEEAAAAASUVORK5CYII=
+greeting;Willkommen;Welcome;Bienvenue
+error;Fehler;Error;
+yaxis;HÃ¤ufigkeit;Frequency;
+histogramTitle;Histogramm;Histogram of x;
+sliderTitle;Klassenanzahl:;Number of bins:;
+CoroVisionaer - Reha leicht gemacht;CoroVisionaer - Reha leicht gemacht;CoroVisionaer - Rehabilitation at once;CoroVisionaer - Rehabilitation immediatement
+Trainingsdaten suchen ...;Trainingsdaten suchen ...;Search for exercises ...;Chercher les donnees du patient ...
+Name;Name;Lastname;Nom de famille
+Vorname;Vorname;Firstname;Prenom
+Geburtsdatum;Geburtsdatum;Date of birth;Date de naissance
+Geschlecht;Geschlecht;Sex;Sexe
+Groesse;Groesse;Height;La taille du corps
+Gewicht;Gewicht;Weight;Poids corporel
+Maximale Herzfrequenz;Maximale Herzfrequenz;Maximum heart rate;Frequence cardiaque maxmiale
+Belastungsintensitaet;Belastungsintensitaet;Stress level;L'intensite du stress
+Frequenzbereich;Frequenzbereich;Range of Heart rate;Gamme de frequences
+dd.mm.yyyy;dd.mm.yyyy;yyyy-mm-dd;dd.mm.yyyy
+de;de;en;fr
+maennlich;maennlich;male;male
+weiblich;weiblich;female;femelle
+Trainingsdaten analysieren ...;Trainingsdaten analysieren ...;Analyse Training Data ...;Analyser donnees d'exercise ...
+Keine Daten;Keine Daten;No data;Aucune donnee
+Risikoklasse;Risikoklasse;Risk Class;Classe de risque
+Daten;Daten;Data;Dates
+Leider keine Trainingseinheiten gefunden ...;Leider keine Trainingseinheiten gefunden ...;Sorry, no exercise units found...;Excusez moi, aucune exercise...
+Bitte korrigieren;Bitte korrigieren;Please, input new data;Corrigez, s'il vous plait
+Weiter;Weiter...;Continue …;Continuez ...
+Zeit;Zeit;Time;Temps
+Geschwindigkeit;Geschwindigkeit;Velocity;Vitesse
+Weg;Weg;Route;Route
+Hoehe;Hoehe;Altitude;Altitude
+Karte;Karte;Map;Carte
+Zusammenfassung;Zusammenfassung;Summary;Resume
+Hilfe;Hilfe;Help;Aider
+Impressum;Impressum;Imprint;Empreinte
+Daten werden aufbereitet...;Daten werden aufbereitet...;Data are processed …;Donnees sont traitees
+minimal;minimal;minimal;minimal
+leicht;leicht;light;facile
+moderat;moderat;moderate;modere
+schwer;schwer;heavy;difficile
+sehr schwer;sehr schwer;very heavy;tres difficile
+maximal;maximal;maximum;maximal
+Los;Los…;Browse …;On y va…
+Keine Datei gewählt;Keine Datei gewählt;No file selected;Aucun fichier selectionne
+Bereite Daten auf;Bereite Daten auf …;Preparing data;Preparer les dates
+aus;aus …;from …;de …
+Device waehlen;Device waehlen;Select device;Selectioner dispositif
+Fehlerhafte Daten;Fehlerhafte Daten;Data error;Donnees erronees
+Device;Gerät;Device;Dispositif
+nicht installiert;nicht installiert;not installed;pas installee
+Alter;Alter;Age;Age
+Plot;Graph;Plot;Graphique
+TCX-Import;TCX-Datenimport;TCX-Data Import;Importation de donnees TCX
+Dateien nicht eingelesen;Datei(en) nicht eingelesen;File(s) not importet;Donnee(s) pas importee
+Falsches Format;Falsches Format;Wrong file format;Format de fichier incorrect
+Zeitraum analysieren;Zeitraum analysieren…;Analyse Range of Training Data ...;Analyser periode de donnees d'exercise ...
+bis;bis;to;a
+PersonenDaten;Gehören die neu geladenen Daten zum aktuellen Patienten?;Do the newly loaded data belong to the current patient?;Inclure les nouvelles donnees chargees pour les patients actuels?
+Bitte beachten;Bitte beachten;Please note;Notez, s'il vous plait
+IncImpressum;Impr_DE.htm;Impr_GB.htm;Impr_FR.htm
+Zurück;Zurück;Back;Retour
+HFq;Herzfrequenz;Heartrate;Frequence cardiaque
+Optimale Belastung;Optimale Belastung;Optimal Intensity;Intensite optimale
+XAchse;X-Achse;X-Axis;X-Axe
+YAchse;Y-Achse;Y-Axis;Y-Axe
+Herzfrequenz;Herzfrequenz;Heartrate;Frequence cardiaque
+An;An;On;Allumee
+Aus;Aus;Off;Delumee
+PersonenDaten2;Personendaten;Personal Data;Dates personelles
