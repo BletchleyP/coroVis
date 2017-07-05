@@ -26,7 +26,7 @@ Risikoklasse;Risikoklasse;Risk Class;Classe de risque
 Daten;Daten;Data;Dates
 Leider keine Trainingseinheiten gefunden ...;Leider keine Trainingseinheiten gefunden ...;Sorry, no exercise units found...;Excusez moi, aucune exercise...
 Bitte korrigieren;Bitte korrigieren;Please, input new data;Corrigez, s'il vous plait
-Weiter;Weiter...;Continue …;Continuez ...
+Weiter;Weiter...;Continue ?;Continuez ...
 Zeit;Zeit;Time;Temps
 Geschwindigkeit;Geschwindigkeit;Velocity;Vitesse
 Weg;Weg;Route;Route
@@ -35,32 +35,32 @@ Karte;Karte;Map;Carte
 Zusammenfassung;Zusammenfassung;Summary;Resume
 Hilfe;Hilfe;Help;Aider
 Impressum;Impressum;Imprint;Empreinte
-Daten werden aufbereitet...;Daten werden aufbereitet...;Data are processed …;Donnees sont traitees
+Daten werden aufbereitet...;Daten werden aufbereitet...;Data are processed ?;Donnees sont traitees
 minimal;minimal;minimal;minimal
 leicht;leicht;light;facile
 moderat;moderat;moderate;modere
 schwer;schwer;heavy;difficile
 sehr schwer;sehr schwer;very heavy;tres difficile
 maximal;maximal;maximum;maximal
-Los;Los…;Browse …;On y va…
-Keine Datei gewählt;Keine Datei gewählt;No file selected;Aucun fichier selectionne
-Bereite Daten auf;Bereite Daten auf …;Preparing data;Preparer les dates
-aus;aus …;from …;de …
+Los;Los?;Browse ?;On y va?
+Keine Datei gew?hlt;Keine Datei gew?hlt;No file selected;Aucun fichier selectionne
+Bereite Daten auf;Bereite Daten auf ?;Preparing data;Preparer les dates
+aus;aus ?;from ?;de ?
 Device waehlen;Device waehlen;Select device;Selectioner dispositif
 Fehlerhafte Daten;Fehlerhafte Daten;Data error;Donnees erronees
-Device;Gerät;Device;Dispositif
+Device;Ger?t;Device;Dispositif
 nicht installiert;nicht installiert;not installed;pas installee
 Alter;Alter;Age;Age
 Plot;Graph;Plot;Graphique
 TCX-Import;TCX-Datenimport;TCX-Data Import;Importation de donnees TCX
 Dateien nicht eingelesen;Datei(en) nicht eingelesen;File(s) not importet;Donnee(s) pas importee
 Falsches Format;Falsches Format;Wrong file format;Format de fichier incorrect
-Zeitraum analysieren;Zeitraum analysieren…;Analyse Range of Training Data ...;Analyser periode de donnees d'exercise ...
+Zeitraum analysieren;Zeitraum analysieren?;Analyse Range of Training Data ...;Analyser periode de donnees d'exercise ...
 bis;bis;to;a
-PersonenDaten;Gehören die neu geladenen Daten zum aktuellen Patienten?;Do the newly loaded data belong to the current patient?;Inclure les nouvelles donnees chargees pour les patients actuels?
+PersonenDaten;Geh?ren die neu geladenen Daten zum aktuellen Patienten?;Do the newly loaded data belong to the current patient?;Inclure les nouvelles donnees chargees pour les patients actuels?
 Bitte beachten;Bitte beachten;Please note;Notez, s'il vous plait
-IncImpressum;Impr_DE.htm;Impr_GB.htm;Impr_FR.htm
-Zurück;Zurück;Back;Retour
+IncImpressum;Imprint_DE.html;Imprint_GB.html;Imprint_FR.html
+Zur?ck;Zur?ck;Back;Retour
 HFq;Herzfrequenz;Heartrate;Frequence cardiaque
 Optimale Belastung;Optimale Belastung;Optimal Intensity;Intensite optimale
 XAchse;X-Achse;X-Axis;X-Axe
