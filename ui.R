@@ -62,7 +62,7 @@ shinyUI(fluidPage(
   
   # Das Conditionalpanel dient dazu einige Schalter zu verbergen, wird nie sichtbar
   conditionalPanel("false",
-                   checkboxInput("lgIn", "Eingeloggt", value = TRUE),
+                   checkboxInput("lgIn", "Login", value = TRUE),
                    checkboxInput("helpCB", "Hilfe", value = FALSE),
                    checkboxInput("imprCB", "Impressum", value = FALSE),
                    checkboxInput("iPanelOn", "InputPanel on/off", value = TRUE),
@@ -70,22 +70,8 @@ shinyUI(fluidPage(
                    ),
   
   # Die Titelleiste
-  titlePanel(title = textOutput("title_t"), windowTitle = "CVis - powered JEG ShinyGroupAG and R"),
+  titlePanel(title = textOutput("title_t"), windowTitle = "CoroVis - powered JEG ShinyGroupAG and R"),
   hr(),
-
-# Login-Seite - bleibt im Vergleich zu den Vorversionen zunächst in reduzierter Form bestehen
-  # fuer den Fall das diese Funktionalitaet wieder aufgegriffen werden soll
-  conditionalPanel("input.lgIn != true",
-                   fluidRow(column(12, align = "center", titlePanel("CoroVisionaer"))),
-                   fluidRow(column(12, align = "center", img(src="ts.png", height="400", width="600"))),
-                   fluidRow(column(12, align = "center", 
-                                   br(),
-                                   textInput("name", "eMail", "", placeholder = "test@test.com"),
-                                   passwordInput("pw", "Passwort", placeholder = "..."),
-                                   actionButton("regist", "Registrieren"),
-                                   actionButton("login", "Login")
-                   ))
-  ),
 
   # Das Working-Area mit Sidebar und Mainpanel
   conditionalPanel("input.lgIn == true && input.helpCB == false && input.imprCB == false",
@@ -155,6 +141,8 @@ shinyUI(fluidPage(
                      mainPanel(
                        
                        tabsetPanel(id = "tP",
+                          tabPanel(textOutput("start"), id = "plo00", uiOutput("startOut"), icon = icon("home")),
+                          
                           tabPanel(textOutput("daten_t"), id = "plo0", value = "tP1", dataTableOutput("tabOut"),icon = icon("table")),
                           
                           tabPanel(textOutput("zeit_t"), 
@@ -171,6 +159,8 @@ shinyUI(fluidPage(
                                    icon = icon("road")),
                           
                           tabPanel(textOutput("gesamt_t"), id = "plo6", tableOutput("tOut2"), icon = icon("pie-chart")),
+                          
+                          tabPanel(textOutput("settings"), id = "plo7", uiOutput("settingsOut"), icon = icon("sliders")),
                           
                           type = "pills",
                           

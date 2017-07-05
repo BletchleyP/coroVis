@@ -1,11 +1,12 @@
 keyword;de;en;fr
 flag;iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAANklEQVRIie3NMQ0AMBDDQPPHVk4uhE6RXt8MXn2oJIvOFwGAiQoMAgQjFRgEHIxU4CcgWIFnF71AVopWPAqbAAAAAElFTkSuQmCC;iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACOUlEQVRIx+2VT0iTcRjHB0FXIRAPw5swEDyNoGAQHgQrCPTSSTIkyINEoCDYQbqMhKAOQekhkXrtz8VKmJsH04NETFSWUVPM6M9imKhDUtN99fOb73q3ObdDggcfeC7v3mef3/s+3+/3dUlyHWa7jgFFAb40NGg7kVB86Y8u3gjI5X2U08mkNFlSovDuyNbyssovPM25x9f0StGHvZouK9NiX5/SgIXrzYpUVGgtHOai7lkRnTzTUzTgxOlu3b4/qvkrjfro9Wp9dlZ7lQKcu/Zac48tTZWW6ldXl/ll8vOiPPXPCwLc559ozBrWB49H39ralNzY0O+VdV26OfQPwI2nqns1+GJcn3w+RWtr9TceV2JtU42dI3kBda1BLdy5q2m3WyuBgDnY24mfBspMBsDuFv+YvnbcSg2FQmboWXAuB2D1vzMHidbUaDMW09Z2Uh0P3me81n0BdNXll4pYbwzke3u7eWzz2hyAmcpKxfx+c33+x6rOXh3IWXoawOmKKSegyEoB7MH/3WnAYfw5h3Y6uWDxWhyDBWvvte+/ZBbG4igWyUKzASweASAEBIEw8i7ZeRGpITmkhwSRIpJ0Ajgd0qWQMhCkjcTzAjAHJjFDu6ZhCBNhJkyVDWAGE2JGTMlBMClmxbQZAGyNvXls7I7tsb/tyHwAmjghVihihrghdoifjCUTUAQVgUVwEWD2nxwEoAlGApIiMAlOAjQNIFqJWKKWyM1eViGA3UQ9kU/08wk4/mQeDcAOGLVAx2wmAaAAAAAASUVORK5CYII=;iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAANUlEQVRIiWP4//8/Ay0xTQ0fRhYwhC75jwsTAu8dTXHiUQtGLRi1YNSCUQuGlgW0xKMWEMQARV2D+0evqEEAAAAASUVORK5CYII=
-greeting;Willkommen;Welcome;Bienvenue
-error;Fehler;Error;
+greeting;Herzlich willkommen;Welcome;Bienvenue
+greetingSubtitle;zu CoroVis - der Reha-App des Kardiologen; to CoroVis - the App for cardiac rehabilitation; a CoroVis - l'App pour la rehabilitation cardiaque
+error;Fehler;Error;Erreur
 yaxis;Häufigkeit;Frequency;
 histogramTitle;Histogramm;Histogram of x;
 sliderTitle;Klassenanzahl:;Number of bins:;
-CoroVisionaer - Reha leicht gemacht;CoroVisionaer - Reha leicht gemacht;CoroVisionaer - Rehabilitation at once;CoroVisionaer - Rehabilitation immediatement
+CoroVisTitle;CoroVis - Reha leicht gemacht;CoroVis - Rehabilitation at once;CoroVis - Rehabilitation immediatement
 Trainingsdaten suchen ...;Trainingsdaten suchen ...;Search for exercises ...;Chercher les donnees du patient ...
 Name;Name;Lastname;Nom de famille
 Vorname;Vorname;Firstname;Prenom
@@ -60,7 +61,7 @@ bis;bis;to;a
 PersonenDaten;Geh?ren die neu geladenen Daten zum aktuellen Patienten?;Do the newly loaded data belong to the current patient?;Inclure les nouvelles donnees chargees pour les patients actuels?
 Bitte beachten;Bitte beachten;Please note;Notez, s'il vous plait
 IncImpressum;Imprint_DE.html;Imprint_GB.html;Imprint_FR.html
-Zur?ck;Zur?ck;Back;Retour
+Zur?ck;Zurueck;Back;Retour
 HFq;Herzfrequenz;Heartrate;Frequence cardiaque
 Optimale Belastung;Optimale Belastung;Optimal Intensity;Intensite optimale
 XAchse;X-Achse;X-Axis;X-Axe
@@ -69,3 +70,5 @@ Herzfrequenz;Herzfrequenz;Heartrate;Frequence cardiaque
 An;An;On;Allumee
 Aus;Aus;Off;Delumee
 PersonenDaten2;Personendaten;Personal Data;Dates personelles
+Einstellungen;Einstellungen;Settings;Parametres
+Start;Start;Start;Debut

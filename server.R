@@ -193,6 +193,26 @@ shinyServer(function(input, output, session) {
     })
   }
   
+  renderSettings <- function() {
+    output$settingsOut <- renderUI({
+      tagList(
+        h3(translate("Einstellungen"))
+      )
+    })
+  }
+  
+  renderStart <- function() {
+    output$startOut <- renderUI({
+      tagList(
+        hr(),
+        fluidRow(column(12, align = "center", titlePanel(translate("greeting")))),
+        fluidRow(column(12, align = "center", img(src="ts.png", height="500", width="750"))),
+        fluidRow(column(12, align = "center", h3(translate("greetingSubtitle")))),
+        hr()
+      )
+    })
+  }
+  
   # -------------------
   # Hilfsfunktionen ...
   # -------------------
@@ -213,7 +233,7 @@ shinyServer(function(input, output, session) {
         h1(translate("Hilfe")),
         br(),
         tags$video(src="bref.mp4", type='video/mp4', width='50%', controls='controls'),
-        actionButton("backFromHelp", translate("Zurück"))
+        actionButton("backFromHelp", translate("Zur?ck"))
       )
     })
   }
@@ -231,7 +251,7 @@ shinyServer(function(input, output, session) {
         h1(translate("Impressum")),
         br(),
         includeHTML(translate("IncImpressum")),
-        actionButton("backFromImpr", translate("Zurück"))
+        actionButton("backFromImpr", translate("Zur?ck"))
       )
     })
   }
@@ -268,7 +288,7 @@ shinyServer(function(input, output, session) {
     renderFlag()
     
     # Title-Panel
-    output$title_t <- renderText({ paste(translate("CoroVisionaer - Reha leicht gemacht")) })
+    output$title_t <- renderText({ paste(translate("CoroVisTitle")) })
     output$hilfe_t <- renderText({ paste(translate("Hilfe")) })
     output$impressum_t <- renderText({ paste(translate("Impressum")) })
     output$pers0_t <- renderText({ paste(translate("PersonenDaten2")) })
@@ -296,18 +316,22 @@ shinyServer(function(input, output, session) {
     output$frequenzbereich_t <- renderText({ paste(translate("Frequenzbereich")) })
     
     # mainPanel
+    output$start <- renderText({ paste(translate("Start")) })
     output$daten_t <- renderText({ paste(translate("Daten")) })
     output$zeit_t <- renderText({ paste(translate("Plot")) })
     output$karte_t <- renderText({ paste(translate("Karte")) })
     output$gesamt_t <- renderText({ paste(translate("Zusammenfassung")) })
     output$selAxisX <- renderText({ paste(translate("XAchse"))})
     output$selAxis <- renderText({ paste(translate("YAchse")) })
+    output$settings <- renderText({ paste(translate("Einstellungen")) })
     renderSelAxis()
+    renderSettings()
+    renderStart()
 
     
     # Wieder Einstellen von bestimmten ausgewaehlten Parametern nach dem Sprachwechsel...
     updateDateInput(session, "inpAlter", value = currentBirthDate)        # Alter wieder einstellen
-    updateRadioButtons(session, "inpGesch", selected = currentSex)  # Geschlecht wieder einstellen
+    updateRadioButtons(session, "inpGesch", selected = currentSex)        # Geschlecht wieder einstellen
     renderDataSelect(unitList)                                # Auswahldaten (wieder) einstellen
     renderDataPlot()                                          # Datenplot neu beschriften
     renderMapPlot()                                           # Kartenplot ausfuehren
