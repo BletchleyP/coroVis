@@ -17,8 +17,6 @@ iLang <- 1
 # Fuer die Devices
 deviceList <- list("Polar M200 (CSV, GPX)" = "POLARM200", "Garmin/Allgemein (TCX)" = "GARMIN")
 
-
-
 # Fuer die Berechnungen
 einJahr <- 365
 
@@ -87,7 +85,7 @@ shinyServer(function(input, output, session) {
       mask <- as.character(translate("maennlich"))
       fem <- as.character(translate("weiblich"))
       tagList(
-        dateInput("inpAlter", value = NULL, label = translate("Geburtsdatum"), format = translate("dd.mm.yyyy"), language = translate("de"))
+        dateInput("inpAlter", value = curD, label = translate("Geburtsdatum"), format = translate("dd.mm.yyyy"), language = translate("de"))
       )
     })
   }
@@ -727,9 +725,10 @@ shinyServer(function(input, output, session) {
   observe({
     
     # Immer wieder ...
-    curD <- input$inpAlter  # Geburtsdatum merken ...
-    curG <- input$inpGesch  # Geschlecht merken, um beim Sprachwechsel das wieder aktualisieren zu koennen (ansonsten waere in der
+    curD <<- input$inpAlter  # Geburtsdatum merken ...
+    curG <<- input$inpGesch  # Geschlecht merken, um beim Sprachwechsel das wieder aktualisieren zu koennen (ansonsten waere in der
                             # Konstellation mit dem JS-Script ein Update der Infos nicht so leicht moeglich)
+    print(curD)
     
     # Ist eine Berechnung des Alters erforderlich ...
     output$alterausgabe <- renderText({ 
