@@ -19,9 +19,7 @@ deviceList <- list("Polar M200 (CSV, GPX)" = "POLARM200", "Garmin/Allgemein (TCX
 
 # Fuer die Berechnungen
 einJahr <- 365
-
 hfBereiche <- list("minimal" = 0.34,"leicht" = 0.54, "moderat" = 0.69, "schwer" = 0.89, "sehr schwer" = 0.97, "maximal" = 1.0)
-
 
 # -------------------------------------------------------------------
 # Allgemeine Translate-Funktionen fuer die unterschiedlichen Sprachen
@@ -55,8 +53,8 @@ shinyServer(function(input, output, session) {
   # --------------------------------------------------------------------------------------
   # Fuer das Merken von Einstellungen der UI (Geburtsdatum, Geschlecht, Status InputPanel) 
   # --------------------------------------------------------------------------------------
-  curD <- NULL
-  curG <- NULL
+  currentBirthDate <- NULL
+  currentSex <- NULL
   iPanel <- TRUE
   
   # ----------------------------------------------------------------
@@ -85,7 +83,7 @@ shinyServer(function(input, output, session) {
       mask <- as.character(translate("maennlich"))
       fem <- as.character(translate("weiblich"))
       tagList(
-        dateInput("inpAlter", value = curD, label = translate("Geburtsdatum"), format = translate("dd.mm.yyyy"), language = translate("de"))
+        dateInput("inpAlter", value = currentBirthDate, label = translate("Geburtsdatum"), format = translate("dd.mm.yyyy"), language = translate("de"))
       )
     })
   }
@@ -308,8 +306,8 @@ shinyServer(function(input, output, session) {
 
     
     # Wieder Einstellen von bestimmten ausgewaehlten Parametern nach dem Sprachwechsel...
-    updateDateInput(session, "inpAlter", value = curD)        # Alter wieder einstellen
-    updateRadioButtons(session, "inpGesch", selected = curG)  # Geschlecht wieder einstellen
+    updateDateInput(session, "inpAlter", value = currentBirthDate)        # Alter wieder einstellen
+    updateRadioButtons(session, "inpGesch", selected = currentSex)  # Geschlecht wieder einstellen
     renderDataSelect(unitList)                                # Auswahldaten (wieder) einstellen
     renderDataPlot()                                          # Datenplot neu beschriften
     renderMapPlot()                                           # Kartenplot ausfuehren
@@ -725,10 +723,9 @@ shinyServer(function(input, output, session) {
   observe({
     
     # Immer wieder ...
-    curD <<- input$inpAlter  # Geburtsdatum merken ...
-    curG <<- input$inpGesch  # Geschlecht merken, um beim Sprachwechsel das wieder aktualisieren zu koennen (ansonsten waere in der
+    currentBirthDate <<- input$inpAlter  # Geburtsdatum merken ...
+    currentSex <<- input$inpGesch  # Geschlecht merken, um beim Sprachwechsel das wieder aktualisieren zu koennen (ansonsten waere in der
                             # Konstellation mit dem JS-Script ein Update der Infos nicht so leicht moeglich)
-    print(curD)
     
     # Ist eine Berechnung des Alters erforderlich ...
     output$alterausgabe <- renderText({ 
