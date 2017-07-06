@@ -3,8 +3,9 @@ library(leaflet)
 
 # Definition der UI
 shinyUI(fluidPage(
-  
-  # Fuer JavaScript...
+
+# --------------------------------------------------------------------------------------------------------------
+  # Skripte des HTML-Head-Teils
   shinyjs::useShinyjs(),
   
   # Darstellung der Sprachen-Fähnchen, von Hilfe und Impressum
@@ -46,6 +47,22 @@ shinyUI(fluidPage(
                       }); 
                     });")
                 ),
+  
+# --------------------------------------------------------------------------------------------------------------
+  # SteuerPanel mit ausgeblendeten Schaltern
+  conditionalPanel("false",
+                   checkboxInput("lgIn", "Login", value = TRUE),
+                   checkboxInput("helpCB", "Hilfe", value = FALSE),
+                   checkboxInput("imprCB", "Impressum", value = FALSE),
+                   checkboxInput("iPanelOn", "InputPanel on/off", value = TRUE),
+                   checkboxInput("hrPlotOn", "HR-Plot on/off", value = FALSE),
+                   
+                   selectInput(inputId = "currentPanel", label = "Aktuelles HauptPanel:", choices = 
+                                 list("WorkingPanel" = 1, "HelpPanel" = 2, "ImprintPanel" = 3))
+                   ),
+
+# --------------------------------------------------------------------------------------------------------------
+  # Kopfzeile mit gefloateten Panels
   div(style = "padding-right: 10px; float:right", uiOutput("flag")),
   conditionalPanel("input.helpCB != true",
                    div(id = "hil", style = "padding-right: 10px; float:right", a(icon("question"), uiOutput("hilfe_t")))
@@ -60,24 +77,18 @@ shinyUI(fluidPage(
                    div(id = "increase", style = "padding-right: 10px; float:right", a(icon("toggle-off"), uiOutput("pers1_t")))
                   ),
   
-  # Das Conditionalpanel dient dazu einige Schalter zu verbergen, wird nie sichtbar
-  conditionalPanel("false",
-                   checkboxInput("lgIn", "Login", value = TRUE),
-                   checkboxInput("helpCB", "Hilfe", value = FALSE),
-                   checkboxInput("imprCB", "Impressum", value = FALSE),
-                   checkboxInput("iPanelOn", "InputPanel on/off", value = TRUE),
-                   checkboxInput("hrPlotOn", "HR-Plot on/off", value = FALSE)
-                   ),
-  
-  # Die Titelleiste
+# --------------------------------------------------------------------------------------------------------------
+  # TitelPanel
   titlePanel(title = textOutput("title_t"), windowTitle = "CoroVis - powered JEG ShinyGroupAG and R"),
   hr(),
 
-  # Das Working-Area mit Sidebar und Mainpanel
+# --------------------------------------------------------------------------------------------------------------
+  # WorkingPanel mit drei untergeordneten Panels: PatientPanel, SidebarPanel und MainPanel
   conditionalPanel("input.lgIn == true && input.helpCB == false && input.imprCB == false",
-                   
+
+          # ----------------------------------------------------------------------------------------------------
+            # WorkingPanel > PatientPanel zur Eingabe der administrativen Patientendaten (IDAT)
                    conditionalPanel("input.iPanelOn == true",
-                   # Ein uebergeordnetes inputPanel, fuer die Eingabe der administrativen Patientendaten
                    inputPanel(
                      # Eingabe des Namens
                      textInput("nachname", label = textOutput("name_t")),
@@ -107,7 +118,8 @@ shinyUI(fluidPage(
                    hr()
                    ),
                    
-                   # Sidebar zur Eingabe der Grenzwerte der Trainingsdaten
+          # ----------------------------------------------------------------------------------------------------
+          # WorkingPanel > SidebarPanel zum Laden von Dateien und zur Vorgabe von Belastungswerten
                    sidebarLayout(
                      
                      #sidebarPanel für die Patientendaten
@@ -137,7 +149,8 @@ shinyUI(fluidPage(
 
                      ),
                      
-                     # mainPanel für die Patientendatenvisualisierung als Tabsets organsiert
+          # ----------------------------------------------------------------------------------------------------
+          # WorkingPanel > MainPanel für die Patientendatenvisualisierung, als Tabsets organsiert
                      mainPanel(
                        
                        tabsetPanel(id = "tP",
@@ -170,10 +183,14 @@ shinyUI(fluidPage(
                    )
   ),
   
+# --------------------------------------------------------------------------------------------------------------
+  # HelpPanel zur Anzeige von Hilfetexten
   conditionalPanel("input.helpCB == true",
                    uiOutput("helpPanel")
   ),
   
+# --------------------------------------------------------------------------------------------------------------
+  # ImprintPanel zur Anzeige des Impressums
   conditionalPanel("input.imprCB == true",
                    uiOutput("aboutPanel")
   )
