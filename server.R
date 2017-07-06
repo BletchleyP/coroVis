@@ -71,7 +71,7 @@ shinyServer(function(input, output, session) {
   # ----------------------------------------------------------------
   exerciseData <- NULL    # Liste für die Daten der Trainingseinheiten
   unitList <- NULL        # Liste der Namen für die Trainingseinheiten
-  viewportdf <- NULL      # Dataframe fuer alle eingelesenen Daten aus den Trainingseinheiten
+  
    
   # ------------------------------------------
   # Vorbereitungsfunktionen zum Rendern des UI
@@ -364,22 +364,22 @@ shinyServer(function(input, output, session) {
     
     # X-Achse auswaehlen
     switch(xAx,
-           Weg = { xAxis <- viewportdf$DistanceMeters },
-           Zeit = { xAxis <- viewportdf$Time }
+           Weg = { xAxis <- viewportDF$DistanceMeters },
+           Zeit = { xAxis <- viewportDF$Time }
     )
     
     # Y-Achse auswaehlen
     switch(yAx,
-           Weg = { yAxis <- viewportdf$DistanceMeters },
-           Hoehe = { yAxis <- viewportdf$AltitudeMeters },
+           Weg = { yAxis <- viewportDF$DistanceMeters },
+           Hoehe = { yAxis <- viewportDF$AltitudeMeters },
            
            # Geschwindigkeit berechnen...
            Geschwindigkeit = {
              dWeg <- array()
-             for(i in 2:length(viewportdf$DistanceMeters)) {
-              dT <- times(viewportdf$Time[i]) - times(viewportdf$Time[i-1])
+             for(i in 2:length(viewportDF$DistanceMeters)) {
+              dT <- times(viewportDF$Time[i]) - times(viewportDF$Time[i-1])
               dT <- as.integer(substr(dT, 7, 8)) + as.integer(substr(dT, 4, 5)) * 60 + as.integer(substr(dT, 1, 2)) * 3600
-              dWeg[i] <- ((viewportdf$DistanceMeters[i] - viewportdf$DistanceMeters[i-1]) / dT) * 3.6 
+              dWeg[i] <- ((viewportDF$DistanceMeters[i] - viewportDF$DistanceMeters[i-1]) / dT) * 3.6 
              }
              dWeg[1] = 0
              yAxis = dWeg
@@ -393,8 +393,8 @@ shinyServer(function(input, output, session) {
       output$explorationPlot <- renderPlot({
       
         x <- xAxis
-        yb <- viewportdf$HeartRateBpm < rVal$hfBu 
-        yc <- viewportdf$HeartRateBpm > rVal$hfBo
+        yb <- viewportDF$HeartRateBpm < rVal$hfBu 
+        yc <- viewportDF$HeartRateBpm > rVal$hfBo
       
         y1 <- yAxis
         plot(x, y1, main = translate("Optimale Belastung"), xlab = translate(xAx), ylab = translate(yAx))
@@ -405,8 +405,8 @@ shinyServer(function(input, output, session) {
       # ... und den tolerierten Herzfrequenzbereich darstellen (wird nur angezeigt, wenn vom Benutzer gewuenscht)
       output$explorationPlotHR <- renderPlot({
       
-        y2 <- viewportdf$HeartRateBpm
-        x <- viewportdf$Time
+        y2 <- viewportDF$HeartRateBpm
+        x <- viewportDF$Time
       
         plot(x, y2, type = "p", col = "blue", main = NULL, xlab = translate("Zeit"), ylab = translate("HFq"), ylim = c(40, rVal$maxFr))
         rect(0, rVal$hfBu, x, rVal$hfBo, border = NULL, col = rgb(0,0,1,.005))
@@ -425,15 +425,15 @@ shinyServer(function(input, output, session) {
     output$tOut1 <- renderLeaflet({
       
       # Sind ueberhaupt GPS-Daten geladen?
-      gpsAvailable <- grep("LatitudeDegrees", names(viewportdf))
+      gpsAvailable <- grep("LatitudeDegrees", names(viewportDF))
       if (length(gpsAvailable) > 0) {
         
         # Dataframe zusammenstellen...
-        testdata <- viewportdf[,c("Time", "LatitudeDegrees", "LongitudeDegrees")]
+        testdata <- viewportDF[,c("Time", "LatitudeDegrees", "LongitudeDegrees")]
         colnames(testdata) <- c("lat", "lng", "hr")
-        testdata$lat <- as.numeric(as.character(viewportdf$LatitudeDegrees))
-        testdata$lng <- as.numeric(as.character(viewportdf$LongitudeDegrees))
-        testdata$hr <- as.numeric(as.character(viewportdf$HeartRateBpm))
+        testdata$lat <- as.numeric(as.character(viewportDF$LatitudeDegrees))
+        testdata$lng <- as.numeric(as.character(viewportDF$LongitudeDegrees))
+        testdata$hr <- as.numeric(as.character(viewportDF$HeartRateBpm))
         testdata$colorcode <- ifelse(testdata$hr<rVal$hfBu, "#FFCC00", ifelse(testdata$hr>rVal$hfBo, "#FF0000", "#00FF00"))
         testdata$hr <- as.factor(testdata$hr)
     
@@ -461,84 +461,14 @@ shinyServer(function(input, output, session) {
     return(watch)
   }
   
-  # Die Funktion importiert aus einem TCX-File (auf Basis von XML) die benoetigten Trainingsdaten
-  importDataTCX <- function(tcxfile) {
-    myfile <- c(Filename = tcxfile$name)
-    doc <- xmlParse(tcxfile$datapath)
-    labs <- NULL
-    
-    # count all <Trackpoint>-tags in file
-    totalsize <- xmlSize(getNodeSet(doc, "//ns:Trackpoint", "ns"))
-    if (totalsize>0) {
-      if (file.exists("temp.csv")) {file.remove("temp.csv")}
-      cattemp <- file("temp.csv", open = "a")
-      mynames <- c("Filename", "Id", "Time", "HeartRateBpm", "LatitudeDegrees", "LongitudeDegrees", "AltitudeMeters", "DistanceMeters")
-      cat(paste0(paste(mynames, collapse = ","), "\n"), file=cattemp)
-      
-      # count <Activity>-tags
-      nodes <- getNodeSet(doc, "//ns:Activities", "ns")
-      size <- xmlSize(nodes[[1]])
-      counter <- 0
-      
-      withProgress(message = translate("TCX-Import"), value = 0, {
-        
-        # foreach <Activity>-tag
-        for (i in 1:size) {
-          
-          startnode <- nodes[[1]][[i]]
-          label <- c(Id = xmlValue(startnode[["Id"]]))
-          labs <- c(labs, label)
-          subnodes <- getNodeSet(doc, paste0("(//ns:Activity)[", i, "]//ns:Trackpoint"), "ns")
-          subsize <- xmlSize(subnodes)
-          counter <- counter + subsize
-          
-          # increment progress bar
-          incProgress(i/size)
-          
-          # for each <Trackpoint>-tag
-          if (subsize>0) {
-            for (j in 1:subsize) {
-              v = getChildrenStrings(subnodes[[j]])
-              if (length(subnodes[[j]]["Position"])==1) {
-                v <- c(v, getChildrenStrings(subnodes[[j]]["Position"][[1]]))
-              }
-              v <- c(myfile, label, v)
-              cat(paste0(paste(v[mynames], collapse = ","), "\n"), file=cattemp)
-            }
-          }
-        }
-      })
-      
-      close(cattemp)
-      
-      # Die Datentypen zuweisen ...
-      df_trackpoints <- read.csv("temp.csv", header = TRUE, stringsAsFactors = FALSE, colClasses = "character")
-      df_trackpoints$Filename <- as.factor(df_trackpoints$Filename)
-      df_trackpoints$Id <- as.factor(df_trackpoints$Id)
-      df_trackpoints$LatitudeDegrees <- as.factor(df_trackpoints$LatitudeDegrees)
-      df_trackpoints$LongitudeDegrees <- as.factor(df_trackpoints$LongitudeDegrees)
-      df_trackpoints$HeartRateBpm <- as.integer(df_trackpoints$HeartRateBpm)
-      df_trackpoints$AltitudeMeters <- as.integer(df_trackpoints$AltitudeMeters)
-      df_trackpoints$DistanceMeters <- as.numeric(df_trackpoints$DistanceMeters)
-      df_trackpoints$Time <- times(substr(df_trackpoints$Time, 12, 19))
-      df_trackpoints[is.na(df_trackpoints)] <- 0
-      
-    } else {
-      df_trackpoints <- NULL
-    }
-    
-    if (file.exists("temp.csv")) {file.remove("temp.csv")} # immer aufraeumen ... ;-)
-    ret_list <- list(labs, df_trackpoints)
-    
-    return(ret_list)
-  }
+  
   
   # Dateien für die Trainingseinheit einer Polar M200 - Watch zusammenstellen (d.h. ...)
   lookForExerciseUnitPolarM200 <- function(datInfo) {
     
     unitList <<- NULL
     exerciseData <<- NULL
-    viewportdf <<- NULL
+    viewportDF <<- NULL
     
     dN <- list()
     necData <- list()
@@ -659,7 +589,7 @@ shinyServer(function(input, output, session) {
                                       # Bereits geladene werden nur ueberschrieben, neue hinzugefuegt, egal
                                       # wieviele bereits ausgewaehlt oder geladen wurden
       exerciseData <<- necData
-      viewportdf <<- vp_df
+      viewportDF <<- vp_df
       renderDataSelect(unitList)
     }
   }
@@ -669,7 +599,7 @@ shinyServer(function(input, output, session) {
     
     unitList <<- NULL
     exerciseData <<- NULL
-    viewportdf <<- NULL
+    viewportDF <<- NULL
     
     necData <- list()
     endings <- c("tcx")
@@ -720,7 +650,7 @@ shinyServer(function(input, output, session) {
     if (readFiles > 0) {
       unitList <<- selList
       exerciseData <<- necData
-      viewportdf <<- vp_df    
+      viewportDF <<- vp_df    
       renderDataSelect(unitList)
     }
   }
@@ -765,43 +695,43 @@ shinyServer(function(input, output, session) {
   # Die Events beachten...
   # ----------------------
   
-  # Wenn Trainingsdaten geladen werden
-  observeEvent(input$patDat, {
-    
-    #Gehoeren die eingelesenen Daten immer noch zur selben Person?
-    if (!is.null(exerciseData))
-      askForPerson()
-    
-    # Dateiinfos der geladenen Dateien erhalten
-    datInfo <- input$patDat
-    
-    # Von welcher Watch sind die Daten geladen
-    switch(decideWhichWatch(),
-
-      # Dateien der Trainingseinheiten nach Standard Polar M 200 (CSV, GPX, TCX) zusammenstellen
-      POLARM200 = {
-        renderDataSelect(NULL)
-        lookForExerciseUnitPolarM200(datInfo)
-        #renderTabSetPanel() - noch notwendig
-        renderDataPlot()
-        renderSelAxis()
-        renderMapPlot()
-      },
-      
-      # Dateien der Trainingseinheiten nach Standard GARMIN (TCX) zusammenstellen
-      GARMIN = {
-        renderDataSelect(NULL)
-        lookForExerciseUnitGarmin(datInfo)
-        #renderTabSetPanel() - noch notwendig
-        renderDataPlot()
-        renderSelAxis()
-        renderMapPlot()
-      }
-      
-    )
-
-    visualizeDataTable(input$Data)
-  })
+  # # Wenn Trainingsdaten geladen werden
+  # observeEvent(input$patDat, {
+  #   
+  #   #Gehoeren die eingelesenen Daten immer noch zur selben Person?
+  #   if (!is.null(exerciseData))
+  #     askForPerson()
+  #   
+  #   # Dateiinfos der geladenen Dateien erhalten
+  #   datInfo <- input$patDat
+  #   
+  #   # Von welcher Watch sind die Daten geladen
+  #   switch(decideWhichWatch(),
+  # 
+  #     # Dateien der Trainingseinheiten nach Standard Polar M 200 (CSV, GPX, TCX) zusammenstellen
+  #     POLARM200 = {
+  #       renderDataSelect(NULL)
+  #       lookForExerciseUnitPolarM200(datInfo)
+  #       #renderTabSetPanel() - noch notwendig
+  #       renderDataPlot()
+  #       renderSelAxis()
+  #       renderMapPlot()
+  #     },
+  #     
+  #     # Dateien der Trainingseinheiten nach Standard GARMIN (TCX) zusammenstellen
+  #     GARMIN = {
+  #       renderDataSelect(NULL)
+  #       lookForExerciseUnitGarmin(datInfo)
+  #       #renderTabSetPanel() - noch notwendig
+  #       renderDataPlot()
+  #       renderSelAxis()
+  #       renderMapPlot()
+  #     }
+  #     
+  #   )
+  # 
+  #   visualizeDataTable(input$Data)
+  # })
   
   # Wird eine Trainingseinheit ausgewaehlt, dann ....
   observeEvent(input$inpData, {
@@ -886,5 +816,153 @@ shinyServer(function(input, output, session) {
   observeEvent(input$login, {
     updateCheckboxInput(session, "lgIn", value = TRUE)
   })
+  
+  
+  
+# ########################################################################################################################
+#
+#    Definiere Funktionen mit Shiny-Interaktionen
+# 
+# ########################################################################################################################
+
+# ------------------------------------------------------------------------------------------------------------------------
+  
+  # Die Funktion importiert Trainingsdaten aus einer TCX-Datei und liefert Dataframe
+  importDataTCX <- function(tcxFile) {
+
+    doc <- xmlParse(tcxFile)
+    # ??? labs <- NULL
+    
+    # ermittle Gesamtanzahl <Trackpoint>-tags
+    totalSize <- xmlSize(getNodeSet(doc, "//ns:Trackpoint", "ns"))
+    if (totalSize>0) {
+      if (file.exists("temp.csv")) {file.remove("temp.csv")}
+      catTemp <- file("temp.csv", open = "a")
+      myHeader <- c("Filename", "Id", "Time", "HeartRateBpm", "LatitudeDegrees", "LongitudeDegrees", "AltitudeMeters",
+                    "DistanceMeters")
+      cat(paste0(paste(myHeader, collapse = ","), "\n"), file=catTemp)
+      
+      # ermittle Anzahl <Activity>-tags
+      nodes <- getNodeSet(doc, "//ns:Activities", "ns")
+      size <- xmlSize(nodes[[1]])
+      counter <- 0
+      
+      withProgress(message = translate("TCX-Import"), value = 0, {
+        
+        # foreach <Activity>-tag
+        for (i in 1:size) {
+          startNode <- nodes[[1]][[i]]
+          label <- c(Id = xmlValue(startNode[["Id"]]))
+          # ??? labs <- c(labs, label)
+          subNodes <- getNodeSet(doc, paste0("(//ns:Activity)[", i, "]//ns:Trackpoint"), "ns")
+          subSize <- xmlSize(subNodes)
+          counter <- counter + subSize
+          
+          # foreach <Trackpoint>-tag
+          if (subSize>0) {
+            for (j in 1:subSize) {
+              v = getChildrenStrings(subNodes[[j]])
+              if (length(subNodes[[j]]["Position"])==1) {
+                v <- c(v, getChildrenStrings(subNodes[[j]]["Position"][[1]]))
+              }
+              v <- c("filename.txt", label, v)
+              cat(paste0(paste(v[myHeader], collapse = ","), "\n"), file=catTemp)
+            }
+          }
+          
+          # aktualisiere Fortschrittsanzeige
+          incProgress(i/size)
+        }
+      })
+      
+      # beende den Datenstrom und importiere die Daten aus catTemp
+      close(catTemp)
+      df_trackpoints <- read.csv("temp.csv", header = TRUE, stringsAsFactors = FALSE, colClasses = "character")
+      # ??? df_trackpoints$Filename <- as.factor(df_trackpoints$Filename)
+      # ??? df_trackpoints$Id <- as.factor(df_trackpoints$Id)
+      # ??? df_trackpoints$LatitudeDegrees <- as.factor(df_trackpoints$LatitudeDegrees)
+      # ??? df_trackpoints$LongitudeDegrees <- as.factor(df_trackpoints$LongitudeDegrees)
+      # ??? df_trackpoints$HeartRateBpm <- as.integer(df_trackpoints$HeartRateBpm)
+      # ??? df_trackpoints$AltitudeMeters <- as.integer(df_trackpoints$AltitudeMeters)
+      # ??? df_trackpoints$DistanceMeters <- as.numeric(df_trackpoints$DistanceMeters)
+      # ??? df_trackpoints$Time <- times(substr(df_trackpoints$Time, 12, 19))
+      # ??? df_trackpoints[is.na(df_trackpoints)] <- 0
+      
+    } else {
+      df_trackpoints <- NULL
+    }
+    
+    if (file.exists("temp.csv")) {file.remove("temp.csv")}
+    # ??? ret_list <- list(labs, df_trackpoints)
+    # ??? return(ret_list)
+    return(df_trackpoints)
+  }
+  
+# ------------------------------------------------------------------------------------------------------------------------
+  
+  # Funktion kontrolliert den Datenimport nach Upload
+  importFiles <- function(n) {
+    viewportNewDF <- NULL
+    
+    # durchlaufe alle zu importierenden Dateien
+    for (i in 1:n) {
+      currentFile <- input$patDat[i,]
+      result <- checkFileformat(currentFile)
+      
+      if (substr(result, 1, 1) == "@") {
+        # Fehlermeldung und weiter
+        message(result)
+        
+      } else {
+        # starte formatspezifische Konversion in Dataframe
+        if (result == "TCX") {
+          newDF <- importDataTCX(currentFile$datapath)
+        } else if (result == "CSV") {
+          newDF <- importDataCSV(currentFile$datapath)
+        } else {
+          newDF <- importDataGPX(currentFile$datapath)
+        }
+        
+        if (is.null(newDF)) {
+          # Fehlermeldung und weiter
+          message(paste("Fehler beim Datenimport: is.null(dataframe) für", currentFile$name))
+          
+        } else {
+          # merge neue Daten mit viewportNewDF
+          if (is.null(viewportNewDF)) {
+            viewportNewDF <- newDF
+          } else {
+            viewportNewDF <- mergeData(viewportNewDF, newDF)
+          }
+        }
+      }
+    }
+    
+    # publiziere neuen Gesamtdatensatz
+    if (is.null(viewportNewDF)) {
+      message("Sorry, Datenimport war nicht erfolgreich!")
+    } else {
+      viewportDF <<- viewportNewDF
+    }
+  }
+  
+# ------------------------------------------------------------------------------------------------------------------------
+  
+  
+  
+# ########################################################################################################################
+#
+#    Registriere Observer-Ereignisse
+#
+# ########################################################################################################################
+
+# ------------------------------------------------------------------------------------------------------------------------
+
+  # Observer zu fileInput -> neue Importfunktion
+  observeEvent(input$patDat, {
+    importFiles(nrow(input$patDat))
+  })
+  
+# ------------------------------------------------------------------------------------------------------------------------
   
 })
