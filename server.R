@@ -154,7 +154,7 @@ shinyServer(function(input, output, session) {
   renderRiskClass <- function() {
     output$riskclass <- renderUI({
       tagList(
-        radioButtons("inpRiskClass", label = translate("Risikoklasse"), choiceNames = list('A', 'B', 'C', 'D'), choiceValues = list(hfMaxGeneral, hfMaxGeneral*0.8, hfMaxGeneral*0.6, hfMaxGeneral*0.5), inline = TRUE)
+        radioButtons("inpRiskClass", label = a(href = 'LL_KActiv.pdf', translate("Risikoklasse"), target = "_blank"), choiceNames = list('A', 'B', 'C', 'D'), choiceValues = list(hfMaxGeneral, hfMaxGeneral*0.8, hfMaxGeneral*0.6, hfMaxGeneral*0.5), inline = TRUE)
       )
     })
   }
