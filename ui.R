@@ -51,9 +51,6 @@ shinyUI(fluidPage(
 # --------------------------------------------------------------------------------------------------------------
   # controlPanel mit ausgeblendeten Schaltern
   conditionalPanel("false",
-                   checkboxInput("lgIn", "Login", value = TRUE),
-                   checkboxInput("helpCB", "Hilfe", value = FALSE),
-                   checkboxInput("imprCB", "Impressum", value = FALSE),
                    checkboxInput("iPanelOn", "InputPanel on/off", value = TRUE),
                    checkboxInput("hrPlotOn", "HR-Plot on/off", value = FALSE),
                    
@@ -85,7 +82,7 @@ shinyUI(fluidPage(
 
 # --------------------------------------------------------------------------------------------------------------
   # WorkingPanel mit drei untergeordneten Panels: PatientPanel, SidebarPanel und MainPanel
-  conditionalPanel("input.currentPanel == 'workingPanel' || (input.lgIn == true && input.helpCB == false && input.imprCB == false)",
+  conditionalPanel("input.currentPanel == 'workingPanel'",
 
           # ----------------------------------------------------------------------------------------------------
             # WorkingPanel > PatientPanel zur Eingabe der administrativen Patientendaten (IDAT)
@@ -185,11 +182,14 @@ shinyUI(fluidPage(
   ),
   
 # --------------------------------------------------------------------------------------------------------------
-  # HelpPanel zur Anzeige von Hilfetexten
-  conditionalPanel("input.helpCB == true",
-                   uiOutput("helpPanel")
+  # helpPanel zur Anzeige des Impressums
+  conditionalPanel("input.currentPanel == 'helpPanel'",
+                   h1(textOutput(outputId = "helpTitle")),
+                   br(),
+                   tags$video(src='bref.mp4', type='video/mp4', width='40%', controls='controls'),
+                   actionButton(inputId = "helpBack", label = textOutput(outputId = "helpBackLabel"))
   ),
-  
+
 # --------------------------------------------------------------------------------------------------------------
   # imprintPanel zur Anzeige des Impressums
   conditionalPanel("input.currentPanel == 'imprintPanel'",

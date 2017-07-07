@@ -217,24 +217,6 @@ shinyServer(function(input, output, session) {
     
   }
   
-  # Aktiviert die Hilfeseite ....
-  actualHelp <- function() {
-    output$helpPanel <- renderUI({
-      tagList(
-        h1(translate("Hilfe")),
-        br(),
-        tags$video(src="bref.mp4", type='video/mp4', width='50%', controls='controls'),
-        actionButton("backFromHelp", translate("Zur?ck"))
-      )
-    })
-  }
-  
-  actHelp <- function() {
-    actualHelp()
-    updateCheckboxInput(session, "helpCB", value = TRUE)
-    updateCheckboxInput(session, "imprCB", value = FALSE)
-  }
-  
   # Abfrage ob die eingelesenen Daten immer noch zum selben Patienten gehoeren ...
   askForPerson <- function() {
     m = modalDialog(
@@ -309,10 +291,7 @@ shinyServer(function(input, output, session) {
     renderDataPlot()                                          # Datenplot neu beschriften
     renderMapPlot()                                           # Kartenplot ausfuehren
     renderSelAxis()                                           # Achsenauswahl neu beschriften
-    
-    # Hilfedarstellung aktualisieren
-    actualHelp()
-    
+
   }
   
   # -----------------
@@ -634,11 +613,6 @@ shinyServer(function(input, output, session) {
   # UI beschriften
   setFlag()
 
-  # Video zur Ausgabe der Hilfe
-  output$videocontent <- renderUI({
-    tags$video(src="bref_alt.mp4", type='video/mp4', width='50%', controls='controls')
-  })
-  
   # ----------------------------------------------------
   # Bestimmte Variablen und Konstellation beobachten ...
   # ----------------------------------------------------
@@ -745,11 +719,6 @@ shinyServer(function(input, output, session) {
   observeEvent(input$hfBer, {
     rVal$hfBu <- input$hfBer[1]
     rVal$hfBo <- input$hfBer[2]
-  })
-  
-  # Wenn der Zurueck-Button der Hilfe aktiviert wird...
-  observeEvent(input$backFromHelp, {
-    updateCheckboxInput(session, "helpCB", value = FALSE)
   })
   
   observeEvent(input$samePerson, {
@@ -945,7 +914,8 @@ shinyServer(function(input, output, session) {
   # TODO
   
   # helpPanel
-  # TODO
+  output$helpTitle <- renderText({translate("Hilfe", input$currentLanguage)})
+  output$helpBackLabel <- renderText({translate("Zur?ck", input$currentLanguage)})
   
   # imprintPanel
   output$imprintTitle <- renderText({translate("Impressum", input$currentLanguage)})
@@ -972,7 +942,6 @@ shinyServer(function(input, output, session) {
   
   # Einblenden der Hilfe
   shinyjs::onclick("hil", {
-    actHelp()
     updateSelectInput(session, inputId = "currentPanel", selected = "helpPanel")
   })
   
@@ -991,6 +960,12 @@ shinyServer(function(input, output, session) {
 #
 # ##############################################################################################################
 
+# --------------------------------------------------------------------------------------------------------------
+  
+  observeEvent(input$helpBack, {
+    updateSelectInput(session, inputId = "currentPanel", selected = "workingPanel")
+  })
+  
 # --------------------------------------------------------------------------------------------------------------
   
   observeEvent(input$imprintBack, {
