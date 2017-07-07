@@ -85,7 +85,7 @@ shinyUI(fluidPage(
 
 # --------------------------------------------------------------------------------------------------------------
   # WorkingPanel mit drei untergeordneten Panels: PatientPanel, SidebarPanel und MainPanel
-  conditionalPanel("input.lgIn == true && input.helpCB == false && input.imprCB == false",
+  conditionalPanel("input.currentPanel == 'workingPanel' || (input.lgIn == true && input.helpCB == false && input.imprCB == false)",
 
           # ----------------------------------------------------------------------------------------------------
             # WorkingPanel > PatientPanel zur Eingabe der administrativen Patientendaten (IDAT)
@@ -191,17 +191,12 @@ shinyUI(fluidPage(
   ),
   
 # --------------------------------------------------------------------------------------------------------------
-  # ImprintPanel zur Anzeige des Impressums
-  conditionalPanel("input.imprCB == true",
-                   uiOutput("aboutPanel")
-  ),
-
+  # imprintPanel zur Anzeige des Impressums
   conditionalPanel("input.currentPanel == 'imprintPanel'",
                    h1(textOutput(outputId = "imprintTitle")),
                    br(),
                    htmlOutput(outputId = "imprintHTML"),
                    actionButton(inputId = "imprintBack", label = textOutput(outputId = "imprintBackLabel"))
   )
-
   
 ))

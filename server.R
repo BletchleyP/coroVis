@@ -51,9 +51,9 @@ shinyServer(function(input, output, session) {
   # ----------------------------------------------------------------
   # Einmaliges Festlegen der Reaktion auf Klick auf die Flagge, usw.
   # ----------------------------------------------------------------
-  shinyjs::onclick("languageflag", change_language) 
-  shinyjs::onclick("hil", actHelp) 
-  shinyjs::onclick("imp", actImpr) 
+   
+   
+  
   shinyjs::onclick("decrease", iPanelOn)
   shinyjs::onclick("increase", iPanelOn)
 
@@ -235,24 +235,6 @@ shinyServer(function(input, output, session) {
     updateCheckboxInput(session, "imprCB", value = FALSE)
   }
   
-  # Aktiviert oder aktualisiert die Impressumseite ....
-  actualImpr <- function() {
-    output$aboutPanel <- renderUI({
-      tagList(
-        h1(translate("Impressum")),
-        br(),
-        includeHTML(translate("IncImpressum")),
-        actionButton("backFromImpr", translate("Zur?ck"))
-      )
-    })
-  }
- 
-  actImpr <- function() {
-    actualImpr()
-    updateCheckboxInput(session, "imprCB", value = TRUE)
-    updateCheckboxInput(session, "helpCB", value = FALSE)
-  }
-  
   # Abfrage ob die eingelesenen Daten immer noch zum selben Patienten gehoeren ...
   askForPerson <- function() {
     m = modalDialog(
@@ -328,8 +310,7 @@ shinyServer(function(input, output, session) {
     renderMapPlot()                                           # Kartenplot ausfuehren
     renderSelAxis()                                           # Achsenauswahl neu beschriften
     
-    # Die Impressumdarstellung und Hilfedarstellung aktualisieren
-    actualImpr()
+    # Hilfedarstellung aktualisieren
     actualHelp()
     
   }
@@ -771,11 +752,6 @@ shinyServer(function(input, output, session) {
     updateCheckboxInput(session, "helpCB", value = FALSE)
   })
   
-  # Wenn der Zurueck-Button des Impressums aktiviert wird...
-  observeEvent(input$backFromImpr, {
-    updateCheckboxInput(session, "imprCB", value = FALSE)
-  })
-  
   observeEvent(input$samePerson, {
     updateTextInput(session, "nachname", value = "")
     updateTextInput(session, "vorname", value =  "")
@@ -950,6 +926,27 @@ shinyServer(function(input, output, session) {
 # --------------------------------------------------------------------------------------------------------------
   # Anpassung bei Sprachwechsel
   
+  # Flag
+  # TODO
+  
+  # headerPanel
+  # TODO
+  
+  # titlePanel
+  # TODO
+  
+  # workingPanel > patientPanel
+  # TODO
+  
+  # workingPanel > sidebarPanel
+  # TODO
+  
+  # workingPanel > mainPanel
+  # TODO
+  
+  # helpPanel
+  # TODO
+  
   # imprintPanel
   output$imprintTitle <- renderText({translate("Impressum", input$currentLanguage)})
   output$imprintHTML <- renderUI({getPage(translate("IncImpressum", input$currentLanguage))})
@@ -961,10 +958,45 @@ shinyServer(function(input, output, session) {
   
 # ##############################################################################################################
 #
+#    Definiere javascript-Events
+#
+# ##############################################################################################################
+
+# --------------------------------------------------------------------------------------------------------------
+
+  # Sprachwechsel bei Klick auf Flagge
+  shinyjs::onclick("languageflag", {
+    change_language()                                           # TEMP: Abwaertskompatibilitaet zu alter Version
+    updateSliderInput(session, inputId = "currentLanguage", value = (input$currentLanguage %% numDics) + 1)
+  })
+  
+  # Einblenden der Hilfe
+  shinyjs::onclick("hil", {
+    actHelp()
+    updateSelectInput(session, inputId = "currentPanel", selected = "helpPanel")
+  })
+  
+  # Einblenden des Impressums
+  shinyjs::onclick("imp", {
+    updateSelectInput(session, inputId = "currentPanel", selected = "imprintPanel")
+  })
+  
+# --------------------------------------------------------------------------------------------------------------
+  
+  
+  
+# ##############################################################################################################
+#
 #    Registriere Observer-Ereignisse
 #
 # ##############################################################################################################
 
+# --------------------------------------------------------------------------------------------------------------
+  
+  observeEvent(input$imprintBack, {
+    updateSelectInput(session, inputId = "currentPanel", selected = "workingPanel")
+  })
+  
 # --------------------------------------------------------------------------------------------------------------
 
   # Observer zu fileInput -> neue Importfunktion
