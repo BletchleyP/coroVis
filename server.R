@@ -8,12 +8,6 @@ library(ggplot2)  # Darstellung der Plots ...
 # Globale Variablendefinition
 # ---------------------------
 
-# Fuer die Sprache
-dic <- read.csv2("languages.csv", header=TRUE, stringsAsFactors = FALSE, row.names=1)
-availableLang <- names(dic)
-numDics <- length(availableLang)
-iLang <- 1
-
 # Fuer die Devices
 deviceList <- list("Polar M200 (CSV, GPX)" = "POLARM200", "Garmin/Allgemein (TCX)" = "GARMIN")
 
@@ -25,10 +19,7 @@ hfBereiche <- list("minimal" = 0.34,"leicht" = 0.54, "moderat" = 0.69, "schwer" 
 # Allgemeine Translate-Funktionen fuer die unterschiedlichen Sprachen
 # -------------------------------------------------------------------
 
-# die Funktion sucht fuer das eingegebene Schluesselwort die Uebersetzung ...
-translate <- function(kword) {
-  return(dic[kword, availableLang[iLang]])
-}
+
 
 # die Funktion sucht fuer die eingegebene Übersetzung das Schluesselwort ...
 rev_translate <- function(word) {
@@ -946,23 +937,41 @@ shinyServer(function(input, output, session) {
     }
   }
   
-# ------------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------
   
   
   
-# ########################################################################################################################
+# ##############################################################################################################
+#
+#    Verbinde Reactive sources mit Reactive endpoints
+#
+# ##############################################################################################################
+  
+# --------------------------------------------------------------------------------------------------------------
+  # Anpassung bei Sprachwechsel
+  
+  # imprintPanel
+  output$imprintTitle <- renderText({translate("Impressum", input$currentLanguage)})
+  output$imprintHTML <- renderUI({getPage(translate("IncImpressum", input$currentLanguage))})
+  output$imprintBackLabel <- renderText({translate("Zur?ck", input$currentLanguage)})
+  
+# --------------------------------------------------------------------------------------------------------------
+  
+
+  
+# ##############################################################################################################
 #
 #    Registriere Observer-Ereignisse
 #
-# ########################################################################################################################
+# ##############################################################################################################
 
-# ------------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------
 
   # Observer zu fileInput -> neue Importfunktion
   observeEvent(input$patDat, {
     importFiles(nrow(input$patDat))
   })
   
-# ------------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------
   
 })

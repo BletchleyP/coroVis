@@ -49,7 +49,7 @@ shinyUI(fluidPage(
                 ),
   
 # --------------------------------------------------------------------------------------------------------------
-  # SteuerPanel mit ausgeblendeten Schaltern
+  # controlPanel mit ausgeblendeten Schaltern
   conditionalPanel("false",
                    checkboxInput("lgIn", "Login", value = TRUE),
                    checkboxInput("helpCB", "Hilfe", value = FALSE),
@@ -58,7 +58,8 @@ shinyUI(fluidPage(
                    checkboxInput("hrPlotOn", "HR-Plot on/off", value = FALSE),
                    
                    selectInput(inputId = "currentPanel", label = "Aktuelles HauptPanel:", choices = 
-                                 list("WorkingPanel" = 1, "HelpPanel" = 2, "ImprintPanel" = 3))
+                                 list("workingPanel", "helpPanel", "imprintPanel")),
+                   sliderInput(inputId = "currentLanguage", label = "Aktuelle Sprache", min = 1, max = numDics, step = 1, value = 1)
                    ),
 
 # --------------------------------------------------------------------------------------------------------------
@@ -193,6 +194,14 @@ shinyUI(fluidPage(
   # ImprintPanel zur Anzeige des Impressums
   conditionalPanel("input.imprCB == true",
                    uiOutput("aboutPanel")
+  ),
+
+  conditionalPanel("input.currentPanel == 'imprintPanel'",
+                   h1(textOutput(outputId = "imprintTitle")),
+                   br(),
+                   htmlOutput(outputId = "imprintHTML"),
+                   actionButton(inputId = "imprintBack", label = textOutput(outputId = "imprintBackLabel"))
   )
+
   
 ))
