@@ -12,7 +12,7 @@ hfMaxGeneral <- 200
 viewportDF <- NULL
 
 # Vokabelliste als Dataframe
-dic <- read.csv2("languages.csv", header=TRUE, stringsAsFactors = FALSE, row.names=1)
+dic <- read.csv2("languages.csv", header=TRUE, stringsAsFactors = FALSE, row.names=1, fileEncoding="UTF-8")
 availableLang <- names(dic)
 numDics <- length(availableLang)
 iLang <- 1                                                      # TEMP: Abwaertskompatibilitaet zu alter Version

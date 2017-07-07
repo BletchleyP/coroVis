@@ -31,9 +31,18 @@ shinyUI(fluidPage(
                       height: 17px !important;
                       cursor: pointer;
                     }
-                    video{
+                    video {
                       display: block;
                       margin: 0 auto;
+                    }
+                    .centered {
+                      text-align: center;
+                    }
+                    #patient {
+                      padding: 10px 25px 0 25px;
+                      border: 1px solid lightgray;
+                      border-radius: 5px;
+                      background-color: WhiteSmoke;
                     }
                     "))
     ),
@@ -56,28 +65,33 @@ shinyUI(fluidPage(
                    
                    selectInput(inputId = "currentPanel", label = "Aktuelles HauptPanel:", choices = 
                                  list("workingPanel", "helpPanel", "imprintPanel")),
-                   sliderInput(inputId = "currentLanguage", label = "Aktuelle Sprache", min = 1, max = numDics, step = 1, value = 1)
+                   sliderInput(inputId = "currentLanguage", label = "Aktuelle Sprache",
+                               min = 1, max = numDics, step = 1, value = 1)
                    ),
 
 # --------------------------------------------------------------------------------------------------------------
   # Kopfzeile mit gefloateten Panels
   div(style = "padding-right: 10px; float:right", uiOutput("flag")),
   conditionalPanel("input.helpCB != true",
-                   div(id = "hil", style = "padding-right: 10px; float:right", a(icon("question"), uiOutput("hilfe_t")))
+                   div(id = "hil", style = "padding-right: 10px; float:right",
+                       a(icon("question"), textOutput("hilfe_t")))
                   ),
   conditionalPanel("input.imprCB != true",
-                    div(id = "imp", style = "padding-right: 10px; float:right", a(icon("info"), uiOutput("impressum_t")))
+                    div(id = "imp", style = "padding-right: 10px; float:right",
+                        a(icon("info"), textOutput("impressum_t")))
                    ),
   conditionalPanel("input.iPanelOn == true && input.imprCB != true && input.helpCB != true",
-                    div(id = "decrease", style = "padding-right: 10px; float:right", a(icon("toggle-on"), uiOutput("pers0_t")))
+                    div(id = "decrease", style = "padding-right: 10px; float:right",
+                        a(icon("toggle-on"), textOutput("pers0_t")))
                   ),
   conditionalPanel("input.iPanelOn != true && input.imprCB != true && input.helpCB != true",
-                   div(id = "increase", style = "padding-right: 10px; float:right", a(icon("toggle-off"), uiOutput("pers1_t")))
+                   div(id = "increase", style = "padding-right: 10px; float:right",
+                       a(icon("toggle-off"), textOutput("pers1_t")))
                   ),
   
 # --------------------------------------------------------------------------------------------------------------
   # TitelPanel
-  titlePanel(title = textOutput("title_t"), windowTitle = "CoroVis - powered JEG ShinyGroupAG and R"),
+  titlePanel(title = textOutput("title_t"), windowTitle = "coroVis"),
   hr(),
 
 # --------------------------------------------------------------------------------------------------------------
@@ -85,100 +99,83 @@ shinyUI(fluidPage(
   conditionalPanel("input.currentPanel == 'workingPanel'",
 
           # ----------------------------------------------------------------------------------------------------
-            # WorkingPanel > PatientPanel zur Eingabe der administrativen Patientendaten (IDAT)
-                   conditionalPanel("input.iPanelOn == true",
-                   inputPanel(
-                     # Eingabe des Namens
-                     textInput("nachname", label = textOutput("name_t")),
-                     
-                     # Eingabe des Vornamens
-                     textInput("vorname", label = textOutput("vorname_t")),
-                     
-                     # Eingabe des Geburtsdatums und des Alters
-                     uiOutput("gebdat"),
-                     
-                     # Ausgabe des Alters
-                     uiOutput("alter"),
-                     
-                     # Eingabe des Geschlechts
-                     uiOutput("gesch"),
-                     
-                     # Eingabe der Groesse
-                     sliderInput("groesse", label = textOutput("groesse_t"), value = 170, min = 120, max = 210),
-                     
-                     # Eingabe des Koerpergewichts
-                     sliderInput("gewicht", label = textOutput("gewicht_t"), value = 70, min = 45, max = 180),
-                     
-                     # Ausgabe des BMI
-                     uiOutput("bmiUI")
-
-                   ),
-                   hr()
-                   ),
+            # WorkingPanel > patientPanel zur Eingabe der administrativen Patientendaten (IDAT)
+              conditionalPanel("input.iPanelOn == true",
+                div(id = "patient",
+                  fluidRow(
+                    column(2, textInput("nachname", label = textOutput("name_t"))),
+                    column(2, textInput("vorname", label = textOutput("vorname_t"))),
+                    column(2, uiOutput("gebdat")),
+                    column(2, uiOutput("gesch")),
+                    column(2, sliderInput("groesse", label = textOutput("groesse_t"),
+                                          value = 170, min = 120, max = 210)),
+                    column(2, sliderInput("gewicht", label = textOutput("gewicht_t"),
+                                          value = 70, min = 45, max = 180))
+                  )
+                ), hr()
+              ),
                    
           # ----------------------------------------------------------------------------------------------------
-          # WorkingPanel > SidebarPanel zum Laden von Dateien und zur Vorgabe von Belastungswerten
-                   sidebarLayout(
-                     
-                     #sidebarPanel für die Patientendaten
-                     sidebarPanel(
-                       
-                       # Auswahl der Trainingsdatei
-                       uiOutput("fInput"),
-                       
-                       # Eingabe der Dateiauswahl für die Trainingsdaten
-                       uiOutput("datSelect"),
-                       
-                       # Eingabe des Zeitraums, dessen Daten ausgewertet werden sollen
-                       uiOutput("zeitraumSelect"),
-                       hr(),
-                       
-                       # Risikoklasse auswaehlen
-                       uiOutput("riskclass"),
-                       
-                       # Individuelle Belastungsintensitaet auswaehlen
-                       uiOutput("intensity"),
-                       
-                       # Maximale Herzfrequenz auswaehlen
-                       sliderInput("hfMax", label = textOutput("hfMax_t"), value = 70, min = 40, max = hfMaxGeneral),
-                       
-                       # Herzfrequenzbereich fuer die Belastung auswaehlen
-                       sliderInput("hfBer", label = textOutput("frequenzbereich_t"), value = c(60, 80), min = 40, max = hfMaxGeneral)
-
-                     ),
+            # WorkingPanel > sidebarPanel zum Laden von Dateien und zur Vorgabe von Belastungswerten
+            sidebarLayout(
+              sidebarPanel(
+                uiOutput("fInput"),             # Auswahl der Trainingsdatei                        
+                uiOutput("datSelect"),          # Eingabe der Dateiauswahl für die Trainingsdaten
+                uiOutput("zeitraumSelect"),     # Eingabe des Zeitraums, dessen Daten ausgewertet werden sollen
+                hr(),
+                fluidRow(
+                  column(4, align="center", uiOutput("alter")),             # Ausgabe des Alters
+                  column(4, align="center", uiOutput("bmiUI")),             # Ausgabe des BMI
+                  column(4, align="center", br(), uiOutput("riskclass"))    # Risikoklasse auswaehlen
+                ),
+                fluidRow(
+                  column(6, align="center", sliderInput("hfMax", label = textOutput("hfMax_t"), value = 70,
+                                                        min = 40, max = hfMaxGeneral)),
+                  column(6, align="center", uiOutput("intensity"))          # Belastungsintensitaet auswaehlen
+                ),
+                # Herzfrequenzbereich fuer die Belastung auswaehlen
+                sliderInput("hfBer", label = textOutput("frequenzbereich_t"), value = c(60, 80),
+                            min = 40, max = hfMaxGeneral)
+              ),
                      
           # ----------------------------------------------------------------------------------------------------
-          # WorkingPanel > MainPanel für die Patientendatenvisualisierung, als Tabsets organsiert
-                     mainPanel(
-                       
-                       tabsetPanel(id = "tP",
-                          tabPanel(textOutput("start"), id = "plo00", uiOutput("startOut"), icon = icon("home")),
-                          
-                          tabPanel(textOutput("daten_t"), id = "plo0", value = "tP1", dataTableOutput("tabOut"),icon = icon("table")),
-                          
-                          tabPanel(textOutput("zeit_t"), 
-                                   id = "plo1", 
-                                   plotOutput("explorationPlot"),
-                                   uiOutput("selAxOut"),
-                                   conditionalPanel("input.hrPlotOn",
-                                                    plotOutput("explorationPlotHR")), 
-                                   icon = icon("bar-chart")),         
-                          
-                          tabPanel(textOutput("karte_t"), 
-                                   id = "plo5",
-                                   leafletOutput("tOut1", height = 600),
-                                   icon = icon("road")),
-                          
-                          tabPanel(textOutput("gesamt_t"), id = "plo6", tableOutput("tOut2"), icon = icon("pie-chart")),
-                          
-                          tabPanel(textOutput("settings"), id = "plo7", uiOutput("settingsOut"), icon = icon("sliders")),
-                          
-                          type = "pills",
-                          
-                          selected = "plo0"
-                       )
-                     )
-                   )
+            # WorkingPanel > mainPanel für die Patientendatenvisualisierung, als Tabsets organsiert
+              mainPanel(
+                tabsetPanel(id = "tP", type = "pills",
+                  tabPanel(textOutput(outputId = "start"), icon = icon("home"),
+                           hr(),
+                           div(class = "centered",
+                             titlePanel(textOutput(outputId = "startTitle")),
+                             img(src="ts.png", width = "50%"),
+                             h3(textOutput(outputId = "startSubtitle"))
+                           ),
+                           hr()
+                  ),
+                  tabPanel(textOutput("daten_t"), icon = icon("table"), value = "tP1",
+                           hr(),
+                           dataTableOutput("tabOut")
+                  ),
+                  tabPanel(textOutput("zeit_t"), icon = icon("bar-chart"),
+                           hr(),
+                           plotOutput("explorationPlot"),
+                           uiOutput("selAxOut"),
+                           conditionalPanel("input.hrPlotOn", plotOutput("explorationPlotHR"))
+                  ),
+                  tabPanel(textOutput("karte_t"), icon = icon("road"),
+                           hr(),
+                           leafletOutput("tOut1", height = 600)
+                  ),
+                  tabPanel(textOutput("gesamt_t"), icon = icon("pie-chart"),
+                           hr(),
+                           tableOutput("tOut2")
+                  ),
+                  tabPanel(textOutput("settings"), icon = icon("sliders"),
+                           hr(),
+                           uiOutput("settingsOut")
+                  )
+                )
+              )
+            )
   ),
   
 # --------------------------------------------------------------------------------------------------------------

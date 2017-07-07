@@ -171,6 +171,12 @@ shinyServer(function(input, output, session) {
     })
   }
   
+
+  
+  
+  
+  
+  
   # Fuer Auswahl der Achsen an den Graphen
   renderSelAxis <- function() {
     output$selAxOut <- renderUI({
@@ -188,18 +194,6 @@ shinyServer(function(input, output, session) {
     output$settingsOut <- renderUI({
       tagList(
         h3(translate("Einstellungen"))
-      )
-    })
-  }
-  
-  renderStart <- function() {
-    output$startOut <- renderUI({
-      tagList(
-        hr(),
-        fluidRow(column(12, align = "center", titlePanel(translate("greeting")))),
-        fluidRow(column(12, align = "center", img(src="ts.png", height="500", width="750"))),
-        fluidRow(column(12, align = "center", h3(translate("greetingSubtitle")))),
-        hr()
       )
     })
   }
@@ -238,51 +232,31 @@ shinyServer(function(input, output, session) {
   # -------------------------------------------------------
   
   setFlag <- function() {
-
+    
     # Setzen des Faehnchens...    
     renderFlag()
     
-    # Title-Panel
-    output$title_t <- renderText({ paste(translate("CoroVisTitle")) })
-    output$hilfe_t <- renderText({ paste(translate("Hilfe")) })
-    output$impressum_t <- renderText({ paste(translate("Impressum")) })
-    output$pers0_t <- renderText({ paste(translate("PersonenDaten2")) })
-    output$pers1_t <- renderText({ paste(translate("PersonenDaten2")) })
-    
     # Input-Panel
-    output$name_t <- renderText({ paste(translate("Name")) })
-    output$vorname_t <- renderText({ paste(translate("Vorname")) })
     renderGebDat()
-    renderAlter()
     renderGesch()
-    output$groesse_t <- renderText({ paste(translate("Groesse")) })
-    output$gewicht_t <- renderText({ paste(translate("Gewicht")) })
-    renderBMI()
-    output$bmiTitle <- renderText({ paste("BMI") })
         
     # Sidebar
     output$patDat_t <- renderText({ paste(translate("Trainingsdaten suchen ...")) })
     renderFI()
     renderTimeline()
+    renderAlter()
+    output$bmiTitle <- renderText({ paste("BMI") })
+    renderBMI()
     renderRiskClass()
     renderStrIntensity()
-    output$hfMax_t <- renderText({ paste(translate("Maximale Herzfrequenz")) })
     output$risiko_t <- renderText({ paste(translate("Belastungsintensitaet")) })
-    output$frequenzbereich_t <- renderText({ paste(translate("Frequenzbereich")) })
     
     # mainPanel
-    output$start <- renderText({ paste(translate("Start")) })
-    output$daten_t <- renderText({ paste(translate("Daten")) })
-    output$zeit_t <- renderText({ paste(translate("Plot")) })
-    output$karte_t <- renderText({ paste(translate("Karte")) })
-    output$gesamt_t <- renderText({ paste(translate("Zusammenfassung")) })
     output$selAxisX <- renderText({ paste(translate("XAchse"))})
     output$selAxis <- renderText({ paste(translate("YAchse")) })
-    output$settings <- renderText({ paste(translate("Einstellungen")) })
+    
     renderSelAxis()
     renderSettings()
-    renderStart()
-
     
     # Wieder Einstellen von bestimmten ausgewaehlten Parametern nach dem Sprachwechsel...
     updateDateInput(session, "inpAlter", value = currentBirthDate)        # Alter wieder einstellen
@@ -303,10 +277,10 @@ shinyServer(function(input, output, session) {
     alleDaten <- grep(" # Alle Daten", data)
     if (length(alleDaten) > 0) {
       choice <- gsub(" # Alle Daten", "", data)
-      output$tabOut <- renderDataTable(exerciseData[[choice]], options = list(pageLength = 10))
+      # ??? output$tabOut <- renderDataTable(exerciseData[[choice]], options = list(pageLength = 10))
       updateTabsetPanel(session, "tP", selected = "tP1")
     } else {
-      output$tabOut <- renderDataTable(NULL, options = list(pageLength = 10))
+      # ??? output$tabOut <- renderDataTable(NULL, options = list(pageLength = 10))
     }
   }
   
@@ -755,6 +729,13 @@ shinyServer(function(input, output, session) {
   
   
   
+
+  
+  output$tabOut <- renderDataTable(values$reactiveDF, options = list(
+    lengthMenu = c(10, 25, 100),
+    pageLength = 10
+  ))
+  
 # ########################################################################################################################
 #
 #    Definiere Funktionen mit Shiny-Interaktionen
@@ -878,9 +859,22 @@ shinyServer(function(input, output, session) {
     if (is.null(viewportNewDF)) {
       message("Sorry, Datenimport war nicht erfolgreich!")
     } else {
+      values$reactiveDF <- viewportNewDF
       viewportDF <<- viewportNewDF
     }
   }
+  
+# --------------------------------------------------------------------------------------------------------------
+  
+# ##############################################################################################################
+#
+#    Erzeuge Reactive values & conductors
+#
+# ##############################################################################################################
+
+# --------------------------------------------------------------------------------------------------------------
+
+  values <- reactiveValues(reactiveDF = NULL)
   
 # --------------------------------------------------------------------------------------------------------------
   
@@ -900,18 +894,41 @@ shinyServer(function(input, output, session) {
   
   # headerPanel
   # TODO
+  output$hilfe_t <- renderText({translate("Hilfe", input$currentLanguage)})
+  output$impressum_t <- renderText({translate("Impressum", input$currentLanguage)})
+  output$pers0_t <- renderText({translate("PersonenDaten2", input$currentLanguage)})
+  output$pers1_t <- renderText({translate("PersonenDaten2", input$currentLanguage)})
+  
+  
   
   # titlePanel
   # TODO
+  output$title_t <- renderText({ paste(translate("CoroVisTitle")) })
   
   # workingPanel > patientPanel
   # TODO
+  output$name_t <- renderText({translate("Name", input$currentLanguage)})
+  output$vorname_t <- renderText({translate("Vorname", input$currentLanguage)})
+  output$groesse_t <- renderText({translate("Groesse", input$currentLanguage)})
+  output$gewicht_t <- renderText({translate("Gewicht", input$currentLanguage)})
   
   # workingPanel > sidebarPanel
   # TODO
+  output$hfMax_t <- renderText({translate("Maximale Herzfrequenz", input$currentLanguage)})
+  output$frequenzbereich_t <- renderText({translate("Frequenzbereich", input$currentLanguage)})
   
   # workingPanel > mainPanel
   # TODO
+  output$start <- renderText({translate("Start", input$currentLanguage)})
+  output$startTitle <- renderText({translate("greeting", input$currentLanguage)})
+  output$startSubtitle <- renderText({translate("greetingSubtitle", input$currentLanguage)})
+  
+  output$daten_t <- renderText({translate("Daten", input$currentLanguage)})
+
+  output$zeit_t <- renderText({translate("Plot", input$currentLanguage)})
+  output$karte_t <- renderText({translate("Karte", input$currentLanguage)})
+  output$gesamt_t <- renderText({translate("Zusammenfassung", input$currentLanguage)})
+  output$settings <- renderText({translate("Einstellungen", input$currentLanguage)})
   
   # helpPanel
   output$helpTitle <- renderText({translate("Hilfe", input$currentLanguage)})

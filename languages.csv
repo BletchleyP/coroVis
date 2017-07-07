@@ -12,14 +12,14 @@ Name;Name;Lastname;Nom de famille
 Vorname;Vorname;Firstname;Prenom
 Geburtsdatum;Geburtsdatum;Date of birth;Date de naissance
 Geschlecht;Geschlecht;Sex;Sexe
-Groesse;Groesse;Height;La taille du corps
+Groesse;Größe;Height;La taille du corps
 Gewicht;Gewicht;Weight;Poids corporel
 Maximale Herzfrequenz;Maximale Herzfrequenz;Maximum heart rate;Frequence cardiaque maxmiale
-Belastungsintensitaet;Belastungsintensitaet;Stress level;L'intensite du stress
+Belastungsintensitaet;Belastungsintensität;Stress level;L'intensite du stress
 Frequenzbereich;Frequenzbereich;Range of Heart rate;Gamme de frequences
 dd.mm.yyyy;dd.mm.yyyy;yyyy-mm-dd;dd.mm.yyyy
 de;de;en;fr
-maennlich;maennlich;male;male
+maennlich;männlich;male;male
 weiblich;weiblich;female;femelle
 Trainingsdaten analysieren ...;Trainingsdaten analysieren ...;Analyse Training Data ...;Analyser donnees d'exercise ...
 Keine Daten;Keine Daten;No data;Aucune donnee
@@ -72,3 +72,12 @@ Aus;Aus;Off;Delumee
 PersonenDaten2;Personendaten;Personal Data;Dates personelles
 Einstellungen;Einstellungen;Settings;Parametres
 Start;Start;Start;Debut
+next;Weiter;next;next[fr]
+previous;Zurück;previous;previous[fr]
+search;Suche:;search;search[fr]
+lengthMenu;Zeige _MENU_ Einträge;Show _MENU_ entries;Show _MENU_ entries[fr]
+loadingRecords;Daten werden geladen ...;Loading ...;Loading ...[fr]
+processing;Bitte warten ...;Please wait ...;Please wait ...[fr]
+info;Zeige _START_ bis _END_ von _TOTAL_ Einträgen; Show _START_ to _END_ of _TOTAL_ entries; Show _START_ to _END_ of _TOTAL_ entries[fr]
+infoEmpty;Zeige 0 bis 0 von 0 Einträgen;Show 0 to 0 of 0 entries;Show 0 to 0 of 0 entries[fr]
+infoFiltered;(gefiltert aus _MAX_ Einträgen insgesamt);(filtered from _MAX_ entries);(filtered from _MAX_ entries)[fr]
