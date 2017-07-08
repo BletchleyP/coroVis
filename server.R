@@ -47,6 +47,11 @@ shinyServer(function(input, output, session) {
   currentSex <- NULL
   iPanel <- TRUE
   
+  # Fuer die Herzfrequenzeingaben, hier auf Session-Ebene
+  rVal <- reactiveValues(hfBo=0, hfBu=0)
+  hfMaxOut <- 0
+  maxFr <- 0
+  
   # ----------------------------------------------------------------
   # Einmaliges Festlegen der Reaktion auf Klick auf die Flagge, usw.
   # ----------------------------------------------------------------
