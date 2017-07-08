@@ -1,5 +1,3 @@
-hfMaxGeneral <- 200
-
 # ##############################################################################################################
 #
 #    Definiere globale Variablen
@@ -7,6 +5,9 @@ hfMaxGeneral <- 200
 # ##############################################################################################################
 
 # --------------------------------------------------------------------------------------------------------------
+
+# Fuer die Berechnungen eines Jahres
+einJahr <- 365
 
 # Dataframe fuer alle eingelesenen Daten aus den Trainingseinheiten
 viewportDF <- NULL
@@ -16,6 +17,15 @@ dic <- read.csv2("languages.csv", header=TRUE, stringsAsFactors = FALSE, row.nam
 availableLang <- names(dic)
 numDics <- length(availableLang)
 iLang <- 1                                                      # TEMP: Abwaertskompatibilitaet zu alter Version
+
+# Variablen für die Herzfrequenzeinstellungen festelegen
+hfMaxGeneral <- 200
+hfBereiche <- list("minimal" = 1,"leicht" = 2, "moderat" = 3, "schwer" = 4, "sehr schwer" = 5, "maximal" = 6)
+heartRateLimits <- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (hfMaxGeneral - 40) + 40
+rVal <- reactiveValues(hfBo=0, hfBu=0)
+hfMaxOut <- 0
+maxFr <- 0
+
 
 # --------------------------------------------------------------------------------------------------------------
 

@@ -13,7 +13,6 @@ deviceList <- list("Polar M200 (CSV, GPX)" = "POLARM200", "Garmin/Allgemein (TCX
 
 # Fuer die Berechnungen
 einJahr <- 365
-hfBereiche <- list("minimal" = 0.34,"leicht" = 0.54, "moderat" = 0.69, "schwer" = 0.89, "sehr schwer" = 0.97, "maximal" = 1.0)
 
 # -------------------------------------------------------------------
 # Allgemeine Translate-Funktionen fuer die unterschiedlichen Sprachen
@@ -661,33 +660,38 @@ shinyServer(function(input, output, session) {
   # Wenn die Risikoklasse, die Belastungsintensität oder die Maximalherzfrequenz eingestellt wird
 
   observeEvent(input$inpRiskClass, {
-    rVal$maxFr <- as.numeric(input$inpRiskClass)
-    rVal$hfMaxOut <- 40 + (rVal$maxFr-40) * hfBereiche[[ifelse(is.null(input$risk), "minimal", rev_translate(input$risk))]]
-    rVal$hfBu <- rVal$hfMaxOut - 5
-    rVal$hfBo <- rVal$hfMaxOut + 5
-    updateSliderInput(session, "hfMax", max = rVal$maxFr, value = rVal$hfMaxOut)
-    updateSliderInput(session, "hfBer", max = rVal$hfMaxOut+10, value = c(rVal$hfBu, rVal$hfBo))
+    
+    heartRateLimits <<- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (as.numeric(input$inpRiskClass) - 40) + 40
+    maxFr <<- as.numeric(input$inpRiskClass)
+    limit <- hfBereiche[[ifelse(is.null(input$risk), 1, input$risk)]]
+    
+    hfMaxOut <<- heartRateLimits[limit+1]+5
+    rVal$hfBu <- heartRateLimits[limit]
+    rVal$hfBo <- heartRateLimits[limit+1]
+    meanLimit <- (rVal$hfBo - rVal$hfBu)/2 + rVal$hfBu
+    item <- names(hfBereiche)[limit]
+    
+    updateSelectInput(session, "risk", selected = item)
+    updateSliderInput(session, "hfMax", max = maxFr, value = meanLimit)
+    updateSliderInput(session, "hfBer", max = rVal$hfBo+10, value = c(rVal$hfBu, rVal$hfBo))
   })
   
   observeEvent(input$risk, {
-    rVal$maxFr <- as.numeric(input$inpRiskClass)
-    rVal$hfMaxOut <- 40 + (rVal$maxFr-40) * hfBereiche[[ifelse(is.null(input$risk), "minimal", rev_translate(input$risk))]]
-    rVal$hfBu <- rVal$hfMaxOut - 5
-    rVal$hfBo <- rVal$hfMaxOut + 5
-    updateSliderInput(session, "hfMax", max = rVal$maxFr, value = rVal$hfMaxOut)
-    updateSliderInput(session, "hfBer", max = rVal$hfMaxOut+10, value = c(rVal$hfBu, rVal$hfBo))
+    limit <- hfBereiche[[ifelse(is.null(input$risk), 1, input$risk)]]
+    hfMaxOut <<- heartRateLimits[limit+1]+5
+    rVal$hfBu <- heartRateLimits[limit]
+    rVal$hfBo <- heartRateLimits[limit+1]
+    meanLimit <- (rVal$hfBo - rVal$hfBu)/2 + rVal$hfBu
+    
+    updateSliderInput(session, "hfMax", max = maxFr, value = meanLimit)
+    updateSliderInput(session, "hfBer", max = rVal$hfBo+10, value = c(rVal$hfBu, rVal$hfBo))
   })
   
   observeEvent(input$hfMax, {
-    rVal$maxFr <- as.numeric(input$inpRiskClass)
-    if (input$hfMax != 40)
-      rVal$hfMaxOut <- input$hfMax
-    else
-      rVal$hfMaxOut <- 40 + (rVal$maxFr-40) * hfBereiche[[ifelse(is.null(input$risk), "minimal", rev_translate(input$risk))]]
-    rVal$hfBu <- rVal$hfMaxOut - 5
-    rVal$hfBo <- rVal$hfMaxOut + 5
-    updateSliderInput(session, "hfMax", max = rVal$maxFr, value = rVal$hfMaxOut)
-    updateSliderInput(session, "hfBer", max = rVal$hfMaxOut+10, value = c(rVal$hfBu, rVal$hfBo))
+    hRate <- heartRateLimits[input$hfMax <= heartRateLimits][1]
+    item <- names(hfBereiche)[which(heartRateLimits == hRate)-1]
+    
+    updateSelectInput(session, "risk", selected = item)
   })
   
   observeEvent(input$hfBer, {
