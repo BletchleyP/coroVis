@@ -668,35 +668,30 @@ shinyServer(function(input, output, session) {
     
     heartRateLimits <<- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (as.numeric(input$inpRiskClass) - 40) + 40
     maxFr <<- as.numeric(input$inpRiskClass)
-    limit <- hfBereiche[[ifelse(is.null(input$risk), 1, input$risk)]]
+
+    updateSliderInput(session, "hfMax", max = maxFr, value = maxFr)
     
-    hfMaxOut <<- heartRateLimits[limit+1]+5
-    rVal$hfBu <- heartRateLimits[limit]
-    rVal$hfBo <- heartRateLimits[limit+1]
-    meanLimit <- (rVal$hfBo - rVal$hfBu)/2 + rVal$hfBu
-    item <- names(hfBereiche)[limit]
-    
-    updateSelectInput(session, "risk", selected = item)
-    updateSliderInput(session, "hfMax", max = maxFr, value = meanLimit)
-    updateSliderInput(session, "hfBer", max = rVal$hfBo+10, value = c(rVal$hfBu, rVal$hfBo))
-  })
-  
-  observeEvent(input$risk, {
-    limit <- hfBereiche[[ifelse(is.null(input$risk), 1, input$risk)]]
-    hfMaxOut <<- heartRateLimits[limit+1]+5
-    rVal$hfBu <- heartRateLimits[limit]
-    rVal$hfBo <- heartRateLimits[limit+1]
-    meanLimit <- (rVal$hfBo - rVal$hfBu)/2 + rVal$hfBu
-    
-    updateSliderInput(session, "hfMax", max = maxFr, value = meanLimit)
-    updateSliderInput(session, "hfBer", max = rVal$hfBo+10, value = c(rVal$hfBu, rVal$hfBo))
   })
   
   observeEvent(input$hfMax, {
-    hRate <- heartRateLimits[input$hfMax <= heartRateLimits][1]
-    item <- names(hfBereiche)[which(heartRateLimits == hRate)-1]
     
-    updateSelectInput(session, "risk", selected = item)
+    heartRateLimits <<- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (input$hfMax - 40) + 40
+    limit <- hfBereiche[[ifelse(is.null(input$risk), 1, input$risk)]]
+    rVal$hfBu <- heartRateLimits[limit]
+    rVal$hfBo <- heartRateLimits[limit+1]
+    
+    updateSliderInput(session, "hfBer", max = heartRateLimits[7], value = c(rVal$hfBu, rVal$hfBo))
+    
+  })
+  
+  observeEvent(input$risk, {
+    
+    limit <- hfBereiche[[ifelse(is.null(input$risk), 1, input$risk)]]
+    rVal$hfBu <- heartRateLimits[limit]
+    rVal$hfBo <- heartRateLimits[limit+1]
+ 
+    updateSliderInput(session, "hfBer", max = heartRateLimits[7], value = c(rVal$hfBu, rVal$hfBo))
+
   })
   
   observeEvent(input$hfBer, {
