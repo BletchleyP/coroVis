@@ -36,10 +36,19 @@ getPage <- function(filename) {
 
 # --------------------------------------------------------------------------------------------------------------
 
-# stellt zu keyword und aktueller Sprache die passende Vokabel bereit
+# stellt zu keyword und Sprache die passende Vokabel bereit; wird keyword nicht gefunden -> return keyword
 translate <- function(keyword, languageID = 0) {
   i <- ifelse(languageID == 0, iLang, languageID)               # TEMP: Abwaertskompatibilitaet zu alter Version
-  return(dic[keyword, availableLang[i]])
+  word <- dic[keyword, availableLang[i]]
+  return(ifelse(is.na(word), keyword, word))
+}
+
+# --------------------------------------------------------------------------------------------------------------
+
+showMessage <- function(msg, languageID) {
+  part <- strsplit(msg, "@")[[1]]
+  showModal(modalDialog(title = translate(part[2], languageID), translate(part[3], languageID),
+                        easyClose = TRUE, footer = NULL))
 }
 
 # --------------------------------------------------------------------------------------------------------------
@@ -80,11 +89,11 @@ checkFileformat <- function(myFile) {
     n <- length(rawdata)
     
     if (n == 0) {
-      msg <- "@Import error@File is empty"
+      msg <- "@File is empty;"
     } else if (n >= 3 && rawdata[1] == polarheader1 && rawdata[3] == polarheader2) {
       msg <- "CSV"
     } else {
-      msg <- "@Import error@Wrong CSV format"
+      msg <- "@Wrong CSV format;"
     }
     
   } else if (myFile$type == "" & sub(".*\\.", "", myFile$name)=="tcx") {
@@ -100,7 +109,7 @@ checkFileformat <- function(myFile) {
   } else {
     
     # Typ ist ... keine Ahnung
-    msg <- "@Import error@Wrong file format. coroVis supports TCX, GPX, CSV only."
+    msg <- "@Wrong file format. coroVis supports TCX, GPX, CSV only;"
   }
   
   return(msg)

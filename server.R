@@ -731,10 +731,7 @@ shinyServer(function(input, output, session) {
   
 
   
-  output$tabOut <- renderDataTable(values$reactiveDF, options = list(
-    lengthMenu = c(10, 25, 100),
-    pageLength = 10
-  ))
+
   
 # ########################################################################################################################
 #
@@ -815,11 +812,12 @@ shinyServer(function(input, output, session) {
     return(df_trackpoints)
   }
   
-# ------------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------
   
-  # Funktion kontrolliert den Datenimport nach Upload
+  # Funktion kontrolliert den Datenimport nach Datei-Upload
   importFiles <- function(n) {
     viewportNewDF <- NULL
+    errormsg <- NULL
     
     # durchlaufe alle zu importierenden Dateien
     for (i in 1:n) {
@@ -827,8 +825,8 @@ shinyServer(function(input, output, session) {
       result <- checkFileformat(currentFile)
       
       if (substr(result, 1, 1) == "@") {
-        # Fehlermeldung und weiter
-        message(result)
+        # speichere Fehlermeldung und weiter zur nächsten Datei
+        errormsg <- paste(errormsg, substring(result, 2))
         
       } else {
         # starte formatspezifische Konversion in Dataframe
@@ -841,30 +839,30 @@ shinyServer(function(input, output, session) {
         }
         
         if (is.null(newDF)) {
-          # Fehlermeldung und weiter
-          message(paste("Fehler beim Datenimport: is.null(dataframe) für", currentFile$name))
+          # speichere Fehlermeldung und weiter
+          errormsg <- paste(errormsg, paste0("No data in file: ", currentFile$name, ";"))
           
         } else {
           # merge neue Daten mit viewportNewDF
           if (is.null(viewportNewDF)) {
             viewportNewDF <- newDF
           } else {
-            viewportNewDF <- mergeData(viewportNewDF, newDF)
+            viewportNewDF <- rbind(viewportNewDF, newDF)
           }
         }
       }
     }
     
-    # publiziere neuen Gesamtdatensatz
-    if (is.null(viewportNewDF)) {
-      message("Sorry, Datenimport war nicht erfolgreich!")
-    } else {
-      values$reactiveDF <- viewportNewDF
-      viewportDF <<- viewportNewDF
+    # publiziere neuen Gesamtdatensatz, ggf. Fehlermeldung
+    values$reactiveDF <- viewportNewDF
+    viewportDF <<- viewportNewDF                              # TEMP: Abwaertskompatibilitaet zu alter Version
+    if (!is.null(errormsg)) {
+      errormsg <- paste0("@Fehlermeldung@", errormsg)
+      showMessage(errormsg, input$currentLanguage)
     }
   }
   
-# --------------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------- 
   
 # ##############################################################################################################
 #
@@ -899,11 +897,8 @@ shinyServer(function(input, output, session) {
   output$pers0_t <- renderText({translate("PersonenDaten2", input$currentLanguage)})
   output$pers1_t <- renderText({translate("PersonenDaten2", input$currentLanguage)})
   
-  
-  
   # titlePanel
-  # TODO
-  output$title_t <- renderText({ paste(translate("CoroVisTitle")) })
+  output$title_t <- renderText({translate("CoroVisTitle", input$currentLanguage)})
   
   # workingPanel > patientPanel
   # TODO
@@ -924,6 +919,10 @@ shinyServer(function(input, output, session) {
   output$startSubtitle <- renderText({translate("greetingSubtitle", input$currentLanguage)})
   
   output$daten_t <- renderText({translate("Daten", input$currentLanguage)})
+  output$tabOut <- renderDataTable(values$reactiveDF, options = list(
+    lengthMenu = c(10, 25, 100),
+    pageLength = 10
+  ))
 
   output$zeit_t <- renderText({translate("Plot", input$currentLanguage)})
   output$karte_t <- renderText({translate("Karte", input$currentLanguage)})

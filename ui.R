@@ -44,6 +44,9 @@ shinyUI(fluidPage(
                       border-radius: 5px;
                       background-color: WhiteSmoke;
                     }
+                    .modal-title {
+                      color: red;
+                    }
                     "))
     ),
    tags$script(HTML('type="text/javascript" src="jquery.dataTables.js"')),
