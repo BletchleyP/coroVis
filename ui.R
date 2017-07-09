@@ -50,7 +50,7 @@ shinyUI(fluidPage(
                     "))
     ),
     
-    # JavaScript functionality to toggle tabs
+    # JavaScript Funktionalitaet zum Toggeln der Tabs
     tags$head(tags$script(HTML(
                            "Shiny.addCustomMessageHandler('hideTab', function(message){
                               var tabsetTarget = document.getElementById(message.tabsetName);
@@ -81,19 +81,19 @@ shinyUI(fluidPage(
 # --------------------------------------------------------------------------------------------------------------
   # Kopfzeile mit gefloateten Panels
   div(style = "padding-right: 10px; float:right", uiOutput("flag")),
-  conditionalPanel("input.helpCB != true",
+  conditionalPanel("input.currentPanel != 'helpPanel'",
                    div(id = "hil", style = "padding-right: 10px; float:right",
                        a(icon("question"), textOutput("hilfe_t")))
                   ),
-  conditionalPanel("input.imprCB != true",
+  conditionalPanel("input.currentPanel != 'imprintPanel'",
                     div(id = "imp", style = "padding-right: 10px; float:right",
                         a(icon("info"), textOutput("impressum_t")))
                    ),
-  conditionalPanel("input.iPanelOn == true && input.imprCB != true && input.helpCB != true",
+  conditionalPanel("input.iPanelOn == true && input.currentPanel != 'imprintPanel' && input.currentPanel != 'helpPanel'",
                     div(id = "decrease", style = "padding-right: 10px; float:right",
                         a(icon("toggle-on"), textOutput("pers0_t")))
                   ),
-  conditionalPanel("input.iPanelOn != true && input.imprCB != true && input.helpCB != true",
+  conditionalPanel("input.iPanelOn != true && input.currentPanel != 'imprintPanel' && input.currentPanel != 'helpPanel'",
                    div(id = "increase", style = "padding-right: 10px; float:right",
                        a(icon("toggle-off"), textOutput("pers1_t")))
                   ),
