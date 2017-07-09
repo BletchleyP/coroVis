@@ -49,16 +49,19 @@ shinyUI(fluidPage(
                     }
                     "))
     ),
-   tags$script(HTML('type="text/javascript" src="jquery.dataTables.js"')),
-   tags$script(HTML("type=\"text/javascript\" 
-                      $(document).ready(function() {
-                        $('#tabOut').dataTable( {
-                        \"language\": {
-                          \"url\": \"//datatables.net/plug-ins/i18n/German\"
-                        }
-                      }); 
-                    });")
-                ),
+    
+    # JavaScript functionality to toggle tabs
+    tags$head(tags$script(HTML(
+                           "Shiny.addCustomMessageHandler('hideTab', function(message){
+                              var tabsetTarget = document.getElementById(message.tabsetName);
+                              if (message.hide == 1) {
+                                  tabsetTarget.children[message.number].style.display = 'none';
+                              } else {
+                                tabsetTarget.children[message.number].style.display = 'inline';
+                              }
+                           });"
+                          ))),
+
   
 # --------------------------------------------------------------------------------------------------------------
   # controlPanel mit ausgeblendeten Schaltern
@@ -95,6 +98,7 @@ shinyUI(fluidPage(
 # --------------------------------------------------------------------------------------------------------------
   # TitelPanel
   titlePanel(title = textOutput("title_t"), windowTitle = "coroVis"),
+  actionButton(inputId = "hide2", label = "Hide tab MAP", width = "60%"),
   hr(),
 
 # --------------------------------------------------------------------------------------------------------------
@@ -145,7 +149,7 @@ shinyUI(fluidPage(
             # WorkingPanel > mainPanel für die Patientendatenvisualisierung, als Tabsets organsiert
               mainPanel(
                 tabsetPanel(id = "tP", type = "pills",
-                  tabPanel(textOutput(outputId = "start"), icon = icon("home"),
+                  tabPanel(textOutput(outputId = "start"), icon = icon("home"), value = "tP0",
                            hr(),
                            div(class = "centered",
                              titlePanel(textOutput(outputId = "startTitle")),
@@ -158,21 +162,21 @@ shinyUI(fluidPage(
                            hr(),
                            dataTableOutput("tabOut")
                   ),
-                  tabPanel(textOutput("zeit_t"), icon = icon("bar-chart"),
+                  tabPanel(textOutput("zeit_t"), icon = icon("bar-chart"), value = "tP2",
                            hr(),
                            plotOutput("explorationPlot"),
                            uiOutput("selAxOut"),
                            conditionalPanel("input.hrPlotOn", plotOutput("explorationPlotHR"))
                   ),
-                  tabPanel(textOutput("karte_t"), icon = icon("road"),
+                  tabPanel(textOutput("karte_t"), icon = icon("road"), value = "tP3",
                            hr(),
                            leafletOutput("tOut1", height = 600)
                   ),
-                  tabPanel(textOutput("gesamt_t"), icon = icon("pie-chart"),
+                  tabPanel(textOutput("gesamt_t"), icon = icon("pie-chart"), value = "tP4",
                            hr(),
                            tableOutput("tOut2")
                   ),
-                  tabPanel(textOutput("settings"), icon = icon("sliders"),
+                  tabPanel(textOutput("settings"), icon = icon("sliders"), value = "tP5",
                            hr(),
                            uiOutput("settingsOut")
                   )

@@ -584,11 +584,10 @@ shinyServer(function(input, output, session) {
     }
   }
 
-  # --------------------------------------------------
-  # Beim ersten Durchlauf Beschriftungen einstellen...
-  # --------------------------------------------------
+  # -----------------------
+  # UI - Beschriftungen ...
+  # -----------------------
   
-  # UI beschriften
   setFlag()
 
   # ----------------------------------------------------
@@ -731,11 +730,15 @@ shinyServer(function(input, output, session) {
     updateCheckboxInput(session, "lgIn", value = TRUE)
   })
   
-  
-  
-
-  
-
+  observeEvent(input$hide2, {
+    if (input$hide2 %% 2 == 0) {
+      hideTab(mytabsetName = "tP", child = 3, selectInstead = "tP1", status = 0)
+      updateActionButton(session, inputId = "hide2", label = "Hide tab MAP")
+    } else {
+      hideTab(mytabsetName = "tP", child = 3, selectInstead = "tP1", status = 1)
+      updateActionButton(session, inputId = "hide2", label = "Show tab MAP")      
+    }    
+  })
   
 # ########################################################################################################################
 #
@@ -867,6 +870,15 @@ shinyServer(function(input, output, session) {
   }
   
 # -------------------------------------------------------------------------------------------------------------- 
+
+  # Wrapper-Function for Hiding a tab in a Tabset Panel
+  hideTab <- function(mytabsetName, child, selectInstead, status){
+    session$sendCustomMessage(type = "hideTab", message = list(tabsetName = mytabsetName, number = child, hide = status))
+    updateTabsetPanel(session, inputId = mytabsetName, selected = selectInstead)
+  }
+  
+# -------------------------------------------------------------------------------------------------------------- 
+  
   
 # ##############################################################################################################
 #
