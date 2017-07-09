@@ -101,7 +101,6 @@ shinyUI(fluidPage(
 # --------------------------------------------------------------------------------------------------------------
   # TitelPanel
   titlePanel(title = textOutput("title_t"), windowTitle = "coroVis"),
-  actionButton(inputId = "hide2", label = "Hide tab MAP", width = "60%"),
   hr(),
 
 # --------------------------------------------------------------------------------------------------------------

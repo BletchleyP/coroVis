@@ -735,16 +735,6 @@ shinyServer(function(input, output, session) {
     updateCheckboxInput(session, "lgIn", value = TRUE)
   })
   
-  observeEvent(input$hide2, {
-    if (input$hide2 %% 2 == 0) {
-      hideTab(mytabsetName = "tP", child = 3, selectInstead = "tP1", status = 0)
-      updateActionButton(session, inputId = "hide2", label = "Hide tab MAP")
-    } else {
-      hideTab(mytabsetName = "tP", child = 3, selectInstead = "tP1", status = 1)
-      updateActionButton(session, inputId = "hide2", label = "Show tab MAP")      
-    }    
-  })
-  
 # ########################################################################################################################
 #
 #    Definiere Funktionen mit Shiny-Interaktionen
