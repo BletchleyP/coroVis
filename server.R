@@ -612,7 +612,10 @@ shinyServer(function(input, output, session) {
     # Ist der BMI-Rechner betaetigt ...
     output$bmi <- renderText({ paste(round(input$gewicht/((input$groesse/100)^2), digits = 1)) })
     
-    tabs <- input$tabsToShow
+    # Die ausgewaehlten Panels (hinterlegt in einer CheckboxGroup) werden mit folgender Anweisung dargestellt
+    # Die Tabs muessen als integer-Vektor uebergeben werden. Innerhalb der Observe-Funktion werden Aenderungen
+    # der CheckboxGroup wahrgenommen und das TabsetPanel aktualisiert.
+    showTabsInTabset("tP", as.integer(input$tabsToShow))
     
   })
   
@@ -873,11 +876,29 @@ shinyServer(function(input, output, session) {
   
 # -------------------------------------------------------------------------------------------------------------- 
 
-  # Wrapper-Function for Hiding a tab in a Tabset Panel
+  # Wrapper-Funktion fuer das Verstecken eines TabPanels
   hideTab <- function(mytabsetName, child, selectInstead = NULL, status){
     session$sendCustomMessage(type = "hideTab", message = list(tabsetName = mytabsetName, number = child, hide = status))
+    # 
     if (!is.null(selectInstead)) {
       updateTabsetPanel(session, inputId = mytabsetName, selected = selectInstead)
+    } else {
+      updateTabsetPanel(session, inputId = mytabsetName)
+    }
+  }
+  
+  # Funktion um in einem ganzen TabSet Panels an- oder abzuschalten. tabsToHide ist ein Vektor mit dem die Nummern
+  # der tabPanels uebergeben werden koennen. Die Funktion ist abgestimmt auf den tabPanel-Namen 'tPx mit x, das der Nummer
+  # entspricht. Im tabsetPanel muessen dann die Panels den value 'tPx' besitzen.
+  # Das erste verbleibende Panel wird dann aktiv geschaltet.
+  showTabsInTabset <- function(tabSet, tabsToShow) {
+    allTabs = c(0, 1, 2, 3, 4, 5)
+    for(i in allTabs) {
+      hideTab(mytabsetName = tabSet, child = i, status = 0)
+    }
+    newTabToSelect <- (which(allTabs %in% tabsToShow) - 1)[1]
+    for(i in tabsToShow) {
+        hideTab(mytabsetName = tabSet, child = i, status = 1, selectInstead = paste0("tP",newTabToSelect))
     }
   }
   

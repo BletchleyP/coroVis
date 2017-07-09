@@ -54,7 +54,7 @@ shinyUI(fluidPage(
     tags$head(tags$script(HTML(
                            "Shiny.addCustomMessageHandler('hideTab', function(message){
                               var tabsetTarget = document.getElementById(message.tabsetName);
-                              if (message.hide == 1) {
+                              if (message.hide == 0) {
                                   tabsetTarget.children[message.number].style.display = 'none';
                               } else {
                                 tabsetTarget.children[message.number].style.display = 'inline';
@@ -74,8 +74,8 @@ shinyUI(fluidPage(
                    sliderInput(inputId = "currentLanguage", label = "Aktuelle Sprache",
                                min = 1, max = numDics, step = 1, value = 1),
                    checkboxGroupInput("tabsToShow", "Zeige folgende Tabs", 
-                                      c("Start", "Daten", "Plots", "Karten", "Zusammenfassung", "Einstellungen"),
-                                      selected = c("Start","Einstellungen"))
+                                      c("Start" = 0, "Daten" = 1, "Plots" = 2, "Karten" = 3, "Zusammenfassung" = 4, "Einstellungen" = 5),
+                                      selected = c(0, 5))
                    ),
 
 # --------------------------------------------------------------------------------------------------------------
