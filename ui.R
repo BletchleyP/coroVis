@@ -65,14 +65,17 @@ shinyUI(fluidPage(
   
 # --------------------------------------------------------------------------------------------------------------
   # controlPanel mit ausgeblendeten Schaltern
-  conditionalPanel("false",
+  conditionalPanel("true",
                    checkboxInput("iPanelOn", "InputPanel on/off", value = TRUE),
                    checkboxInput("hrPlotOn", "HR-Plot on/off", value = FALSE),
                    
                    selectInput(inputId = "currentPanel", label = "Aktuelles HauptPanel:", choices = 
                                  list("workingPanel", "helpPanel", "imprintPanel")),
                    sliderInput(inputId = "currentLanguage", label = "Aktuelle Sprache",
-                               min = 1, max = numDics, step = 1, value = 1)
+                               min = 1, max = numDics, step = 1, value = 1),
+                   checkboxGroupInput("tabsToShow", "Zeige folgende Tabs", 
+                                      c("Start", "Daten", "Plots", "Karten", "Zusammenfassung", "Einstellungen"),
+                                      selected = c("Start","Einstellungen"))
                    ),
 
 # --------------------------------------------------------------------------------------------------------------

@@ -612,6 +612,8 @@ shinyServer(function(input, output, session) {
     # Ist der BMI-Rechner betaetigt ...
     output$bmi <- renderText({ paste(round(input$gewicht/((input$groesse/100)^2), digits = 1)) })
     
+    tabs <- input$tabsToShow
+    
   })
   
   # ----------------------
@@ -872,9 +874,11 @@ shinyServer(function(input, output, session) {
 # -------------------------------------------------------------------------------------------------------------- 
 
   # Wrapper-Function for Hiding a tab in a Tabset Panel
-  hideTab <- function(mytabsetName, child, selectInstead, status){
+  hideTab <- function(mytabsetName, child, selectInstead = NULL, status){
     session$sendCustomMessage(type = "hideTab", message = list(tabsetName = mytabsetName, number = child, hide = status))
-    updateTabsetPanel(session, inputId = mytabsetName, selected = selectInstead)
+    if (!is.null(selectInstead)) {
+      updateTabsetPanel(session, inputId = mytabsetName, selected = selectInstead)
+    }
   }
   
 # -------------------------------------------------------------------------------------------------------------- 
