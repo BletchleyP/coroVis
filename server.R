@@ -1,4 +1,6 @@
 library(shiny)    # Shiny selbst...
+library(shinyjs)  # ShinyJS zur Unterstuetzung ...
+library(colourpicker) # Zur Farbauswahl ...
 library(chron)    # Handling von Zeit und Datum...
 library(XML)      # Einlesen von XML-Dateien ...
 library(leaflet)  # Darstellung der Karten ... 
@@ -17,8 +19,6 @@ einJahr <- 365
 # -------------------------------------------------------------------
 # Allgemeine Translate-Funktionen fuer die unterschiedlichen Sprachen
 # -------------------------------------------------------------------
-
-
 
 # die Funktion sucht fuer die eingegebene Übersetzung das Schluesselwort ...
 rev_translate <- function(word) {
@@ -52,12 +52,18 @@ shinyServer(function(input, output, session) {
   hfMaxOut <- 0
   maxFr <- 0
   
+  # Fuer die Farbdarstellungen der Herzfrequenzreferenzbereiche
+  basicCol1 <- "#ffcc00"
+  basicCol2 <- "#00ff00"
+  basicCol3 <- "#ff0000"
+  underRef <- "#ffcc00"
+  inRef <- "#00ff00"
+  aboveRef <- "#ff0000"
+  
   # ----------------------------------------------------------------
   # Einmaliges Festlegen der Reaktion auf Klick auf die Flagge, usw.
   # ----------------------------------------------------------------
-   
-   
-  
+
   shinyjs::onclick("decrease", iPanelOn)
   shinyjs::onclick("increase", iPanelOn)
 
@@ -67,7 +73,6 @@ shinyServer(function(input, output, session) {
   exerciseData <- NULL    # Liste für die Daten der Trainingseinheiten
   unitList <- NULL        # Liste der Namen für die Trainingseinheiten
   
-   
   # ------------------------------------------
   # Vorbereitungsfunktionen zum Rendern des UI
   # ------------------------------------------
@@ -175,12 +180,6 @@ shinyServer(function(input, output, session) {
     })
   }
   
-
-  
-  
-  
-  
-  
   # Fuer Auswahl der Achsen an den Graphen
   renderSelAxis <- function() {
     output$selAxOut <- renderUI({
@@ -197,7 +196,16 @@ shinyServer(function(input, output, session) {
   renderSettings <- function() {
     output$settingsOut <- renderUI({
       tagList(
-        h3(translate("Einstellungen"))
+        div(id = "colors",
+            h4(translate("Farbwerte")),
+            fluidRow(
+              column(3, colourInput("cpUnder", label = translate("UnterRef"), value = underRef),
+                     colourInput("cpRight", label = translate("ImRef"), value = inRef),
+                     colourInput("cpAbove", label = translate("ÜberRef"), value = aboveRef)),
+              column(3, actionButton("resetColors", label = translate("FarbenZurück")))
+            ),
+            hr()
+        )
       )
     })
   }
@@ -327,7 +335,7 @@ shinyServer(function(input, output, session) {
       
         y1 <- yAxis
         plot(x, y1, main = translate("Optimale Belastung"), xlab = translate(xAx), ylab = translate(yAx))
-        points(x, y1, col = ifelse(yb, "orange", ifelse(yc, "red", "green")))
+        points(x, y1, col = ifelse(yb, underRef, ifelse(yc, aboveRef, inRef)))
       
       })
     
@@ -363,7 +371,7 @@ shinyServer(function(input, output, session) {
         testdata$lat <- as.numeric(as.character(viewportDF$LatitudeDegrees))
         testdata$lng <- as.numeric(as.character(viewportDF$LongitudeDegrees))
         testdata$hr <- as.numeric(as.character(viewportDF$HeartRateBpm))
-        testdata$colorcode <- ifelse(testdata$hr<rVal$hfBu, "#FFCC00", ifelse(testdata$hr>rVal$hfBo, "#FF0000", "#00FF00"))
+        testdata$colorcode <- ifelse(testdata$hr<rVal$hfBu, underRef, ifelse(testdata$hr>rVal$hfBo, aboveRef, inRef))
         testdata$hr <- as.factor(testdata$hr)
     
         # Karte generieren...
@@ -729,10 +737,28 @@ shinyServer(function(input, output, session) {
     if (input$hrOn == "FALSE")
       updateCheckboxInput(session, "hrPlotOn", value = FALSE)
   })
+
+  # Wenn die Farben für die Herzfrequenzreferenzbereichsanzeige geaendert wird
+  observeEvent(input$cpUnder, {
+    underRef <- input$cpUnder
+    print(underRef)
+  })
   
-  # Wenn der Login-Button betaetigt wird, dann wieder auf die Arbeits-UI
-  observeEvent(input$login, {
-    updateCheckboxInput(session, "lgIn", value = TRUE)
+  observeEvent(input$cpRight, {
+    inRef <- input$cpRight
+  })
+  
+  observeEvent(input$cpUnder, {
+    aboveRef <- input$cpAbove
+  })
+  
+  observeEvent(input$resetColors, {
+    underRef <- basicCol1
+    inRef <- basicCol2
+    aboveRef <- basicCol3
+    updateColourInput(session, "cpUnder", value = underRef)
+    updateColourInput(session, "cpRight", value = inRef)
+    updateColourInput(session, "cpAbove", value = aboveRef)
   })
   
 # ########################################################################################################################
@@ -996,10 +1022,6 @@ shinyServer(function(input, output, session) {
   shinyjs::onclick("imp", {
     updateSelectInput(session, inputId = "currentPanel", selected = "imprintPanel")
   })
-  
-# --------------------------------------------------------------------------------------------------------------
-  
-  
   
 # ##############################################################################################################
 #
