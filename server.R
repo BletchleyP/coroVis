@@ -1,6 +1,5 @@
 library(shiny)    # Shiny selbst...
 library(shinyjs)  # ShinyJS zur Unterstuetzung ...
-library(colourpicker) # Zur Farbauswahl ...
 library(chron)    # Handling von Zeit und Datum...
 library(XML)      # Einlesen von XML-Dateien ...
 library(leaflet)  # Darstellung der Karten ... 
@@ -63,7 +62,6 @@ shinyServer(function(input, output, session) {
   # ----------------------------------------------------------------
   # Einmaliges Festlegen der Reaktion auf Klick auf die Flagge, usw.
   # ----------------------------------------------------------------
-
   shinyjs::onclick("decrease", iPanelOn)
   shinyjs::onclick("increase", iPanelOn)
 
@@ -199,9 +197,9 @@ shinyServer(function(input, output, session) {
         div(id = "colors",
             h4(translate("Farbwerte")),
             fluidRow(
-              column(3, colourInput("cpUnder", label = translate("UnterRef"), value = underRef),
-                     colourInput("cpRight", label = translate("ImRef"), value = inRef),
-                     colourInput("cpAbove", label = translate("ÜberRef"), value = aboveRef)),
+              column(3, colourInput("cpUnder", label = translate("UnterRef"), value = underRef, showColour = "background"),
+                     colourInput("cpRight", label = translate("ImRef"), value = inRef, showColour = "background"),
+                     colourInput("cpAbove", label = translate("ÜberRef"), value = aboveRef, showColour = "background")),
               column(3, actionButton("resetColors", label = translate("FarbenZurück")))
             ),
             hr(),

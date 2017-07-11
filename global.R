@@ -19,7 +19,7 @@ numDics <- length(availableLang)
 iLang <- 1                                                      # TEMP: Abwaertskompatibilitaet zu alter Version
 
 # Variablen für die Herzfrequenzeinstellungen festelegen
-hfMaxGeneral <- 200
+hfMaxGeneral <- 220
 hfBereiche <- list("minimal" = 1,"leicht" = 2, "moderat" = 3, "schwer" = 4, "sehr schwer" = 5, "maximal" = 6)
 heartRateLimits <- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (hfMaxGeneral - 40) + 40
 
