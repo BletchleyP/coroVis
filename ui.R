@@ -64,7 +64,7 @@ shinyUI(fluidPage(
   
 # --------------------------------------------------------------------------------------------------------------
   # controlPanel mit ausgeblendeten Schaltern
-  conditionalPanel("false",
+  conditionalPanel("true",
                    checkboxInput("iPanelOn", "InputPanel on/off", value = TRUE),
                    checkboxInput("hrPlotOn", "HR-Plot on/off", value = FALSE),
                    

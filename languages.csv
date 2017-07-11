@@ -7,7 +7,7 @@ yaxis;Häufigkeit;Frequency;
 histogramTitle;Histogramm;Histogram of x;
 sliderTitle;Klassenanzahl:;Number of bins:;
 CoroVisTitle;CoroVis - Reha leicht gemacht;CoroVis - Rehabilitation at once;CoroVis - Rehabilitation immediatement
-Trainingsdaten suchen ...;Trainingsdaten suchen ...;Search for exercises ...;Chercher les donnees du patient ...
+Trainingsdaten suchen ...;Trainingsdaten suchen;Search for exercises;Chercher les donnees du patient
 Name;Name;Lastname;Nom de famille
 Vorname;Vorname;Firstname;Prenom
 Geburtsdatum;Geburtsdatum;Date of birth;Date de naissance
@@ -21,7 +21,7 @@ dd.mm.yyyy;dd.mm.yyyy;yyyy-mm-dd;dd.mm.yyyy
 de;de;en;fr
 maennlich;männlich;male;male
 weiblich;weiblich;female;femelle
-Trainingsdaten analysieren ...;Trainingsdaten analysieren ...;Analyse Training Data ...;Analyser donnees d'exercise ...
+Trainingsdaten analysieren ...;Trainingsdaten analysieren;Analyse Training Data;Analyser donnees d'exercise
 Keine Daten;Keine Daten;No data;Aucune donnee
 Risikoklasse;Risikoklasse;Risk Class;Classe de risque
 Daten;Daten;Data;Dates
