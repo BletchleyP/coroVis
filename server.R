@@ -204,7 +204,8 @@ shinyServer(function(input, output, session) {
                      colourInput("cpAbove", label = translate("ÜberRef"), value = aboveRef)),
               column(3, actionButton("resetColors", label = translate("FarbenZurück")))
             ),
-            hr()
+            hr(),
+            actionButton("createPDF", "Create PDF")
         )
       )
     })
@@ -738,10 +739,9 @@ shinyServer(function(input, output, session) {
       updateCheckboxInput(session, "hrPlotOn", value = FALSE)
   })
 
-  # Wenn die Farben für die Herzfrequenzreferenzbereichsanzeige geaendert wird
+  # Wenn die Farben für die Herzfrequenzreferenzbereichsanzeige geaendert oder zurueckgesetzt wird
   observeEvent(input$cpUnder, {
     underRef <- input$cpUnder
-    print(underRef)
   })
   
   observeEvent(input$cpRight, {
@@ -759,6 +759,14 @@ shinyServer(function(input, output, session) {
     updateColourInput(session, "cpUnder", value = underRef)
     updateColourInput(session, "cpRight", value = inRef)
     updateColourInput(session, "cpAbove", value = aboveRef)
+  })
+  
+  observeEvent(input$createPDF, {
+    pdf("test1.pdf")
+    print("Juhu!")
+    plot(1,2)
+    
+    dev.off()
   })
   
 # ########################################################################################################################
