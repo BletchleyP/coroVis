@@ -23,6 +23,9 @@ hfMaxGeneral <- 200
 hfBereiche <- list("minimal" = 1,"leicht" = 2, "moderat" = 3, "schwer" = 4, "sehr schwer" = 5, "maximal" = 6)
 heartRateLimits <- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (hfMaxGeneral - 40) + 40
 
+# Vorgabe für viewportDF
+myHeader <- c("Filename", "Id", "Time", "HeartRateBpm", "LatitudeDegrees", "LongitudeDegrees",
+              "AltitudeMeters", "DistanceMeters")
 
 # --------------------------------------------------------------------------------------------------------------
 
@@ -68,10 +71,48 @@ importDataCSV <- function(myFile) {
 
 # --------------------------------------------------------------------------------------------------------------
 
-# extrahiert aus GPX-Datei einen Dataframe
-importDataGPX <- function(myFile) {
-  # TODO
-  return(NULL)
+# extrahiert dataframe aus gpxfile; bei fehlerhaften Daten wird insgesamt NULL zurückgeliefert
+importDataGPX <- function(gpxfile) {
+  newData <- NULL
+  doc <- xmlParse(gpxfile)
+  nodes <- getNodeSet(doc, "//ns:trkpt", "ns")
+  totalsize <- xmlSize(nodes)
+  if (totalsize>0) {
+    for (i in 1:totalsize) {
+      node <- nodes[[i]]
+      x <- c(Time = xmlValue(node[["time"]]), LatitudeDegrees = xmlAttrs(node)[["lat"]],
+             LongitudeDegrees = xmlAttrs(node)[["lon"]], AltitudeMeters = xmlValue(node[["ele"]]))
+      newData <- rbind(newData, x)
+    }
+    
+    # konvertiere Matrix zu Dataframe
+    newData <- as.data.frame(newData, stringsAsFactors = FALSE)
+    row.names(newData) <- NULL
+    
+    # konvertiere chr zu numeric mit 6 (Lat/Lon) bzw. 1 (Altitude) Nachkommastelle
+    options(digits=10)
+    newData$LatitudeDegrees <- round(as.numeric(newData$LatitudeDegrees), 6)
+    newData$LongitudeDegrees <- round(as.numeric(newData$LongitudeDegrees), 6)
+    newData$AltitudeMeters <- round(as.numeric(newData$AltitudeMeters), 1)
+    
+    # erweitere fehlende Spalten und sortiert neu
+    newData$Filename <- NA
+    newData$Id <- NA
+    newData$HeartRateBpm <- NA
+    newData$DistanceMeters <- NA
+    newData <- newData[myHeader]
+    
+    # entferne Millisekunden und ZULU-timezone tag
+    timeZ <- grepl("(\\.[0-9]{3})?Z", newData$Time)
+    if (sum(timeZ, na.rm=TRUE) == totalsize) {
+      newData$Time <- sub("(\\.[0-9]{3})?Z", "", newData$Time)
+      newData$Time <- as.POSIXct(newData$Time, format = "%Y-%m-%dT%H:%M:%S", tz = "UTC")
+    } else {
+      newData <- NULL
+    }
+  }
+  
+  return(newData)
 }
 
 # --------------------------------------------------------------------------------------------------------------

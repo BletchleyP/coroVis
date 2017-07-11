@@ -780,8 +780,6 @@ shinyServer(function(input, output, session) {
     if (totalSize>0) {
       if (file.exists("temp.csv")) {file.remove("temp.csv")}
       catTemp <- file("temp.csv", open = "a")
-      myHeader <- c("Filename", "Id", "Time", "HeartRateBpm", "LatitudeDegrees", "LongitudeDegrees", "AltitudeMeters",
-                    "DistanceMeters")
       cat(paste0(paste(myHeader, collapse = ","), "\n"), file=catTemp)
       
       # ermittle Anzahl <Activity>-tags
