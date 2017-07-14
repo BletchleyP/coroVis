@@ -1,14 +1,13 @@
 library(shiny)
 library(leaflet)
 
-# Definition der UI
 shinyUI(fluidPage(
 
 # --------------------------------------------------------------------------------------------------------------
   # Skripte des HTML-Head-Teils
   shinyjs::useShinyjs(),
   
-  # Darstellung der Sprachen-Fähnchen, von Hilfe und Impressum
+  # CSS
   tags$head(
     tags$style(HTML("
                     #flag {
@@ -66,16 +65,14 @@ shinyUI(fluidPage(
   # controlPanel mit ausgeblendeten Schaltern
   conditionalPanel("true",
                    checkboxInput("iPanelOn", "InputPanel on/off", value = TRUE),
-                   checkboxInput("hrPlotOn", "HR-Plot on/off", value = FALSE),
-                   
                    selectInput(inputId = "currentPanel", label = "Aktuelles HauptPanel:", choices = 
                                  list("workingPanel", "helpPanel", "imprintPanel")),
-                   sliderInput(inputId = "currentLanguage", label = "Aktuelle Sprache",
+                   sliderInput(inputId = "language", label = "Aktuelle Sprache",
                                min = 1, max = numDics, step = 1, value = 1),
                    checkboxGroupInput("tabsToShow", "Zeige folgende Tabs", 
-                                      c("Start" = 0, "Daten" = 1, "Plots" = 2, "Karten" = 3, "Zusammenfassung" = 4, "Einstellungen" = 5),
-                                      selected = c(0, 5))
-                   ),
+                                      c("Start" = 0, "Daten" = 1, "Plots" = 2, "Karten" = 3,
+                                        "Zusammenfassung" = 4, "Einstellungen" = 5), selected = c(0, 1, 5))
+  ),
 
 # --------------------------------------------------------------------------------------------------------------
   # Kopfzeile mit gefloateten Panels
@@ -103,11 +100,11 @@ shinyUI(fluidPage(
   hr(),
 
 # --------------------------------------------------------------------------------------------------------------
-  # WorkingPanel mit drei untergeordneten Panels: PatientPanel, SidebarPanel und MainPanel
+  # workingPanel mit drei untergeordneten Panels: patientPanel, sidebarPanel und mainPanel
   conditionalPanel("input.currentPanel == 'workingPanel'",
 
           # ----------------------------------------------------------------------------------------------------
-            # WorkingPanel > patientPanel zur Eingabe der administrativen Patientendaten (IDAT)
+            # patientPanel zur Eingabe der Patientendaten (IDAT)
               conditionalPanel("input.iPanelOn == true",
                 div(id = "patient",
                   fluidRow(
@@ -124,7 +121,7 @@ shinyUI(fluidPage(
               ),
                    
           # ----------------------------------------------------------------------------------------------------
-            # WorkingPanel > sidebarPanel zum Laden von Dateien und zur Vorgabe von Belastungswerten
+            # sidebarPanel zum Laden von Dateien und zur Vorgabe von Belastungswerten
             sidebarLayout(
               sidebarPanel(
                 uiOutput("fInput"),             # Auswahl der Trainingsdatei                        
@@ -147,7 +144,7 @@ shinyUI(fluidPage(
               ),
                      
           # ----------------------------------------------------------------------------------------------------
-            # WorkingPanel > mainPanel für die Patientendatenvisualisierung, als Tabsets organsiert
+            # mainPanel für die Patientendatenvisualisierung, als Tabsets organsiert
               mainPanel(
                 tabsetPanel(id = "tP", type = "pills",
                   tabPanel(textOutput(outputId = "start"), icon = icon("home"), value = "tP0",
