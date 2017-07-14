@@ -761,8 +761,8 @@ shinyServer(function(input, output, session) {
   
   observeEvent(input$createPDF, {
     pdf("test1.pdf")
-    print("Juhu!")
     plot(1,2)
+    text(1,1, "Juhu!")
     
     dev.off()
   })
