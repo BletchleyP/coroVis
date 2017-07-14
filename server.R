@@ -890,7 +890,7 @@ shinyServer(function(input, output, session) {
     viewportDF <<- viewportNewDF                              # TEMP: Abwaertskompatibilitaet zu alter Version
     if (!is.null(errormsg)) {
       errormsg <- paste0("@Fehlermeldung@", errormsg)
-      showMessage(errormsg, input$currentLanguage)
+      showMessage(errormsg, input$language)
     }
   }
   
@@ -953,51 +953,51 @@ shinyServer(function(input, output, session) {
   
   # headerPanel
   # TODO
-  output$hilfe_t <- renderText({translate("Hilfe", input$currentLanguage)})
-  output$impressum_t <- renderText({translate("Impressum", input$currentLanguage)})
-  output$pers0_t <- renderText({translate("PersonenDaten2", input$currentLanguage)})
-  output$pers1_t <- renderText({translate("PersonenDaten2", input$currentLanguage)})
+  output$hilfe_t <- renderText({translate("Hilfe", input$language)})
+  output$impressum_t <- renderText({translate("Impressum", input$language)})
+  output$pers0_t <- renderText({translate("PersonenDaten2", input$language)})
+  output$pers1_t <- renderText({translate("PersonenDaten2", input$language)})
   
   # titlePanel
-  output$title_t <- renderText({translate("CoroVisTitle", input$currentLanguage)})
+  output$title_t <- renderText({translate("CoroVisTitle", input$language)})
   
   # workingPanel > patientPanel
   # TODO
-  output$name_t <- renderText({translate("Name", input$currentLanguage)})
-  output$vorname_t <- renderText({translate("Vorname", input$currentLanguage)})
-  output$groesse_t <- renderText({translate("Groesse", input$currentLanguage)})
-  output$gewicht_t <- renderText({translate("Gewicht", input$currentLanguage)})
+  output$name_t <- renderText({translate("Name", input$language)})
+  output$vorname_t <- renderText({translate("Vorname", input$language)})
+  output$groesse_t <- renderText({translate("Groesse", input$language)})
+  output$gewicht_t <- renderText({translate("Gewicht", input$language)})
   
   # workingPanel > sidebarPanel
   # TODO
-  output$hfMax_t <- renderText({translate("Maximale Herzfrequenz", input$currentLanguage)})
-  output$frequenzbereich_t <- renderText({translate("Frequenzbereich", input$currentLanguage)})
+  output$hfMax_t <- renderText({translate("Maximale Herzfrequenz", input$language)})
+  output$frequenzbereich_t <- renderText({translate("Frequenzbereich", input$language)})
   
   # workingPanel > mainPanel
   # TODO
-  output$start <- renderText({translate("Start", input$currentLanguage)})
-  output$startTitle <- renderText({translate("greeting", input$currentLanguage)})
-  output$startSubtitle <- renderText({translate("greetingSubtitle", input$currentLanguage)})
+  output$start <- renderText({translate("Start", input$language)})
+  output$startTitle <- renderText({translate("greeting", input$language)})
+  output$startSubtitle <- renderText({translate("greetingSubtitle", input$language)})
   
-  output$daten_t <- renderText({translate("Daten", input$currentLanguage)})
+  output$daten_t <- renderText({translate("Daten", input$language)})
   output$tabOut <- renderDataTable(values$reactiveDF, options = list(
     lengthMenu = c(10, 25, 100),
     pageLength = 10
   ))
 
-  output$zeit_t <- renderText({translate("Plot", input$currentLanguage)})
-  output$karte_t <- renderText({translate("Karte", input$currentLanguage)})
-  output$gesamt_t <- renderText({translate("Zusammenfassung", input$currentLanguage)})
-  output$settings <- renderText({translate("Einstellungen", input$currentLanguage)})
+  output$zeit_t <- renderText({translate("Plot", input$language)})
+  output$karte_t <- renderText({translate("Karte", input$language)})
+  output$gesamt_t <- renderText({translate("Zusammenfassung", input$language)})
+  output$settings <- renderText({translate("Einstellungen", input$language)})
   
   # helpPanel
-  output$helpTitle <- renderText({translate("Hilfe", input$currentLanguage)})
-  output$helpBackLabel <- renderText({translate("Zur?ck", input$currentLanguage)})
+  output$helpTitle <- renderText({translate("Hilfe", input$language)})
+  output$helpBackLabel <- renderText({translate("Zur?ck", input$language)})
   
   # imprintPanel
-  output$imprintTitle <- renderText({translate("Impressum", input$currentLanguage)})
-  output$imprintHTML <- renderUI({getPage(translate("IncImpressum", input$currentLanguage))})
-  output$imprintBackLabel <- renderText({translate("Zur?ck", input$currentLanguage)})
+  output$imprintTitle <- renderText({translate("Impressum", input$language)})
+  output$imprintHTML <- renderUI({getPage(translate("IncImpressum", input$language))})
+  output$imprintBackLabel <- renderText({translate("Zur?ck", input$language)})
   
 # --------------------------------------------------------------------------------------------------------------
   
@@ -1014,7 +1014,7 @@ shinyServer(function(input, output, session) {
   # Sprachwechsel bei Klick auf Flagge
   shinyjs::onclick("languageflag", {
     change_language()                                           # TEMP: Abwaertskompatibilitaet zu alter Version
-    updateSliderInput(session, inputId = "currentLanguage", value = (input$currentLanguage %% numDics) + 1)
+    updateSliderInput(session, inputId = "language", value = (input$language %% numDics) + 1)
   })
   
   # Einblenden der Hilfe
