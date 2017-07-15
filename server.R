@@ -1,6 +1,5 @@
 library(shiny)    # Shiny selbst...
 library(shinyjs)  # ShinyJS zur Unterstuetzung ...
-library(colourpicker) # Zur Farbauswahl ...
 library(chron)    # Handling von Zeit und Datum...
 library(XML)      # Einlesen von XML-Dateien ...
 library(leaflet)  # Darstellung der Karten ... 
@@ -60,7 +59,6 @@ shinyServer(function(input, output, session) {
   # ----------------------------------------------------------------
   # Einmaliges Festlegen der Reaktion auf Klick auf die Flagge, usw.
   # ----------------------------------------------------------------
-
   shinyjs::onclick("decrease", iPanelOn)
   shinyjs::onclick("increase", iPanelOn)
 
@@ -152,11 +150,14 @@ shinyServer(function(input, output, session) {
         div(id = "colors",
             h4(translate("Farbwerte")),
             fluidRow(
-              column(3, colourInput("cpUnder", label = translate("UnterRef"), value = underRef),
-                     colourInput("cpRight", label = translate("ImRef"), value = inRef),
-                     colourInput("cpAbove", label = translate("ÜberRef"), value = aboveRef)),
+              column(3, colourInput("cpUnder", label = translate("UnterRef"), value = underRef, showColour = "background"),
+                     colourInput("cpRight", label = translate("ImRef"), value = inRef, showColour = "background"),
+                     colourInput("cpAbove", label = translate("ÜberRef"), value = aboveRef, showColour = "background")),
               column(3, actionButton("resetColors", label = translate("FarbenZurück")))
             ),
+            hr(),
+            h4(translate("maximaleHF")),
+            sliderInput("overrideMaxHF", label = NULL, value = hfMaxGeneral, min = 100, max = 240, step = 1),
             hr()
         )
       )
@@ -569,6 +570,7 @@ shinyServer(function(input, output, session) {
     heartRateLimits <<- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (as.numeric(input$inpRiskClass) - 40) + 40
     maxFr <<- as.numeric(input$inpRiskClass)
 
+    updateSliderInput(session, "overrideMaxHF", value = maxFr)
     updateSliderInput(session, "hfMax", max = maxFr, value = maxFr)
     
   })
@@ -603,10 +605,9 @@ shinyServer(function(input, output, session) {
   
 
 
-  # Wenn die Farben für die Herzfrequenzreferenzbereichsanzeige geaendert wird
+  # Wenn die Farben für die Herzfrequenzreferenzbereichsanzeige geaendert oder zurueckgesetzt wird
   observeEvent(input$cpUnder, {
     underRef <- input$cpUnder
-    print(underRef)
   })
   
   observeEvent(input$cpRight, {
@@ -624,6 +625,18 @@ shinyServer(function(input, output, session) {
     updateColourInput(session, "cpUnder", value = underRef)
     updateColourInput(session, "cpRight", value = inRef)
     updateColourInput(session, "cpAbove", value = aboveRef)
+  })
+  
+  observeEvent(input$createPDF, {
+    pdf("test1.pdf")
+    plot(1,2)
+    text(1,1, "Juhu!")
+    
+    dev.off()
+  })
+  
+  observeEvent(input$overrideMaxHF, {
+    updateSliderInput(session, "hfMax", value = input$hfMax, max = input$overrideMaxHF)
   })
   
 # ########################################################################################################################
