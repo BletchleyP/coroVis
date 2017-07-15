@@ -770,7 +770,6 @@ shinyServer(function(input, output, session) {
   importDataTCX <- function(tcxFile) {
 
     doc <- xmlParse(tcxFile)
-    # ??? labs <- NULL
     
     # ermittle Gesamtanzahl <Trackpoint>-tags
     totalSize <- xmlSize(getNodeSet(doc, "//ns:Trackpoint", "ns"))
@@ -784,13 +783,12 @@ shinyServer(function(input, output, session) {
       size <- xmlSize(nodes[[1]])
       counter <- 0
       
-      withProgress(message = translate("TCX-Import"), value = 0, {
+      withProgress(message = sprintf(translate("importDataMsg", isolate(input$language)), totalSize), value = 0, {
         
         # foreach <Activity>-tag
         for (i in 1:size) {
           startNode <- nodes[[1]][[i]]
           label <- c(Id = xmlValue(startNode[["Id"]]))
-          # ??? labs <- c(labs, label)
           subNodes <- getNodeSet(doc, paste0("(//ns:Activity)[", i, "]//ns:Trackpoint"), "ns")
           subSize <- xmlSize(subNodes)
           counter <- counter + subSize
@@ -802,36 +800,26 @@ shinyServer(function(input, output, session) {
               if (length(subNodes[[j]]["Position"])==1) {
                 v <- c(v, getChildrenStrings(subNodes[[j]]["Position"][[1]]))
               }
-              v <- c("filename.txt", label, v)
+              v <- c(label, v)
               cat(paste0(paste(v[myHeader], collapse = ","), "\n"), file=catTemp)
             }
           }
           
           # aktualisiere Fortschrittsanzeige
-          incProgress(i/size)
+          incProgress(counter/totalSize)
         }
       })
       
       # beende den Datenstrom und importiere die Daten aus catTemp
       close(catTemp)
       df_trackpoints <- read.csv("temp.csv", header = TRUE, stringsAsFactors = FALSE, colClasses = "character")
-      # ??? df_trackpoints$Filename <- as.factor(df_trackpoints$Filename)
-      # ??? df_trackpoints$Id <- as.factor(df_trackpoints$Id)
-      # ??? df_trackpoints$LatitudeDegrees <- as.factor(df_trackpoints$LatitudeDegrees)
-      # ??? df_trackpoints$LongitudeDegrees <- as.factor(df_trackpoints$LongitudeDegrees)
-      # ??? df_trackpoints$HeartRateBpm <- as.integer(df_trackpoints$HeartRateBpm)
-      # ??? df_trackpoints$AltitudeMeters <- as.integer(df_trackpoints$AltitudeMeters)
-      # ??? df_trackpoints$DistanceMeters <- as.numeric(df_trackpoints$DistanceMeters)
-      # ??? df_trackpoints$Time <- times(substr(df_trackpoints$Time, 12, 19))
-      # ??? df_trackpoints[is.na(df_trackpoints)] <- 0
       
     } else {
       df_trackpoints <- NULL
     }
     
     if (file.exists("temp.csv")) {file.remove("temp.csv")}
-    # ??? ret_list <- list(labs, df_trackpoints)
-    # ??? return(ret_list)
+
     return(df_trackpoints)
   }
   
@@ -839,57 +827,84 @@ shinyServer(function(input, output, session) {
   
   # Funktion kontrolliert den Datenimport nach Datei-Upload
   importFiles <- function(fileDF) {
+    newDataAll <- NULL
+    errormsg <- NULL
+    n <- nrow(fileDF)
+    withProgress(message = sprintf(translate("importFileMsg", isolate(input$language)), n), value = 0, {
+      # durchlaufe alle zu importierenden Dateien
+      for (i in 1:n) {
+        currentFile <- fileDF[i,]
+        result <- checkFileformat(currentFile)
+        if (substr(result, 1, 1) == "@") {
+          # speichere Fehlermeldung und weiter zur nächsten Datei
+          errormsg <- paste(errormsg, substring(result, 2))
+  
+        } else {
+          # starte formatspezifische Konversion in Dataframe
+          if (result == "TCX") {
+            newData <- importDataTCX(currentFile$datapath)
+          } else if (result == "CSV") {
+            newData <- importDataCSV(currentFile$datapath)
+          } else {
+            newData <- importDataGPX(currentFile$datapath)
+          }
+  
+          if (is.null(newData)) {
+            # speichere Fehlermeldung und weiter
+            errormsg <- paste(errormsg, paste0("No data in file: ", currentFile$name, ";"))
+  
+          } else {
+            # merge neue Daten mit newDataAll
+            if (is.null(newDataAll)) {
+              newDataAll <- newData
+            } else {
+              newDataAll <- rbind(newDataAll, newData)
+            }
+          }
+        }
+        
+        # aktualisiere Fortschrittsanzeige
+        incProgress(i/n)
+      }
+    })
     
-    coroDF <- fileDF
+    # entferne Millisekunden und ZULU-timezone tag
+    timeZ <- grepl("(\\.[0-9]{3})?Z", newDataAll$Time)
+    if (sum(timeZ, na.rm=TRUE) == nrow(newDataAll)) {
+      newDataAll$Time <- sub("(\\.[0-9]{3})?Z", "", newDataAll$Time)
+      newDataAll$Time <- as.POSIXct(newDataAll$Time, format = "%Y-%m-%dT%H:%M:%S", tz = "UTC")
+    } else {
+      newDataAll <- NULL
+      errormsg <- paste(errormsg, "Fehler bei Datum-Zeit-Konversion")
+    }
     
+    # konvertiere chr zu numeric mit 6 (Lat/Lon) bzw. 1 (Altitude, Distance) Nachkommastelle
+    options(digits=10)
+    newDataAll$LatitudeDegrees <- round(as.numeric(newDataAll$LatitudeDegrees), 6)
+    newDataAll$LongitudeDegrees <- round(as.numeric(newDataAll$LongitudeDegrees), 6)
+    newDataAll$AltitudeMeters <- round(as.numeric(newDataAll$AltitudeMeters), 1)
+    newDataAll$DistanceMeters <- round(as.numeric(newDataAll$DistanceMeters), 1)
     
-    return(coroDF)
+    newDataAll$GPS <- ifelse(is.na(newDataAll$LatitudeDegrees) | is.na(newDataAll$LatitudeDegrees), "-", "+")
     
-    # n <- nrow(fileDF)
-    # viewportNewDF <- NULL
-    # errormsg <- NULL
-    # 
-    # # durchlaufe alle zu importierenden Dateien
-    # for (i in 1:n) {
-    #   currentFile <- input$patDat[i,]
-    #   result <- checkFileformat(currentFile)
-    #   
-    #   if (substr(result, 1, 1) == "@") {
-    #     # speichere Fehlermeldung und weiter zur nächsten Datei
-    #     errormsg <- paste(errormsg, substring(result, 2))
-    #     
-    #   } else {
-    #     # starte formatspezifische Konversion in Dataframe
-    #     if (result == "TCX") {
-    #       newDF <- importDataTCX(currentFile$datapath)
-    #     } else if (result == "CSV") {
-    #       newDF <- importDataCSV(currentFile$datapath)
-    #     } else {
-    #       newDF <- importDataGPX(currentFile$datapath)
-    #     }
-    #     
-    #     if (is.null(newDF)) {
-    #       # speichere Fehlermeldung und weiter
-    #       errormsg <- paste(errormsg, paste0("No data in file: ", currentFile$name, ";"))
-    #       
-    #     } else {
-    #       # merge neue Daten mit viewportNewDF
-    #       if (is.null(viewportNewDF)) {
-    #         viewportNewDF <- newDF
-    #       } else {
-    #         viewportNewDF <- rbind(viewportNewDF, newDF)
-    #       }
-    #     }
-    #   }
-    # }
-    # 
-    # # publiziere neuen Gesamtdatensatz, ggf. Fehlermeldung
-    # values$reactiveDF <- viewportNewDF
-    # viewportDF <<- viewportNewDF                              # TEMP: Abwaertskompatibilitaet zu alter Version
-    # if (!is.null(errormsg)) {
-    #   errormsg <- paste0("@Fehlermeldung@", errormsg)
-    #   showMessage(errormsg, input$language)
-    # }
+    if (!is.null(newDataAll)) {
+      # entferne Zeilen ohne datetime-Signatur
+      # entferne Dupletten auf Basis datetime-Signatur
+      # order by datetime-Signatur
+      # berechne weitere Spalten
+    }
+
+    # Meldung zu Fehlern behandeln
+    if (!is.null(errormsg)) {
+      errormsg <- paste0("@Fehlermeldung@", errormsg)
+      showMessage(errormsg, input$language)
+    }
+    
+    colnames(newDataAll)[match("Time", colnames(newDataAll))] <- "DTG"
+    colnames(newDataAll)[match("Id", colnames(newDataAll))] <- "Label"
+    newDataAll$Date <- format(newDataAll$DTG, "%Y-%m-%d")
+    newDataAll$Time <- format(newDataAll$DTG, "%H:%M:%S")
+    return(newDataAll)
   }
   
 # -------------------------------------------------------------------------------------------------------------- 
@@ -922,6 +937,28 @@ shinyServer(function(input, output, session) {
   
 # -------------------------------------------------------------------------------------------------------------- 
   
+  modifyDF <- function(df, lang) {
+    if (is.null(df)) {
+      return(NULL)
+    } else {
+      colnames(df)[match("Label", colnames(df))] <- translate("Label", lang)
+      colnames(df)[match("Date", colnames(df))] <- translate("Date", lang)
+      colnames(df)[match("Time", colnames(df))] <- translate("Time", lang)
+      colnames(df)[match("HeartRateBpm", colnames(df))] <- translate("HeartRateBpm", lang)
+      colnames(df)[match("LatitudeDegrees", colnames(df))] <- translate("LatitudeDegrees", lang)
+      colnames(df)[match("LongitudeDegrees", colnames(df))] <- translate("LongitudeDegrees", lang)
+      colnames(df)[match("AltitudeMeters", colnames(df))] <- translate("AltitudeMeters", lang)
+      colnames(df)[match("DistanceMeters", colnames(df))] <- translate("DistanceMeters", lang)
+      
+      cols <- c(translate("Label", lang), translate("Date", lang), translate("Time", lang),
+                translate("HeartRateBpm", lang), "GPS", translate("AltitudeMeters", lang),
+                translate("DistanceMeters", lang))
+      return(df[cols])
+    }
+  }
+  
+# -------------------------------------------------------------------------------------------------------------- 
+  
   
 # ##############################################################################################################
 #
@@ -933,9 +970,14 @@ shinyServer(function(input, output, session) {
 
   values <- reactiveValues(reactiveDF = NULL)
   
-  coroData <- reactive({
+  coroRawData <- reactive({
     importFiles(input$userfiles)
   })
+  
+  coroData <- reactive({
+    modifyDF(coroRawData(), input$language)
+  })
+  
   
 # --------------------------------------------------------------------------------------------------------------
   
@@ -1000,8 +1042,7 @@ shinyServer(function(input, output, session) {
   output$daten_t <- renderText({translate("Daten", input$language)})
   tableRenderer <- function(languageStyle) {
     output$coroTable <- renderDataTable({
-      cols <- c("type", "name")
-      coroData()[cols]
+      coroData()
     }, options = list(
       lengthMenu = c(10, 25, 100),
       pageLength = 10,
