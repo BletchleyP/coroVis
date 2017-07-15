@@ -289,10 +289,7 @@ shinyServer(function(input, output, session) {
     alleDaten <- grep(" # Alle Daten", data)
     if (length(alleDaten) > 0) {
       choice <- gsub(" # Alle Daten", "", data)
-      # ??? output$tabOut <- renderDataTable(exerciseData[[choice]], options = list(pageLength = 10))
       updateTabsetPanel(session, "tP", selected = "tP1")
-    } else {
-      # ??? output$tabOut <- renderDataTable(NULL, options = list(pageLength = 10))
     }
   }
   
@@ -841,51 +838,58 @@ shinyServer(function(input, output, session) {
 # --------------------------------------------------------------------------------------------------------------
   
   # Funktion kontrolliert den Datenimport nach Datei-Upload
-  importFiles <- function(n) {
-    viewportNewDF <- NULL
-    errormsg <- NULL
+  importFiles <- function(fileDF) {
     
-    # durchlaufe alle zu importierenden Dateien
-    for (i in 1:n) {
-      currentFile <- input$patDat[i,]
-      result <- checkFileformat(currentFile)
-      
-      if (substr(result, 1, 1) == "@") {
-        # speichere Fehlermeldung und weiter zur nächsten Datei
-        errormsg <- paste(errormsg, substring(result, 2))
-        
-      } else {
-        # starte formatspezifische Konversion in Dataframe
-        if (result == "TCX") {
-          newDF <- importDataTCX(currentFile$datapath)
-        } else if (result == "CSV") {
-          newDF <- importDataCSV(currentFile$datapath)
-        } else {
-          newDF <- importDataGPX(currentFile$datapath)
-        }
-        
-        if (is.null(newDF)) {
-          # speichere Fehlermeldung und weiter
-          errormsg <- paste(errormsg, paste0("No data in file: ", currentFile$name, ";"))
-          
-        } else {
-          # merge neue Daten mit viewportNewDF
-          if (is.null(viewportNewDF)) {
-            viewportNewDF <- newDF
-          } else {
-            viewportNewDF <- rbind(viewportNewDF, newDF)
-          }
-        }
-      }
-    }
+    coroDF <- fileDF
     
-    # publiziere neuen Gesamtdatensatz, ggf. Fehlermeldung
-    values$reactiveDF <- viewportNewDF
-    viewportDF <<- viewportNewDF                              # TEMP: Abwaertskompatibilitaet zu alter Version
-    if (!is.null(errormsg)) {
-      errormsg <- paste0("@Fehlermeldung@", errormsg)
-      showMessage(errormsg, input$language)
-    }
+    
+    return(coroDF)
+    
+    # n <- nrow(fileDF)
+    # viewportNewDF <- NULL
+    # errormsg <- NULL
+    # 
+    # # durchlaufe alle zu importierenden Dateien
+    # for (i in 1:n) {
+    #   currentFile <- input$patDat[i,]
+    #   result <- checkFileformat(currentFile)
+    #   
+    #   if (substr(result, 1, 1) == "@") {
+    #     # speichere Fehlermeldung und weiter zur nächsten Datei
+    #     errormsg <- paste(errormsg, substring(result, 2))
+    #     
+    #   } else {
+    #     # starte formatspezifische Konversion in Dataframe
+    #     if (result == "TCX") {
+    #       newDF <- importDataTCX(currentFile$datapath)
+    #     } else if (result == "CSV") {
+    #       newDF <- importDataCSV(currentFile$datapath)
+    #     } else {
+    #       newDF <- importDataGPX(currentFile$datapath)
+    #     }
+    #     
+    #     if (is.null(newDF)) {
+    #       # speichere Fehlermeldung und weiter
+    #       errormsg <- paste(errormsg, paste0("No data in file: ", currentFile$name, ";"))
+    #       
+    #     } else {
+    #       # merge neue Daten mit viewportNewDF
+    #       if (is.null(viewportNewDF)) {
+    #         viewportNewDF <- newDF
+    #       } else {
+    #         viewportNewDF <- rbind(viewportNewDF, newDF)
+    #       }
+    #     }
+    #   }
+    # }
+    # 
+    # # publiziere neuen Gesamtdatensatz, ggf. Fehlermeldung
+    # values$reactiveDF <- viewportNewDF
+    # viewportDF <<- viewportNewDF                              # TEMP: Abwaertskompatibilitaet zu alter Version
+    # if (!is.null(errormsg)) {
+    #   errormsg <- paste0("@Fehlermeldung@", errormsg)
+    #   showMessage(errormsg, input$language)
+    # }
   }
   
 # -------------------------------------------------------------------------------------------------------------- 
@@ -929,6 +933,10 @@ shinyServer(function(input, output, session) {
 
   values <- reactiveValues(reactiveDF = NULL)
   
+  coroData <- reactive({
+    importFiles(input$userfiles)
+  })
+  
 # --------------------------------------------------------------------------------------------------------------
   
   
@@ -963,25 +971,58 @@ shinyServer(function(input, output, session) {
   output$gewicht_t <- renderText({translate("Gewicht", input$language)})
   
   # workingPanel > sidebarPanel
+  output$fileTitle <- renderText({translate("filesHeader", input$language)})
+  output$fileLabel <- renderText({translate("filesButton", input$language)})
+  output$fileCounter <- renderText({
+    if (is.null(input$userfiles)) {
+      return (translate("filesLoaded0", input$language))
+    } else if (nrow(input$userfiles)>1) {
+      return(paste(nrow(input$userfiles), translate("filesLoaded2", input$language)))
+    } else {
+      return (translate("filesLoaded1", input$language))
+    }
+  })
+  
   # TODO
   output$hfMax_t <- renderText({translate("Maximale Herzfrequenz", input$language)})
   output$frequenzbereich_t <- renderText({translate("Frequenzbereich", input$language)})
   
-  # workingPanel > mainPanel
-  # TODO
+  
+  
+  
+  
+  # workingPanel > mainPanel > tp0
   output$start <- renderText({translate("Start", input$language)})
   output$startTitle <- renderText({translate("greeting", input$language)})
   output$startSubtitle <- renderText({translate("greetingSubtitle", input$language)})
   
+  # workingPanel > mainPanel > tp1
   output$daten_t <- renderText({translate("Daten", input$language)})
-  output$tabOut <- renderDataTable(values$reactiveDF, options = list(
-    lengthMenu = c(10, 25, 100),
-    pageLength = 10
-  ))
-
+  tableRenderer <- function(languageStyle) {
+    output$coroTable <- renderDataTable({
+      cols <- c("type", "name")
+      coroData()[cols]
+    }, options = list(
+      lengthMenu = c(10, 25, 100),
+      pageLength = 10,
+      language = languageStyle
+    ))
+  }
+  
+  # workingPanel > mainPanel > tp2
+  # TODO
   output$zeit_t <- renderText({translate("Plot", input$language)})
+  
+  # workingPanel > mainPanel > tp3
+  # TODO
   output$karte_t <- renderText({translate("Karte", input$language)})
+  
+  # workingPanel > mainPanel > tp4
+  # TODO
   output$gesamt_t <- renderText({translate("Zusammenfassung", input$language)})
+  
+  # workingPanel > mainPanel > tp5
+  # TODO
   output$settings <- renderText({translate("Einstellungen", input$language)})
   
   # helpPanel
@@ -1041,11 +1082,23 @@ shinyServer(function(input, output, session) {
   
 # --------------------------------------------------------------------------------------------------------------
 
-  # Observer zu fileInput -> neue Importfunktion
-  observeEvent(input$patDat, {
-    importFiles(nrow(input$patDat))
+  observeEvent(input$language, {
+    languageList <- list("paginate" = list("next" = translate("next", input$language),
+                                      "previous" = translate("previous", input$language)),
+                    "search" = translate("search", input$language),
+                    "lengthMenu" = translate("lengthMenu", input$language),
+                    "loadingRecords" = translate("loadingRecords", input$language),
+                    "processing" = translate("processing", input$language),
+                    "info" = translate("info", input$language),
+                    "infoEmpty" = translate("infoEmpty", input$language),
+                    "infoFiltered" = translate("infoFiltered", input$language))
+    tableRenderer(languageList)
   })
   
 # --------------------------------------------------------------------------------------------------------------
   
+  observeEvent(input$userfiles, {
+    updateTabsetPanel(session, "tP", selected = "tP1")
+  })
+# --------------------------------------------------------------------------------------------------------------
 })
