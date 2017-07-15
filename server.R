@@ -9,9 +9,6 @@ library(ggplot2)  # Darstellung der Plots ...
 # Globale Variablendefinition
 # ---------------------------
 
-# Fuer die Devices
-deviceList <- list("Polar M200 (CSV, GPX)" = "POLARM200", "Garmin/Allgemein (TCX)" = "GARMIN")
-
 # Fuer die Berechnungen
 einJahr <- 365
 
@@ -117,37 +114,6 @@ shinyServer(function(input, output, session) {
     })
   }
   
-  # Fuer den Device-Select und den FileInput
-  renderFI <- function() {
-    output$fInput <- renderUI({
-      tagList(
-        selectInput("devSel", label = translate("Device waehlen"), choices = deviceList),
-        fileInput("patDat", label = textOutput("patDat_t"), multiple = TRUE, buttonLabel = translate("Los"), placeholder = translate("Keine Datei gewählt"))
-      )
-    })
-  }
-  
-  # Fuer die Trainingsdatenliste
-  renderDataSelect <- function(choiceList = NULL) {
-    output$datSelect <- renderUI({
-      tagList(
-        selectInput("inpData", label = translate("Trainingsdaten analysieren ..."), choices = choiceList)
-      )
-    })
-  }
-  
-  renderTimeline <- function() {
-    output$zeitraumSelect <- renderUI({
-      tagList(
-        dateRangeInput("inpDateRange", label = translate("Zeitraum analysieren"), 
-                                       format = translate("dd.mm.yyyy"), 
-                                       language = translate("de"), 
-                                       separator = translate("bis"),
-                                       start = "0000-00-00")
-      )      
-    })
-  }
-  
   # Fuer die Risikoklasse
   renderRiskClass <- function() {
     output$riskclass <- renderUI({
@@ -204,7 +170,7 @@ shinyServer(function(input, output, session) {
             ),
             hr(),
             h4(translate("maximaleHF")),
-            sliderInput("overrideMaxHF", label = NULL, value = input$hfMax, min = input$hfMax, max = 240, step = 1),
+            sliderInput("overrideMaxHF", label = NULL, value = hfMaxGeneral, min = 100, max = 240, step = 1),
             hr()
         )
       )
@@ -224,15 +190,7 @@ shinyServer(function(input, output, session) {
     
   }
   
-  # Abfrage ob die eingelesenen Daten immer noch zum selben Patienten gehoeren ...
-  askForPerson <- function() {
-    m = modalDialog(
-      h2(translate("PersonenDaten")),
-      title = translate("Bitte beachten"),
-      footer = tagList(modalButton("Ja"), actionButton("samePerson", "NEIN"))
-    )
-    showModal(m)    
-  }
+
   
   # Funktion zum An- und Ausschalten des Inputpanels
   iPanelOn <- function() {
@@ -254,9 +212,6 @@ shinyServer(function(input, output, session) {
     renderGesch()
         
     # Sidebar
-    output$patDat_t <- renderText({ paste(translate("Trainingsdaten suchen ...")) })
-    renderFI()
-    renderTimeline()
     renderAlter()
     output$bmiTitle <- renderText({ paste("BMI") })
     renderBMI()
@@ -274,7 +229,6 @@ shinyServer(function(input, output, session) {
     # Wieder Einstellen von bestimmten ausgewaehlten Parametern nach dem Sprachwechsel...
     updateDateInput(session, "inpAlter", value = currentBirthDate)        # Alter wieder einstellen
     updateRadioButtons(session, "inpGesch", selected = currentSex)        # Geschlecht wieder einstellen
-    renderDataSelect(unitList)                                # Auswahldaten (wieder) einstellen
     renderDataPlot()                                          # Datenplot neu beschriften
     renderMapPlot()                                           # Kartenplot ausfuehren
     renderSelAxis()                                           # Achsenauswahl neu beschriften
@@ -388,15 +342,6 @@ shinyServer(function(input, output, session) {
   # ------------------------------------------------------
   # Funktionen fuer die Aufbereitung der Daten zur Ausgabe
   # ------------------------------------------------------
-  
-  # Die Funktion entscheidet anhand der eingelesenen Daten, von welcher Watch die Daten stammen
-  # danach kann entschieden werden, welche Funktion benutzt werden soll, um die Daten entsprechend aufzubereiten
-  decideWhichWatch <- function() {
-    watch <- toupper(input$devSel)
-    return(watch)
-  }
-  
-  
   
   # Dateien für die Trainingseinheit einer Polar M200 - Watch zusammenstellen (d.h. ...)
   lookForExerciseUnitPolarM200 <- function(datInfo) {
@@ -525,7 +470,6 @@ shinyServer(function(input, output, session) {
                                       # wieviele bereits ausgewaehlt oder geladen wurden
       exerciseData <<- necData
       viewportDF <<- vp_df
-      renderDataSelect(unitList)
     }
   }
   
@@ -586,7 +530,6 @@ shinyServer(function(input, output, session) {
       unitList <<- selList
       exerciseData <<- necData
       viewportDF <<- vp_df    
-      renderDataSelect(unitList)
     }
   }
 
@@ -628,50 +571,7 @@ shinyServer(function(input, output, session) {
   # ----------------------
   # Die Events beachten...
   # ----------------------
-  
-  # # Wenn Trainingsdaten geladen werden
-  # observeEvent(input$patDat, {
-  #   
-  #   #Gehoeren die eingelesenen Daten immer noch zur selben Person?
-  #   if (!is.null(exerciseData))
-  #     askForPerson()
-  #   
-  #   # Dateiinfos der geladenen Dateien erhalten
-  #   datInfo <- input$patDat
-  #   
-  #   # Von welcher Watch sind die Daten geladen
-  #   switch(decideWhichWatch(),
-  # 
-  #     # Dateien der Trainingseinheiten nach Standard Polar M 200 (CSV, GPX, TCX) zusammenstellen
-  #     POLARM200 = {
-  #       renderDataSelect(NULL)
-  #       lookForExerciseUnitPolarM200(datInfo)
-  #       #renderTabSetPanel() - noch notwendig
-  #       renderDataPlot()
-  #       renderSelAxis()
-  #       renderMapPlot()
-  #     },
-  #     
-  #     # Dateien der Trainingseinheiten nach Standard GARMIN (TCX) zusammenstellen
-  #     GARMIN = {
-  #       renderDataSelect(NULL)
-  #       lookForExerciseUnitGarmin(datInfo)
-  #       #renderTabSetPanel() - noch notwendig
-  #       renderDataPlot()
-  #       renderSelAxis()
-  #       renderMapPlot()
-  #     }
-  #     
-  #   )
-  # 
-  #   visualizeDataTable(input$Data)
-  # })
-  
-  # Wird eine Trainingseinheit ausgewaehlt, dann ....
-  observeEvent(input$inpData, {
-    visualizeDataTable(input$inpData)
-  })
-  
+
   # Wenn die Risikoklasse, die Belastungsintensität oder die Maximalherzfrequenz eingestellt wird
 
   observeEvent(input$inpRiskClass, {
@@ -679,6 +579,7 @@ shinyServer(function(input, output, session) {
     heartRateLimits <<- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (as.numeric(input$inpRiskClass) - 40) + 40
     maxFr <<- as.numeric(input$inpRiskClass)
 
+    updateSliderInput(session, "overrideMaxHF", value = maxFr)
     updateSliderInput(session, "hfMax", max = maxFr, value = maxFr)
     
   })
@@ -709,15 +610,7 @@ shinyServer(function(input, output, session) {
     rVal$hfBo <- input$hfBer[2]
   })
   
-  observeEvent(input$samePerson, {
-    updateTextInput(session, "nachname", value = "")
-    updateTextInput(session, "vorname", value =  "")
-    updateSliderInput(session, "groesse", value = 170)
-    updateSliderInput(session, "gewicht", value=70)
-    renderGebDat()
-    renderGesch()
-    removeModal()
-  })
+
   
   # Wenn die Achsen für die Graphen ausgewaehlt werden ...
   observeEvent(input$selAxisXId, {
@@ -767,7 +660,7 @@ shinyServer(function(input, output, session) {
   })
   
   observeEvent(input$overrideMaxHF, {
-    updateSliderInput(session, "hfMax", max = input$overrideMaxHF)
+    updateSliderInput(session, "hfMax", value = input$hfMax, max = input$overrideMaxHF)
   })
   
 # ########################################################################################################################
@@ -839,6 +732,8 @@ shinyServer(function(input, output, session) {
   
   # Funktion kontrolliert den Datenimport nach Datei-Upload
   importFiles <- function(fileDF) {
+    if (is.null(fileDF)) {return(NULL)}
+    
     newDataAll <- NULL
     errormsg <- NULL
     n <- nrow(fileDF)
@@ -898,6 +793,7 @@ shinyServer(function(input, output, session) {
     newDataAll$DistanceMeters <- round(as.numeric(newDataAll$DistanceMeters), 1)
     
     newDataAll$GPS <- ifelse(is.na(newDataAll$LatitudeDegrees) | is.na(newDataAll$LatitudeDegrees), "-", "+")
+    newDataAll$Id <- ifelse(is.na(newDataAll$Id), "???", newDataAll$Id)
     
     if (!is.null(newDataAll)) {
       # entferne Zeilen ohne datetime-Signatur
@@ -912,10 +808,26 @@ shinyServer(function(input, output, session) {
       showMessage(errormsg, input$language)
     }
     
+    # umbennen und erweitern von Spalten
     colnames(newDataAll)[match("Time", colnames(newDataAll))] <- "DTG"
     colnames(newDataAll)[match("Id", colnames(newDataAll))] <- "Label"
     newDataAll$Date <- format(newDataAll$DTG, "%Y-%m-%d")
     newDataAll$Time <- format(newDataAll$DTG, "%H:%M:%S")
+    
+    # entferne bei neu geladenen Daten immer alle globalen Filter
+    updateCheckboxInput(session, "filterById", value = FALSE)
+    updateSelectInput(session, "filterByIdSelect",
+                      choices = unique(newDataAll[,match("Label", colnames(newDataAll))]))
+    updateCheckboxInput(session, "filterByDate", value = FALSE)
+    updateSelectInput(session, "filterByDateSelect",
+                      choices = unique(newDataAll[,match("Date", colnames(newDataAll))]))
+    
+    if (is.null(newDataAll)) {
+      updateCheckboxInput(session, "dataAvailable", value = FALSE)
+    } else {
+      updateCheckboxInput(session, "dataAvailable", value = TRUE)
+    }
+    
     return(newDataAll)
   }
   
@@ -949,19 +861,32 @@ shinyServer(function(input, output, session) {
   
 # -------------------------------------------------------------------------------------------------------------- 
   
-  modifyDF <- function(df, lang) {
+  modifyDF <- function(df, lang, filterColId, filterId, filterColDate, filterDate) {
     if (is.null(df)) {
       return(NULL)
     } else {
-      colnames(df)[match("Label", colnames(df))] <- translate("Label", lang)
-      colnames(df)[match("Date", colnames(df))] <- translate("Date", lang)
       colnames(df)[match("Time", colnames(df))] <- translate("Time", lang)
       colnames(df)[match("HeartRateBpm", colnames(df))] <- translate("HeartRateBpm", lang)
       colnames(df)[match("LatitudeDegrees", colnames(df))] <- translate("LatitudeDegrees", lang)
       colnames(df)[match("LongitudeDegrees", colnames(df))] <- translate("LongitudeDegrees", lang)
       colnames(df)[match("AltitudeMeters", colnames(df))] <- translate("AltitudeMeters", lang)
       colnames(df)[match("DistanceMeters", colnames(df))] <- translate("DistanceMeters", lang)
+
+
+
+      updateCheckboxInput(session, "filterById", translate("filterId", lang))
+      if (filterColId) {
+        df <- df[which(df$Label==filterId),]
+      }
+      colnames(df)[match("Label", colnames(df))] <- translate("Label", lang)
       
+      updateCheckboxInput(session, "filterByDate", translate("filterDate", lang))
+      if (filterColDate) {
+        df <- df[which(df$Date==filterDate),]
+      }
+      colnames(df)[match("Date", colnames(df))] <- translate("Date", lang)
+      
+      # Begrenzung auf bestimmte Spalten
       cols <- c(translate("Label", lang), translate("Date", lang), translate("Time", lang),
                 translate("HeartRateBpm", lang), "GPS", translate("AltitudeMeters", lang),
                 translate("DistanceMeters", lang))
@@ -987,10 +912,10 @@ shinyServer(function(input, output, session) {
   })
   
   coroData <- reactive({
-    modifyDF(coroRawData(), input$language)
+    modifyDF(coroRawData(), input$language, input$filterById, input$filterByIdSelect,
+             input$filterByDate, input$filterByDateSelect)
   })
-  
-  
+
 # --------------------------------------------------------------------------------------------------------------
   
   
@@ -1036,6 +961,7 @@ shinyServer(function(input, output, session) {
       return (translate("filesLoaded1", input$language))
     }
   })
+  output$filterTitle <- renderText({translate("filterTitle", input$language)})
   
   # TODO
   output$hfMax_t <- renderText({translate("Maximale Herzfrequenz", input$language)})
@@ -1144,6 +1070,8 @@ shinyServer(function(input, output, session) {
                     "processing" = translate("processing", input$language),
                     "info" = translate("info", input$language),
                     "infoEmpty" = translate("infoEmpty", input$language),
+                    "zeroRecords" = translate("zeroRecords", input$language),
+                    "emptyTable" = translate("emptyTable", input$language),
                     "infoFiltered" = translate("infoFiltered", input$language))
     tableRenderer(languageList)
   })

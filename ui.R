@@ -100,7 +100,9 @@ shinyUI(fluidPage(
                    checkboxGroupInput("tabsToShow", "Zeige folgende Tabs", 
                                       c("Start" = 0, "Daten" = 1, "Plots" = 2, "Karten" = 3,
                                         "Zusammenfassung" = 4, "Einstellungen" = 5),
-                                      selected = c(0, 1, 2, 3, 4, 5))
+                                      selected = c(0, 1, 2, 3, 4, 5)),
+                   checkboxInput("dataAvailable", "Datensatz geladen?", value = FALSE)
+                   
   ),
 
 # --------------------------------------------------------------------------------------------------------------
@@ -158,16 +160,25 @@ shinyUI(fluidPage(
                                  labelIcon = "folder-open-o", width= "250px",
                                  multiple = TRUE, progress = FALSE),
                 textOutput("fileCounter"),
-    
-                
-                
-                
-                
                 hr(),
-                uiOutput("fInput"),             # Auswahl der Trainingsdatei                        
-                uiOutput("datSelect"),          # Eingabe der Dateiauswahl für die Trainingsdaten
-                uiOutput("zeitraumSelect"),     # Eingabe des Zeitraums, dessen Daten ausgewertet werden sollen
-                hr(),
+                conditionalPanel("input.dataAvailable",
+                  tags$label(textOutput("filterTitle")),
+                  fluidRow(
+                    column(8, align="left", checkboxInput("filterById", NULL, FALSE),
+                           conditionalPanel("input.filterById==true",
+                                            selectInput("filterByIdSelect", NULL, NULL))
+                           ),
+                    column(4, align="left", checkboxInput("filterByDate", NULL, FALSE),
+                           conditionalPanel("input.filterByDate==true",
+                                            selectInput("filterByDateSelect", NULL, NULL))
+                           )
+                  ),
+                  hr()
+                ),
+                
+                
+                
+                
                 fluidRow(
                   column(4, align="center", uiOutput("alter")),             # Ausgabe des Alters
                   column(4, align="center", uiOutput("bmiUI")),             # Ausgabe des BMI
