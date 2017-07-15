@@ -203,7 +203,9 @@ shinyServer(function(input, output, session) {
               column(3, actionButton("resetColors", label = translate("FarbenZurück")))
             ),
             hr(),
-            actionButton("createPDF", "Create PDF")
+            h4(translate("maximaleHF")),
+            sliderInput("overrideMaxHF", label = NULL, value = input$hfMax, min = input$hfMax, max = 240, step = 1),
+            hr()
         )
       )
     })
@@ -762,6 +764,10 @@ shinyServer(function(input, output, session) {
     text(1,1, "Juhu!")
     
     dev.off()
+  })
+  
+  observeEvent(input$overrideMaxHF, {
+    updateSliderInput(session, "hfMax", max = input$overrideMaxHF)
   })
   
 # ########################################################################################################################

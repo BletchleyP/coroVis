@@ -103,3 +103,4 @@ LatitudeDegrees;Breitengrad;LatitudeDegrees;[fr]
 LongitudeDegrees;Längengrad;LongitudeDegrees;[fr]
 AltitudeMeters;Höhe;AltitudeMeters;[fr]
 DistanceMeters;Entfernung;DistanceMeters;[fr]
+maximaleHF;Maximale Herzfrequenz korrigieren;Override maximum heart rate;Corriger la frequence cardiaque
