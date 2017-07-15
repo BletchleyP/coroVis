@@ -72,18 +72,34 @@ Aus;Aus;Off;Delumee
 PersonenDaten2;Personendaten;Personal Data;Dates personelles
 Einstellungen;Einstellungen;Settings;Parametres
 Start;Start;Start;Debut
-next;Weiter;next;next[fr]
-previous;Zurück;previous;previous[fr]
-search;Suche:;search;search[fr]
-lengthMenu;Zeige _MENU_ Einträge;Show _MENU_ entries;Show _MENU_ entries[fr]
-loadingRecords;Daten werden geladen ...;Loading ...;Loading ...[fr]
-processing;Bitte warten ...;Please wait ...;Please wait ...[fr]
-info;Zeige _START_ bis _END_ von _TOTAL_ Einträgen; Show _START_ to _END_ of _TOTAL_ entries; Show _START_ to _END_ of _TOTAL_ entries[fr]
-infoEmpty;Zeige 0 bis 0 von 0 Einträgen;Show 0 to 0 of 0 entries;Show 0 to 0 of 0 entries[fr]
-infoFiltered;(gefiltert aus _MAX_ Einträgen insgesamt);(filtered from _MAX_ entries);(filtered from _MAX_ entries)[fr]
+next;Weiter;Next;[fr]
+previous;Zurück;Previous;[fr]
+search;Suche:;Search:;[fr]
+lengthMenu;Zeige _MENU_ Einträge;Show _MENU_ entries;[fr] _MENU_ [fr]
+loadingRecords;Daten werden geladen ...;Loading ...;[fr]
+processing;Bitte warten ...;Please wait ...;[fr]
+info;Zeige _START_ bis _END_ von _TOTAL_ Einträgen; Show _START_ to _END_ of _TOTAL_ entries; [fr] _START_ [fr] _END_ [fr] _TOTAL_ [fr]
+infoEmpty;Zeige 0 bis 0 von 0 Einträgen;Show 0 to 0 of 0 entries;[fr] 0 [fr] 0 [fr] 0 [fr]
+infoFiltered;(gefiltert aus _MAX_ Einträgen insgesamt);(filtered from _MAX_ entries);[fr] _MAX_ [fr]
 Fehlermeldung;Ein Fehler ist aufgetreten:;An error occured:;Texte du message d'erreur:
 Farbwerte;Farbwerte für den Referenzbereich;Colors for reference area;Coleurs de zone referencee
 UnterRef;Unter dem Referenzwert...;Under the reference...;Sous la reference...
 ImRef;Im Referenzbereich...;In the reference...;Dans la reference...
 ÜberRef;Über dem Referenzbereich...; Above the reference...;Sur la reference...
 FarbenZurück;Farben zurücksetzen;Reset colors;Retour couleurs
+filesLoaded0;Keine Dateien geladen;No files loaded;[fr]
+filesLoaded1;1 Datei geladen;1 file loaded;[fr]
+filesLoaded2;Dateien geladen;files loaded; [fr]
+filesButton;Trainingsdaten laden ...;Upload data ...;[fr]
+filesHeader;Welche Dateien sollen analysiert werden?;Choose file(s) for analysis:;[fr]
+importFileMsg;Importiere %i Datei(en);Import of %i file(s);[fr]
+importDataMsg;Importiere %i Messwert(e);Import of %i row(s);[fr]
+Label;Bezeichnung;Label;[fr]
+Date;Datum;Date;[fr]
+Time;Zeit;Time;[fr]
+DTG;Datum-Zeit-Gruppe;Date-Time-Group;[fr]
+HeartRateBpm;Herzfrequenz;HeartRateBpm;[fr]
+LatitudeDegrees;Breitengrad;LatitudeDegrees;[fr]
+LongitudeDegrees;Längengrad;LongitudeDegrees;[fr]
+AltitudeMeters;Höhe;AltitudeMeters;[fr]
+DistanceMeters;Entfernung;DistanceMeters;[fr]

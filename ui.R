@@ -1,6 +1,22 @@
 library(shiny)
 library(leaflet)
 
+# modifizierter fileInput
+coroVisFileInput <- function(inputId, label = NULL, labelIcon = NULL, multiple = FALSE, 
+                       accept = NULL, width = NULL, progress = TRUE, ...) {
+  inputTag <- tags$input(id = inputId, name = inputId, type = "file", class = "coroVisFileIn")
+  if (multiple) {inputTag$attribs$multiple <- "multiple"}
+  if (length(accept) > 0) {inputTag$attribs$accept <- paste(accept, collapse = ",")}
+  div(..., style = if (!is.null(width)) paste0("width: ", validateCssUnit(width), ";", "display: inline;"), 
+      inputTag,
+      tags$label(`for` = inputId, div(icon(labelIcon), label, class = "btn btn-default action-button")),
+      if(progress) {
+        tags$div(id = paste0(inputId, "_progress"), class = "progress shiny-file-input-progress",
+                 tags$div(class = "progress-bar"))
+      }
+  )
+}
+
 shinyUI(fluidPage(
 
 # --------------------------------------------------------------------------------------------------------------
@@ -46,6 +62,18 @@ shinyUI(fluidPage(
                     .modal-title {
                       color: red;
                     }
+                    .coroVisFileIn {
+                      width: 0.1px;
+                      height: 0.1px;
+                      opacity: 0;
+                      overflow: hidden;
+                      position: absolute;
+                      z-index: -1;
+                    }
+                    #fileCounter, #fileLabel {
+                      display: inline;
+                      margin: 10px;
+                    }
                     "))
     ),
     
@@ -63,7 +91,7 @@ shinyUI(fluidPage(
   
 # --------------------------------------------------------------------------------------------------------------
   # controlPanel mit ausgeblendeten Schaltern
-  conditionalPanel("true",
+  conditionalPanel("false",
                    checkboxInput("iPanelOn", "InputPanel on/off", value = TRUE),
                    selectInput(inputId = "currentPanel", label = "Aktuelles HauptPanel:", choices = 
                                  list("workingPanel", "helpPanel", "imprintPanel")),
@@ -71,7 +99,8 @@ shinyUI(fluidPage(
                                min = 1, max = numDics, step = 1, value = 1),
                    checkboxGroupInput("tabsToShow", "Zeige folgende Tabs", 
                                       c("Start" = 0, "Daten" = 1, "Plots" = 2, "Karten" = 3,
-                                        "Zusammenfassung" = 4, "Einstellungen" = 5), selected = c(0, 1, 5))
+                                        "Zusammenfassung" = 4, "Einstellungen" = 5),
+                                      selected = c(0, 1, 2, 3, 4, 5))
   ),
 
 # --------------------------------------------------------------------------------------------------------------
@@ -85,17 +114,17 @@ shinyUI(fluidPage(
                     div(id = "imp", style = "padding-right: 10px; float:right",
                         a(icon("info"), textOutput("impressum_t")))
                    ),
-  conditionalPanel("input.iPanelOn == true && input.currentPanel != 'imprintPanel' && input.currentPanel != 'helpPanel'",
+  conditionalPanel("input.iPanelOn == true && input.currentPanel == 'workingPanel'",
                     div(id = "decrease", style = "padding-right: 10px; float:right",
                         a(icon("toggle-on"), textOutput("pers0_t")))
                   ),
-  conditionalPanel("input.iPanelOn != true && input.currentPanel != 'imprintPanel' && input.currentPanel != 'helpPanel'",
+  conditionalPanel("input.iPanelOn != true && input.currentPanel == 'workingPanel'",
                    div(id = "increase", style = "padding-right: 10px; float:right",
                        a(icon("toggle-off"), textOutput("pers1_t")))
                   ),
   
 # --------------------------------------------------------------------------------------------------------------
-  # TitelPanel
+  # titelPanel
   titlePanel(title = textOutput("title_t"), windowTitle = "coroVis"),
   hr(),
 
@@ -124,6 +153,17 @@ shinyUI(fluidPage(
             # sidebarPanel zum Laden von Dateien und zur Vorgabe von Belastungswerten
             sidebarLayout(
               sidebarPanel(
+                tags$label(textOutput("fileTitle"), style = "display: block;"),
+                coroVisFileInput(inputId = "userfiles", label = textOutput("fileLabel"),
+                                 labelIcon = "folder-open-o", width= "250px",
+                                 multiple = TRUE, progress = FALSE),
+                textOutput("fileCounter"),
+    
+                
+                
+                
+                
+                hr(),
                 uiOutput("fInput"),             # Auswahl der Trainingsdatei                        
                 uiOutput("datSelect"),          # Eingabe der Dateiauswahl für die Trainingsdaten
                 uiOutput("zeitraumSelect"),     # Eingabe des Zeitraums, dessen Daten ausgewertet werden sollen
@@ -158,7 +198,7 @@ shinyUI(fluidPage(
                   ),
                   tabPanel(textOutput("daten_t"), icon = icon("table"), value = "tP1",
                            hr(),
-                           dataTableOutput("tabOut")
+                           dataTableOutput("coroTable")
                   ),
                   tabPanel(textOutput("zeit_t"), icon = icon("bar-chart"), value = "tP2",
                            hr(),
@@ -186,19 +226,19 @@ shinyUI(fluidPage(
 # --------------------------------------------------------------------------------------------------------------
   # helpPanel zur Anzeige des Impressums
   conditionalPanel("input.currentPanel == 'helpPanel'",
-                   h1(textOutput(outputId = "helpTitle")),
+                   h3(textOutput("helpTitle")),
                    br(),
                    tags$video(src='bref.mp4', type='video/mp4', width='40%', controls='controls'),
-                   actionButton(inputId = "helpBack", label = textOutput(outputId = "helpBackLabel"))
+                   actionButton("helpBack", textOutput("helpBackLabel"))
   ),
 
 # --------------------------------------------------------------------------------------------------------------
   # imprintPanel zur Anzeige des Impressums
   conditionalPanel("input.currentPanel == 'imprintPanel'",
-                   h1(textOutput(outputId = "imprintTitle")),
+                   h3(textOutput("imprintTitle")),
                    br(),
-                   htmlOutput(outputId = "imprintHTML"),
-                   actionButton(inputId = "imprintBack", label = textOutput(outputId = "imprintBackLabel"))
+                   htmlOutput("imprintHTML"),
+                   actionButton("imprintBack", textOutput("imprintBackLabel"))
   )
   
 ))

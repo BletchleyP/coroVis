@@ -4,6 +4,9 @@
 #
 # ##############################################################################################################
 
+# temporär zur Fehlerbehandlung
+test <- NULL
+
 # --------------------------------------------------------------------------------------------------------------
 
 # Fuer die Berechnungen eines Jahres
@@ -23,8 +26,8 @@ hfMaxGeneral <- 220
 hfBereiche <- list("minimal" = 1,"leicht" = 2, "moderat" = 3, "schwer" = 4, "sehr schwer" = 5, "maximal" = 6)
 heartRateLimits <- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (hfMaxGeneral - 40) + 40
 
-# Vorgabe für viewportDF
-myHeader <- c("Filename", "Id", "Time", "HeartRateBpm", "LatitudeDegrees", "LongitudeDegrees",
+# Header-Vorgabe für Datenimport
+myHeader <- c("Time", "Id", "HeartRateBpm", "LatitudeDegrees", "LongitudeDegrees",
               "AltitudeMeters", "DistanceMeters")
 
 # --------------------------------------------------------------------------------------------------------------
@@ -89,27 +92,11 @@ importDataGPX <- function(gpxfile) {
     newData <- as.data.frame(newData, stringsAsFactors = FALSE)
     row.names(newData) <- NULL
     
-    # konvertiere chr zu numeric mit 6 (Lat/Lon) bzw. 1 (Altitude) Nachkommastelle
-    options(digits=10)
-    newData$LatitudeDegrees <- round(as.numeric(newData$LatitudeDegrees), 6)
-    newData$LongitudeDegrees <- round(as.numeric(newData$LongitudeDegrees), 6)
-    newData$AltitudeMeters <- round(as.numeric(newData$AltitudeMeters), 1)
-    
     # erweitere fehlende Spalten und sortiert neu
-    newData$Filename <- NA
     newData$Id <- NA
     newData$HeartRateBpm <- NA
     newData$DistanceMeters <- NA
     newData <- newData[myHeader]
-    
-    # entferne Millisekunden und ZULU-timezone tag
-    timeZ <- grepl("(\\.[0-9]{3})?Z", newData$Time)
-    if (sum(timeZ, na.rm=TRUE) == totalsize) {
-      newData$Time <- sub("(\\.[0-9]{3})?Z", "", newData$Time)
-      newData$Time <- as.POSIXct(newData$Time, format = "%Y-%m-%dT%H:%M:%S", tz = "UTC")
-    } else {
-      newData <- NULL
-    }
   }
   
   return(newData)
