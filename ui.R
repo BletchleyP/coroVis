@@ -214,8 +214,14 @@ shinyUI(fluidPage(
                   tabPanel(textOutput("zeit_t"), icon = icon("bar-chart"), value = "tP2",
                            hr(),
                            plotOutput("explorationPlot"),
-                           uiOutput("selAxOut"),
-                           conditionalPanel("input.hrPlotOn", plotOutput("explorationPlotHR"))
+                           fluidRow(
+                             column(4, offset = 2, align="center",
+                                    selectInput("axisXSelect", textOutput("axisXSelectLabel"),
+                                                choices = c("Zeit"))),
+                             column(4, align="center",
+                                    selectInput("axisYSelect", textOutput("axisYSelectLabel"),
+                                                choices = c("Herzfrequenz", "Höhe", "Entfernung")))
+                           )
                   ),
                   tabPanel(textOutput("karte_t"), icon = icon("road"), value = "tP3",
                            hr(),

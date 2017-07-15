@@ -146,19 +146,6 @@ shinyServer(function(input, output, session) {
     })
   }
   
-  # Fuer Auswahl der Achsen an den Graphen
-  renderSelAxis <- function() {
-    output$selAxOut <- renderUI({
-      tagList(
-        inputPanel(
-          selectInput("selAxisId", label = textOutput("selAxis"), choice = list(translate("Weg"), translate("Hoehe"), translate("Geschwindigkeit"))),
-          selectInput("selAxisXId", label = textOutput("selAxisX"), choice = list(translate("Weg"), translate("Zeit"))),
-          radioButtons("hrOn", label = translate("Herzfrequenz"), choiceNames = list(translate('An'), translate('Aus')), choiceValues = list(TRUE, FALSE), inline = TRUE, selected = "FALSE")
-        )
-      )
-    })
-  }
-  
   renderSettings <- function() {
     output$settingsOut <- renderUI({
       tagList(
@@ -222,15 +209,15 @@ shinyServer(function(input, output, session) {
     output$selAxisX <- renderText({ paste(translate("XAchse"))})
     output$selAxis <- renderText({ paste(translate("YAchse")) })
     
-    renderSelAxis()
+
     renderSettings()
     
     # Wieder Einstellen von bestimmten ausgewaehlten Parametern nach dem Sprachwechsel...
     updateDateInput(session, "inpAlter", value = currentBirthDate)        # Alter wieder einstellen
     updateRadioButtons(session, "inpGesch", selected = currentSex)        # Geschlecht wieder einstellen
-    renderDataPlot()                                          # Datenplot neu beschriften
+    # renderDataPlot()                                          # Datenplot neu beschriften
     renderMapPlot()                                           # Kartenplot ausfuehren
-    renderSelAxis()                                           # Achsenauswahl neu beschriften
+
 
   }
   
@@ -238,74 +225,78 @@ shinyServer(function(input, output, session) {
   # Die Daten plotten
   # -----------------
   
-  # Datentabelle im TabPanel darstellen
-  visualizeDataTable<- function(data) {
-    alleDaten <- grep(" # Alle Daten", data)
-    if (length(alleDaten) > 0) {
-      choice <- gsub(" # Alle Daten", "", data)
-      updateTabsetPanel(session, "tP", selected = "tP1")
-    }
-  }
-  
-  # Graphisch im TabPanel darstellen
-  renderDataPlot <- function(xAx = "Weg", yAx = "Weg") {
-    
-    # X-Achse auswaehlen
-    switch(xAx,
-           Weg = { xAxis <- viewportDF$DistanceMeters },
-           Zeit = { xAxis <- viewportDF$Time }
-    )
-    
-    # Y-Achse auswaehlen
-    switch(yAx,
-           Weg = { yAxis <- viewportDF$DistanceMeters },
-           Hoehe = { yAxis <- viewportDF$AltitudeMeters },
-           
-           # Geschwindigkeit berechnen...
-           Geschwindigkeit = {
-             dWeg <- array()
-             for(i in 2:length(viewportDF$DistanceMeters)) {
-              dT <- times(viewportDF$Time[i]) - times(viewportDF$Time[i-1])
-              dT <- as.integer(substr(dT, 7, 8)) + as.integer(substr(dT, 4, 5)) * 60 + as.integer(substr(dT, 1, 2)) * 3600
-              dWeg[i] <- ((viewportDF$DistanceMeters[i] - viewportDF$DistanceMeters[i-1]) / dT) * 3.6 
-             }
-             dWeg[1] = 0
-             yAxis = dWeg
-           }
-    )
+
+  # # Graphisch im TabPanel darstellen
+  # renderDataPlot <- function(xAx = "Weg", yAx = "Weg") {
+  #   
+  #   # X-Achse auswaehlen
+  #   switch(xAx,
+  #          Weg = { xAxis <- viewportDF$DistanceMeters },
+  #          Zeit = { xAxis <- viewportDF$Time }
+  #   )
+  #   
+  #   # Y-Achse auswaehlen
+  #   switch(yAx,
+  #          Weg = { yAxis <- viewportDF$DistanceMeters },
+  #          Hoehe = { yAxis <- viewportDF$AltitudeMeters },
+  #          
+  #          # Geschwindigkeit berechnen...
+  #          Geschwindigkeit = {
+  #            dWeg <- array()
+  #            for(i in 2:length(viewportDF$DistanceMeters)) {
+  #             dT <- times(viewportDF$Time[i]) - times(viewportDF$Time[i-1])
+  #             dT <- as.integer(substr(dT, 7, 8)) + as.integer(substr(dT, 4, 5)) * 60 + as.integer(substr(dT, 1, 2)) * 3600
+  #             dWeg[i] <- ((viewportDF$DistanceMeters[i] - viewportDF$DistanceMeters[i-1]) / dT) * 3.6 
+  #            }
+  #            dWeg[1] = 0
+  #            yAxis = dWeg
+  #          }
+  #   )
     
     # ... nur wenn x- und y-Achse Werte aufweisen, dann...
-    if (!is.null(xAxis) && !is.null(yAxis)) {
+    # if (!is.null(xAxis) && !is.null(yAxis)) {
     
       # ... die Daten selbst im Plot darstellen
-      output$explorationPlot <- renderPlot({
-      
-        x <- xAxis
-        yb <- viewportDF$HeartRateBpm < rVal$hfBu 
-        yc <- viewportDF$HeartRateBpm > rVal$hfBo
-      
-        y1 <- yAxis
-        plot(x, y1, main = translate("Optimale Belastung"), xlab = translate(xAx), ylab = translate(yAx))
-        points(x, y1, col = ifelse(yb, underRef, ifelse(yc, aboveRef, inRef)))
-      
-      })
+  output$explorationPlot <- renderPlot({
+    x <- times(coroData()[,c(input$axisXSelect)])
+    y <- as.numeric(coroData()[,c(input$axisYSelect)])
+    
+    test <<- y
+    plot(x, y, main = "Titel", xlab = "x", ylab = "y")
+    
+  
+    
+    
+    
+    #points(x, y1, col = ifelse(yb, underRef, ifelse(yc, aboveRef, inRef)))
+  
+ })
     
       # ... und den tolerierten Herzfrequenzbereich darstellen (wird nur angezeigt, wenn vom Benutzer gewuenscht)
-      output$explorationPlotHR <- renderPlot({
-      
-        y2 <- viewportDF$HeartRateBpm
-        x <- viewportDF$Time
-      
-        plot(x, y2, type = "p", col = "blue", main = NULL, xlab = translate("Zeit"), ylab = translate("HFq"), ylim = c(40, rVal$maxFr))
-        rect(0, rVal$hfBu, x, rVal$hfBo, border = NULL, col = rgb(0,0,1,.005))
-      
-      })
-    
-    # Andernfalls eine kleine Meldung
-    } else {
-      output$selAxOut <- renderText({ paste("Keine Daten!") })
-    }
-  }
+  #     output$explorationPlotHR <- renderPlot({
+  #     
+  #       y2 <- viewportDF$HeartRateBpm
+  #       x <- viewportDF$Time
+  #     
+  #       plot(x, y2, type = "p", col = "blue", main = NULL, xlab = translate("Zeit"), ylab = translate("HFq"), ylim = c(40, rVal$maxFr))
+  #       rect(0, rVal$hfBu, x, rVal$hfBo, border = NULL, col = rgb(0,0,1,.005))
+  #     
+  #     })
+  # #   
+  #   # Andernfalls eine kleine Meldung
+  #   } else {
+  #     output$selAxOut <- renderText({ paste("Keine Daten!") })
+  #   }
+  # }
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   # Karte im TabPanel darstellen
   renderMapPlot <- function() {
@@ -610,22 +601,7 @@ shinyServer(function(input, output, session) {
   
 
   
-  # Wenn die Achsen für die Graphen ausgewaehlt werden ...
-  observeEvent(input$selAxisXId, {
-    renderDataPlot(rev_translate(input$selAxisXId), rev_translate(input$selAxisId))
-  })
-  
-  observeEvent(input$selAxisId, {
-    renderDataPlot(rev_translate(input$selAxisXId), rev_translate(input$selAxisId))
-  })
-  
-  # Wenn die Herzfrequenz-Darstellung an-/ausgeschaltet wird
-  observeEvent(input$hrOn, {
-    if (input$hrOn == "TRUE")
-      updateCheckboxInput(session, "hrPlotOn", value = TRUE)
-    if (input$hrOn == "FALSE")
-      updateCheckboxInput(session, "hrPlotOn", value = FALSE)
-  })
+
 
   # Wenn die Farben für die Herzfrequenzreferenzbereichsanzeige geaendert wird
   observeEvent(input$cpUnder, {
@@ -763,12 +739,15 @@ shinyServer(function(input, output, session) {
     })
     
     # entferne Millisekunden und ZULU-timezone tag
-    timeZ <- grepl("(\\.[0-9]{3})?Z", newDataAll$Time)
+    test <<- newDataAll$Time
+    timeZ <-   grepl("(\\.[0-9]{3})?Z|(\\.[0-9]{3}?\\+[0-9]{2}:[0-9]{2})", newDataAll$Time)
+    # timeZ <- grepl("(\\.[0-9]{3})?Z", newDataAll$Time)
     if (sum(timeZ, na.rm=TRUE) == nrow(newDataAll)) {
-      newDataAll$Time <- sub("(\\.[0-9]{3})?Z", "", newDataAll$Time)
+      newDataAll$Time <- sub("(\\.[0-9]{3})?Z|(\\.[0-9]{3}?\\+[0-9]{2}:[0-9]{2})", "", newDataAll$Time)
       newDataAll$Time <- as.POSIXct(newDataAll$Time, format = "%Y-%m-%dT%H:%M:%S", tz = "UTC")
     } else {
       newDataAll <- NULL
+      
       errormsg <- paste(errormsg, "Fehler bei Datum-Zeit-Konversion")
     }
     
@@ -978,6 +957,10 @@ shinyServer(function(input, output, session) {
   # workingPanel > mainPanel > tp2
   # TODO
   output$zeit_t <- renderText({translate("Plot", input$language)})
+  output$axisXSelectLabel <- renderText({translate("XAchse", input$language)})
+  output$axisYSelectLabel <- renderText({translate("YAchse", input$language)})
+  
+  
   
   # workingPanel > mainPanel > tp3
   # TODO
