@@ -174,17 +174,11 @@ shinyUI(fluidPage(
                            )
                   ),
                   hr()
-                ),    
+                ),
                 
                 
                 
                 
-                
-                
-                      
-                uiOutput("datSelect"),          # Eingabe der Dateiauswahl für die Trainingsdaten
-                uiOutput("zeitraumSelect"),     # Eingabe des Zeitraums, dessen Daten ausgewertet werden sollen
-                hr(),
                 fluidRow(
                   column(4, align="center", uiOutput("alter")),             # Ausgabe des Alters
                   column(4, align="center", uiOutput("bmiUI")),             # Ausgabe des BMI

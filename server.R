@@ -119,27 +119,6 @@ shinyServer(function(input, output, session) {
     })
   }
   
-  # Fuer die Trainingsdatenliste
-  renderDataSelect <- function(choiceList = NULL) {
-    output$datSelect <- renderUI({
-      tagList(
-        selectInput("inpData", label = translate("Trainingsdaten analysieren ..."), choices = choiceList)
-      )
-    })
-  }
-  
-  renderTimeline <- function() {
-    output$zeitraumSelect <- renderUI({
-      tagList(
-        dateRangeInput("inpDateRange", label = translate("Zeitraum analysieren"), 
-                                       format = translate("dd.mm.yyyy"), 
-                                       language = translate("de"), 
-                                       separator = translate("bis"),
-                                       start = "0000-00-00")
-      )      
-    })
-  }
-  
   # Fuer die Risikoklasse
   renderRiskClass <- function() {
     output$riskclass <- renderUI({
@@ -235,7 +214,6 @@ shinyServer(function(input, output, session) {
     renderGesch()
         
     # Sidebar
-    renderTimeline()
     renderAlter()
     output$bmiTitle <- renderText({ paste("BMI") })
     renderBMI()
@@ -253,7 +231,6 @@ shinyServer(function(input, output, session) {
     # Wieder Einstellen von bestimmten ausgewaehlten Parametern nach dem Sprachwechsel...
     updateDateInput(session, "inpAlter", value = currentBirthDate)        # Alter wieder einstellen
     updateRadioButtons(session, "inpGesch", selected = currentSex)        # Geschlecht wieder einstellen
-    renderDataSelect(unitList)                                # Auswahldaten (wieder) einstellen
     renderDataPlot()                                          # Datenplot neu beschriften
     renderMapPlot()                                           # Kartenplot ausfuehren
     renderSelAxis()                                           # Achsenauswahl neu beschriften
@@ -495,7 +472,6 @@ shinyServer(function(input, output, session) {
                                       # wieviele bereits ausgewaehlt oder geladen wurden
       exerciseData <<- necData
       viewportDF <<- vp_df
-      renderDataSelect(unitList)
     }
   }
   
@@ -556,7 +532,6 @@ shinyServer(function(input, output, session) {
       unitList <<- selList
       exerciseData <<- necData
       viewportDF <<- vp_df    
-      renderDataSelect(unitList)
     }
   }
 
@@ -598,14 +573,7 @@ shinyServer(function(input, output, session) {
   # ----------------------
   # Die Events beachten...
   # ----------------------
-  
 
-  
-  # Wird eine Trainingseinheit ausgewaehlt, dann ....
-  observeEvent(input$inpData, {
-    visualizeDataTable(input$inpData)
-  })
-  
   # Wenn die Risikoklasse, die Belastungsintensität oder die Maximalherzfrequenz eingestellt wird
 
   observeEvent(input$inpRiskClass, {
