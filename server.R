@@ -139,18 +139,7 @@ shinyServer(function(input, output, session) {
     })
   }
   
-  renderSettings <- function() {
-    output$settingsOut <- renderUI({
-      tagList(
-        div(id = "colors",
-            
-            h4(translate("maximaleHF")),
-            sliderInput("overrideMaxHF", label = NULL, value = hfMaxGeneral, min = 100, max = 240, step = 1),
-            hr()
-        )
-      )
-    })
-  }
+
   
   # -------------------
   # Hilfsfunktionen ...
@@ -199,7 +188,7 @@ shinyServer(function(input, output, session) {
     output$selAxis <- renderText({ paste(translate("YAchse")) })
     
 
-    renderSettings()
+
     
     # Wieder Einstellen von bestimmten ausgewaehlten Parametern nach dem Sprachwechsel...
     updateDateInput(session, "inpAlter", value = currentBirthDate)        # Alter wieder einstellen
@@ -568,16 +557,7 @@ shinyServer(function(input, output, session) {
   })
   
 
-  
 
-  
-  observeEvent(input$createPDF, {
-    pdf("test1.pdf")
-    plot(1,2)
-    text(1,1, "Juhu!")
-    
-    dev.off()
-  })
   
   observeEvent(input$overrideMaxHF, {
     updateSliderInput(session, "hfMax", value = input$hfMax, max = input$overrideMaxHF)
@@ -948,7 +928,7 @@ shinyServer(function(input, output, session) {
   output$settingsColor3Label <- renderText({translate("ÜberRef", input$language)})
   output$settingsColorResetLabel <- renderText({translate("FarbenZurück", input$language)})
   
-
+  output$settingsHFmaxTitle <- renderText({translate("maximaleHF", input$language)})
   
   # helpPanel
   output$helpTitle <- renderText({translate("Hilfe", input$language)})

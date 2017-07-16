@@ -256,7 +256,10 @@ shinyUI(fluidPage(
                                                            label = textOutput("settingsColorResetLabel")))
                            ),
                            hr(),
-                           uiOutput("settingsOut")
+                           h4(textOutput("settingsHFmaxTitle")),
+                           sliderInput("overrideMaxHF", label = NULL, value = hfMaxGeneral,
+                                       min = 100, max = 240, step = 1),
+                           hr()
                   )
                 )
               )
