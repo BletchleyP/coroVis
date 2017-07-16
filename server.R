@@ -199,24 +199,8 @@ shinyServer(function(input, output, session) {
 
   }
   
-  # -----------------
-  # Die Daten plotten
-  # -----------------
-  output$explorationPlot <- renderPlot({
-    if (is.null(coroDataPlot())) {return(NULL)}
-    x <- times(coroDataPlot()[,input$axisXSelect])
-    y <- as.numeric(coroDataPlot()[,input$axisYSelect])
-    z <- coroDataPlot()[,c("Group")]
-    ymin <- ifelse("1" %in% input$plotInclude0 && 0<input$axisYZoom[1], 0, input$axisYZoom[1])
-    
-    par(mar = c(5, 5, 0.2, 2))
-    plot(x, y, pch = 16, col=z, main = NULL, xlab = input$axisXSelect, ylab = input$axisYSelect,
-         xlim = c(input$axisXZoom[1], input$axisXZoom[2]), ylim = c(ymin, input$axisYZoom[2]),
-         cex = input$plotPointsize, las = 1,
-         cex.lab = input$plotTextsize, cex.main = input$plotTextsize)
-    if ("2" %in% input$plotInclude0) {lines(x, y, pch=16)}
-    
- })
+
+
   
   
   
@@ -747,6 +731,20 @@ shinyServer(function(input, output, session) {
     return(df)
   }
   
+# --------------------------------------------------------------------------------------------------------------
+  
+  calculateSummary <- function(df, hrmin, hrmax) {
+    if (is.null(df)) {return(NULL)}
+    df$Group1 <- ifelse(df[,c("HeartRateBpm")]<hrmin, 1, 0)
+    df$Group2 <- ifelse(df[,c("HeartRateBpm")]<=hrmax, 1, 0)
+    df$Group2 <- df$Group2 - df$Group1
+    df$Group3 <- ifelse(df[,c("HeartRateBpm")]>hrmax, 1, 0)
+     
+    mydf <- aggregate(df[11:13], by=list(Label=df$Label), FUN=sum, na.rm=TRUE)
+    
+    return(mydf)
+  }
+  
 # -------------------------------------------------------------------------------------------------------------- 
   
   
@@ -771,6 +769,10 @@ shinyServer(function(input, output, session) {
   
   coroDataPlot <- reactive({
     assignGroups(coroData(), input$hfBer[1], input$hfBer[2], input$cpUnder, input$cpRight, input$cpAbove)
+  })
+  
+  coroDataSummary <- reactive({
+    calculateSummary(coroRawData(), input$hfBer[1], input$hfBer[2])
   })
 
 # --------------------------------------------------------------------------------------------------------------
@@ -835,9 +837,9 @@ shinyServer(function(input, output, session) {
   
   # workingPanel > mainPanel > tp1
   output$daten_t <- renderText({translate("Daten", input$language)})
-  tableRenderer <- function(languageStyle) {
+  tableReRenderer <- function(languageStyle) {
     output$coroTable <- renderDataTable({
-      coroDataPlot()
+      coroData()
     }, options = list(
       lengthMenu = c(10, 25, 100),
       pageLength = 10,
@@ -850,7 +852,20 @@ shinyServer(function(input, output, session) {
   output$zeit_t <- renderText({translate("Plot", input$language)})
   output$axisXSelectLabel <- renderText({translate("XAchse", input$language)})
   output$axisYSelectLabel <- renderText({translate("YAchse", input$language)})
-  
+  output$explorationPlot <- renderPlot({
+    if (is.null(coroDataPlot())) {return(NULL)}
+    x <- times(coroDataPlot()[,input$axisXSelect])
+    y <- as.numeric(coroDataPlot()[,input$axisYSelect])
+    z <- coroDataPlot()[,c("Group")]
+    ymin <- ifelse("1" %in% input$plotInclude0 && 0<input$axisYZoom[1], 0, input$axisYZoom[1])
+    
+    par(mar = c(5, 5, 0.2, 2))
+    plot(x, y, pch = 16, col=z, main = NULL, xlab = input$axisXSelect, ylab = input$axisYSelect,
+         xlim = c(input$axisXZoom[1], input$axisXZoom[2]), ylim = c(ymin, input$axisYZoom[2]),
+         cex = input$plotPointsize, las = 1,
+         cex.lab = input$plotTextsize, cex.main = input$plotTextsize)
+    if ("2" %in% input$plotInclude0) {lines(x, y, pch=16)}
+  })
   
   
   # workingPanel > mainPanel > tp3
@@ -860,6 +875,21 @@ shinyServer(function(input, output, session) {
   # workingPanel > mainPanel > tp4
   # TODO
   output$gesamt_t <- renderText({translate("Zusammenfassung", input$language)})
+  output$summaryTitle <- renderText({translate("Statistik", input$language)})
+  output$tOut2 <- renderTable(coroDataSummary(), digits = 0)
+  plotReRenderer <- function(hsize) {
+    output$summaryPlot <- renderPlot({
+      
+      
+      counts <- t(as.matrix(coroDataSummary()[2:4]))
+      counts <- counts[,ncol(counts):1]
+      
+      par(mar = c(5, 12, 0.2, 2))
+      barplot(counts, horiz = TRUE, names.arg = rev(coroDataSummary()$Label), las=1,
+              col = c(input$cpUnder, input$cpRight, input$cpAbove))
+    }, height = hsize)    
+  }
+
   
   # workingPanel > mainPanel > tp5
   # TODO
@@ -942,7 +972,7 @@ shinyServer(function(input, output, session) {
                     "zeroRecords" = translate("zeroRecords", input$language),
                     "emptyTable" = translate("emptyTable", input$language),
                     "infoFiltered" = translate("infoFiltered", input$language))
-    tableRenderer(languageList)
+    tableReRenderer(languageList)
   })
   
 # --------------------------------------------------------------------------------------------------------------
@@ -957,5 +987,9 @@ shinyServer(function(input, output, session) {
     updateColourInput(session, "cpUnder", value = basicCol[1])
     updateColourInput(session, "cpRight", value = basicCol[2])
     updateColourInput(session, "cpAbove", value = basicCol[3])
+  })
+  
+  observeEvent(input$summaryPlotExpander, {
+    plotReRenderer(input$summaryPlotExpander*400)
   })
 })

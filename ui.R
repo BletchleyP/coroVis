@@ -243,17 +243,24 @@ shinyUI(fluidPage(
                   ),
                   tabPanel(textOutput("gesamt_t"), icon = icon("pie-chart"), value = "tP4",
                            hr(),
-                           tableOutput("tOut2")
+                           h4(textOutput("summaryTitle")),
+                           fluidRow(column(4, align="center",
+                                           tableOutput("tOut2")),
+                                    column(8, align="center",
+                                           numericInput("summaryPlotExpander", "Change plot size", 1,
+                                                        min = 0.25, max = 5, step = 0.25),
+                                           plotOutput("summaryPlot",  width = "100%"))
+                           )
                   ),
                   tabPanel(textOutput("settings"), icon = icon("sliders"), value = "tP5",
                            hr(),
                            h4(textOutput("settingsColorTitle")),
                            fluidRow(column(3,
-                                           colourInput("cpUnder", label = textOutput("settingsColor1Label"),
+                                           colourpicker::colourInput("cpUnder", label = textOutput("settingsColor1Label"),
                                                        value = basicCol[1], showColour = "background"),
-                                           colourInput("cpRight", label = textOutput("settingsColor2Label"),
+                                           colourpicker::colourInput("cpRight", label = textOutput("settingsColor2Label"),
                                                        value = basicCol[2], showColour = "background"),
-                                           colourInput("cpAbove", label = textOutput("settingsColor3Label"),
+                                           colourpicker::colourInput("cpAbove", label = textOutput("settingsColor3Label"),
                                                        value = basicCol[3], showColour = "background")),
                                     column(3, actionButton("resetColors",
                                                            label = textOutput("settingsColorResetLabel")))

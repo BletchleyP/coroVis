@@ -105,10 +105,8 @@ LatitudeDegrees;Breitengrad;LatitudeDegrees;[fr]
 LongitudeDegrees;Längengrad;LongitudeDegrees;[fr]
 AltitudeMeters;Höhe;AltitudeMeters;[fr]
 DistanceMeters;Entfernung;DistanceMeters;[fr]
-<<<<<<< HEAD
 maximaleHF;Maximale Herzfrequenz korrigieren;Override maximum heart rate;Corriger la frequence cardiaque
-=======
 filterTitle;Welcher globale Filter soll angewendet werden?;Apply global filter:;[fr]
 filterId;nach Bezeichnung filtern;filter by label;[fr]
 filterDate;nach Datum filtern;filter by date;[fr]
->>>>>>> 57143845eff394acafdbc220665763248bf64914
+Statistik;Hier eine kleine Statistik;[en];[fr]
