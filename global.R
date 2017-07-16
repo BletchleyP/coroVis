@@ -5,7 +5,7 @@
 # ##############################################################################################################
 
 # temporär zur Fehlerbehandlung
-mytest <- 400
+mytest <- NULL
 
 # --------------------------------------------------------------------------------------------------------------
 
@@ -46,6 +46,20 @@ basicCol <- c("#ffcc00", "#00ff00", "#ff0000")
 # stellt HTML aus Datei zum Rendern bereit
 getPage <- function(filename) {
   return(includeHTML(filename))
+}
+
+# --------------------------------------------------------------------------------------------------------------
+
+# berechnet BMI aus Groesse [cm] und Gewicht [kg]
+calculateBMI <- function(groesse, gewicht) {
+  return(round(gewicht/((groesse/100)^2), 1))
+}
+
+# --------------------------------------------------------------------------------------------------------------
+
+# berechnet Alter aus date-of-birth
+calculateAge <- function(dob) {
+  if (is.null(dob)) {return(NULL)} else {return(round(difftime(Sys.time(), dob)/einJahr , 1))}
 }
 
 # --------------------------------------------------------------------------------------------------------------

@@ -70,23 +70,11 @@ shinyServer(function(input, output, session) {
   # Fuer das Geburtsdatum
   renderGebDat <- function(){
     output$gebdat <- renderUI({
-      mask <- as.character(translate("maennlich"))
-      fem <- as.character(translate("weiblich"))
       tagList(
-        dateInput("inpAlter", value = currentBirthDate, label = translate("Geburtsdatum"), format = translate("dd.mm.yyyy"), language = translate("de"))
+        dateInput("inpAlter", value = NULL, label = translate("Geburtsdatum"), format = translate("dd.mm.yyyy"), language = translate("de"))
       )
     })
   }
-  
-  # Fuer das Alter
-  renderAlter <- function(){
-    output$alter <- renderUI({
-      tagList(
-        h5(translate("Alter")),
-        verbatimTextOutput("alterausgabe")
-      )
-    })
-  } 
   
   # Fuer das Geschlecht
   renderGesch <- function(){
@@ -99,15 +87,7 @@ shinyServer(function(input, output, session) {
     })
   }
   
-  # Fuer den BMI
-  renderBMI <- function() {
-    output$bmiUI <- renderUI({
-      tagList(
-        h5("BMI"),
-        verbatimTextOutput("bmi")
-      )      
-    })
-  }
+
   
   # Fuer die Risikoklasse
   renderRiskClass <- function() {
@@ -176,9 +156,9 @@ shinyServer(function(input, output, session) {
     renderGesch()
         
     # Sidebar
-    renderAlter()
-    output$bmiTitle <- renderText({ paste("BMI") })
-    renderBMI()
+
+
+
     renderRiskClass()
     renderStrIntensity()
     output$risiko_t <- renderText({ paste(translate("Belastungsintensitaet")) })
@@ -191,7 +171,7 @@ shinyServer(function(input, output, session) {
 
     
     # Wieder Einstellen von bestimmten ausgewaehlten Parametern nach dem Sprachwechsel...
-    updateDateInput(session, "inpAlter", value = currentBirthDate)        # Alter wieder einstellen
+    updateDateInput(session, "inpAlter", value = NULL)        # Alter wieder einstellen
     updateRadioButtons(session, "inpGesch", selected = currentSex)        # Geschlecht wieder einstellen
     # renderDataPlot()                                          # Datenplot neu beschriften
     renderMapPlot()                                           # Kartenplot ausfuehren
@@ -425,15 +405,7 @@ shinyServer(function(input, output, session) {
     currentBirthDate <<- input$inpAlter  # Geburtsdatum merken ...
     currentSex <<- input$inpGesch  # Geschlecht merken, um beim Sprachwechsel das wieder aktualisieren zu koennen (ansonsten waere in der
                             # Konstellation mit dem JS-Script ein Update der Infos nicht so leicht moeglich)
-    
-    # Ist eine Berechnung des Alters erforderlich ...
-    output$alterausgabe <- renderText({ 
-      paste( round( difftime(Sys.time(), input$inpAlter)/einJahr , 1) )
-    })
-    
-    # Ist der BMI-Rechner betaetigt ...
-    output$bmi <- renderText({ paste(round(input$gewicht/((input$groesse/100)^2), digits = 1)) })
-    
+
     # Die ausgewaehlten Panels (hinterlegt in einer CheckboxGroup) werden mit folgender Anweisung dargestellt
     # Die Tabs muessen als integer-Vektor uebergeben werden. Innerhalb der Observe-Funktion werden Aenderungen
     # der CheckboxGroup wahrgenommen und das TabsetPanel aktualisiert.
@@ -821,6 +793,11 @@ shinyServer(function(input, output, session) {
     }
   })
   output$filterTitle <- renderText({translate("filterTitle", input$language)})
+  output$bmi <- renderText({calculateBMI(input$groesse, input$gewicht)})
+  output$ageTitle <- renderText({translate("Alter", input$language)})
+  output$alterausgabe <- renderText({calculateAge(input$inpAlter)})
+  
+  
   
   # TODO
   output$hfMax_t <- renderText({translate("Maximale Herzfrequenz", input$language)})

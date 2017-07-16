@@ -181,8 +181,9 @@ shinyUI(fluidPage(
                 
                 
                 fluidRow(
-                  column(4, align="center", uiOutput("alter")),             # Ausgabe des Alters
-                  column(4, align="center", uiOutput("bmiUI")),             # Ausgabe des BMI
+                  column(4, align="center", h5(textOutput("ageTitle")),
+                         verbatimTextOutput("alterausgabe", placeholder = TRUE)),
+                  column(4, align="center", h5("BMI"), verbatimTextOutput("bmi")),
                   column(4, align="center", br(), uiOutput("riskclass"))    # Risikoklasse auswaehlen
                 ),
                 fluidRow(
