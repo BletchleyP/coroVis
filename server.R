@@ -102,25 +102,16 @@ shinyServer(function(input, output, session) {
       )      
     })
   }
-  
-  # Fuer das Landesfaehnchen...
-  renderFlag <- function() {
 
-  }
-  
-
-  
   # -------------------
   # Hilfsfunktionen ...
   # -------------------
   
   # Sprachwechsel bei Click auf die Fahne
   change_language <- function() {
-    
     # Die entsprechende Sprache einstellen...
     iLang <<- ifelse(iLang > numDics-1, 1, iLang+1)
     setFlag()
-    
   }
   
 
@@ -136,10 +127,6 @@ shinyServer(function(input, output, session) {
   # -------------------------------------------------------
   
   setFlag <- function() {
-    
-    # Setzen des Faehnchens...    
-    renderFlag()
-    
     # Input-Panel
     renderGebDat()
     renderGesch()
@@ -654,18 +641,15 @@ shinyServer(function(input, output, session) {
       }
       colnames(df)[match("Date", colnames(df))] <- translate("Date", lang)
       
-      # Begrenzung auf bestimmte Spalten
-      cols <- c(translate("Label", lang), translate("Date", lang), translate("Time", lang),
-                translate("HeartRateBpm", lang), "GPS", translate("AltitudeMeters", lang),
-                translate("DistanceMeters", lang))
-      return(df[cols])
+      return(df)
     }
   }
 # -------------------------------------------------------------------------------------------------------------- 
   
-  assignGroups <- function(df, hrmin, hrmax, col1, col2, col3) {
+  assignGroups <- function(df, hrmin, hrmax, col1, col2, col3, lang) {
     if (is.null(df)) {return(NULL)}
-    df$Group <- ifelse(df[,4]<hrmin, col1, ifelse(df[,4]>hrmax, col3, col2))
+    df$Group <- ifelse(df[,c(translate("HeartRateBpm", lang))]<hrmin, col1,
+                       ifelse(df[,c(translate("HeartRateBpm", lang))]>hrmax, col3, col2))
     return(df)
   }
   
@@ -678,7 +662,7 @@ shinyServer(function(input, output, session) {
     df$Group2 <- df$Group2 - df$Group1
     df$Group3 <- ifelse(df[,c("HeartRateBpm")]>hrmax, 1, 0)
      
-    mydf <- aggregate(df[11:13], by=list(Label=df$Label), FUN=sum, na.rm=TRUE)
+    mydf <- aggregate(df[,c("Group1", "Group2", "Group3")], by=list(Label=df$Label), FUN=sum, na.rm=TRUE)
     
     return(mydf)
   }
@@ -706,7 +690,8 @@ shinyServer(function(input, output, session) {
   })
   
   coroDataPlot <- reactive({
-    assignGroups(coroData(), input$hfBer[1], input$hfBer[2], input$cpUnder, input$cpRight, input$cpAbove)
+    assignGroups(coroData(), input$hfBer[1], input$hfBer[2], input$cpUnder, input$cpRight, input$cpAbove,
+                 input$language)
   })
   
   coroDataSummary <- reactive({
@@ -727,7 +712,6 @@ shinyServer(function(input, output, session) {
   # Anpassung bei Sprachwechsel
   
   # Flag
-  # TODO
   output$flag <- renderUI({
     tags$img(src = paste0("data:image/png;base64,",translate("flag", input$language)), id = "languageflag")
   })
@@ -781,11 +765,15 @@ shinyServer(function(input, output, session) {
   output$startTitle <- renderText({translate("greeting", input$language)})
   output$startSubtitle <- renderText({translate("greetingSubtitle", input$language)})
   
-  # workingPanel > mainPanel > tp1
+  # workingPanel > mainPanel > tp1 TABLE
   output$daten_t <- renderText({translate("Daten", input$language)})
   tableReRenderer <- function(languageStyle) {
     output$coroTable <- renderDataTable({
-      coroData()
+      lang <- input$language
+      cols <- c(translate("Label", lang), translate("Date", lang), translate("Time", lang),
+                translate("HeartRateBpm", lang), "GPS", translate("AltitudeMeters", lang),
+                translate("DistanceMeters", lang))
+      coroData()[cols]
     }, options = list(
       lengthMenu = c(10, 25, 100),
       pageLength = 10,
@@ -793,7 +781,7 @@ shinyServer(function(input, output, session) {
     ))
   }
   
-  # workingPanel > mainPanel > tp2
+  # workingPanel > mainPanel > tp2 PLOT
   # TODO
   output$zeit_t <- renderText({translate("Plot", input$language)})
   output$axisXSelectLabel <- renderText({translate("XAchse", input$language)})
@@ -814,24 +802,33 @@ shinyServer(function(input, output, session) {
   })
   
   
-  # workingPanel > mainPanel > tp3
+  # workingPanel > mainPanel > tp3 MAP
   # TODO
   output$karte_t <- renderText({translate("Karte", input$language)})
   output$tOut1 <- renderLeaflet({
     if (is.null(coroDataPlot())) {
       m <- leaflet() %>% addTiles() 
     } else {
-      mydata <- assignGroups(coroRawData(), input$hfBer[1], input$hfBer[2], input$cpUnder, input$cpRight, input$cpAbove)
-      m <- leaflet() %>% addProviderTiles(input$mapTilesSelect) %>% addCircles(data = mydata,
-                                               lat = ~LatitudeDegrees, lng = ~LongitudeDegrees,
-                                               popup= ~HeartRateBpm, radius=5,
+      cols <- colnames(coroDataPlot())
+      i <- match(translate("LatitudeDegrees", input$language), cols)
+      myLat <- coroDataPlot()[,i]
+      mytest <<- myLat
+      
+      i <- match(translate("LongitudeDegrees", input$language), cols)
+      myLng <- coroDataPlot()[,i]
+      i <- match(translate("HeartRateBpm", input$language), cols)
+      myHR <- coroDataPlot()[,i]
+      m <- leaflet() %>% addProviderTiles(input$mapTilesSelect) %>% addCircles(data = coroDataPlot(),
+                                               lat = ~myLat,
+                                               lng = ~myLng,
+                                               popup= ~myHR, radius=5,
                                                color= ~Group, stroke = TRUE, fillOpacity = 1)
     }
   })
   
   
   
-  # workingPanel > mainPanel > tp4
+  # workingPanel > mainPanel > tp4 SUMMARY
   # TODO
   output$gesamt_t <- renderText({translate("Zusammenfassung", input$language)})
   output$summaryTitle <- renderText({translate("Statistik", input$language)})
@@ -850,7 +847,7 @@ shinyServer(function(input, output, session) {
   }
 
   
-  # workingPanel > mainPanel > tp5
+  # workingPanel > mainPanel > tp5 SETTINGS
   # TODO
   output$settings <- renderText({translate("Einstellungen", input$language)})
   
