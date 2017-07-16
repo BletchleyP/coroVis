@@ -186,10 +186,7 @@ shinyServer(function(input, output, session) {
   
   # Karte im TabPanel darstellen
   renderMapPlot <- function() {
-    output$tOut1 <- renderLeaflet({
-        m <- leaflet() %>% addTiles() 
-        m
-    })
+    
   }
   
   # ------------------------------------------------------
@@ -848,6 +845,25 @@ shinyServer(function(input, output, session) {
   # workingPanel > mainPanel > tp3
   # TODO
   output$karte_t <- renderText({translate("Karte", input$language)})
+  
+  output$tOut1 <- renderLeaflet({
+    if (is.null(coroDataPlot())) {
+      m <- leaflet() %>% addTiles() 
+      m
+    } else {
+      mydata <- assignGroups(coroRawData(), input$hfBer[1], input$hfBer[2], input$cpUnder, input$cpRight, input$cpAbove)
+      mytest <<- mydata
+      m <- leaflet() %>% addTiles() %>% addCircles(data = mydata,
+                                               lat = ~LatitudeDegrees, lng = ~LongitudeDegrees,
+                                               popup= ~HeartRateBpm, radius=5,
+                                               color= ~Group,
+                                               stroke = TRUE, fillOpacity = 1)
+      m
+    }
+    
+  })
+  
+  
   
   # workingPanel > mainPanel > tp4
   # TODO
