@@ -202,78 +202,19 @@ shinyServer(function(input, output, session) {
   # -----------------
   # Die Daten plotten
   # -----------------
-  
-
-  # # Graphisch im TabPanel darstellen
-  # renderDataPlot <- function(xAx = "Weg", yAx = "Weg") {
-  #   
-  #   # X-Achse auswaehlen
-  #   switch(xAx,
-  #          Weg = { xAxis <- viewportDF$DistanceMeters },
-  #          Zeit = { xAxis <- viewportDF$Time }
-  #   )
-  #   
-  #   # Y-Achse auswaehlen
-  #   switch(yAx,
-  #          Weg = { yAxis <- viewportDF$DistanceMeters },
-  #          Hoehe = { yAxis <- viewportDF$AltitudeMeters },
-  #          
-  #          # Geschwindigkeit berechnen...
-  #          Geschwindigkeit = {
-  #            dWeg <- array()
-  #            for(i in 2:length(viewportDF$DistanceMeters)) {
-  #             dT <- times(viewportDF$Time[i]) - times(viewportDF$Time[i-1])
-  #             dT <- as.integer(substr(dT, 7, 8)) + as.integer(substr(dT, 4, 5)) * 60 + as.integer(substr(dT, 1, 2)) * 3600
-  #             dWeg[i] <- ((viewportDF$DistanceMeters[i] - viewportDF$DistanceMeters[i-1]) / dT) * 3.6 
-  #            }
-  #            dWeg[1] = 0
-  #            yAxis = dWeg
-  #          }
-  #   )
-    
-    # ... nur wenn x- und y-Achse Werte aufweisen, dann...
-    # if (!is.null(xAxis) && !is.null(yAxis)) {
-    
-      # ... die Daten selbst im Plot darstellen
   output$explorationPlot <- renderPlot({
-    x <- times(coroDataPlot()[,c(input$axisXSelect)])
-    y <- as.numeric(coroDataPlot()[,c(input$axisYSelect)])
+    if (is.null(coroDataPlot())) {return(NULL)}
+    x <- times(coroDataPlot()[,input$axisXSelect])
+    y <- as.numeric(coroDataPlot()[,input$axisYSelect])
     z <- coroDataPlot()[,c("Group")]
-    mytest <<- z
-
-    plot(x, y, pch = 16, col=z, main = "Titel", xlab = "x", ylab = "y")
-
+    ymin <- ifelse("1" %in% input$plotInclude0 && 0<input$axisYZoom[1], 0, input$axisYZoom[1])
     
-  
-    
-    
-
-  
+    par(mar = c(5, 5, 0.2, 2))
+    plot(x, y, pch = 16, col=z, main = NULL, xlab = input$axisXSelect, ylab = input$axisYSelect,
+         xlim = c(input$axisXZoom[1], input$axisXZoom[2]), ylim = c(ymin, input$axisYZoom[2]),
+         cex = input$plotPointsize, las = 1,
+         cex.lab = input$plotTextsize, cex.main = input$plotTextsize)
  })
-    
-      # ... und den tolerierten Herzfrequenzbereich darstellen (wird nur angezeigt, wenn vom Benutzer gewuenscht)
-  #     output$explorationPlotHR <- renderPlot({
-  #     
-  #       y2 <- viewportDF$HeartRateBpm
-  #       x <- viewportDF$Time
-  #     
-  #       plot(x, y2, type = "p", col = "blue", main = NULL, xlab = translate("Zeit"), ylab = translate("HFq"), ylim = c(40, rVal$maxFr))
-  #       rect(0, rVal$hfBu, x, rVal$hfBo, border = NULL, col = rgb(0,0,1,.005))
-  #     
-  #     })
-  # #   
-  #   # Andernfalls eine kleine Meldung
-  #   } else {
-  #     output$selAxOut <- renderText({ paste("Keine Daten!") })
-  #   }
-  # }
-  
-  
-  
-  
-  
-  
-  
   
   
   
