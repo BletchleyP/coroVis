@@ -3,7 +3,7 @@ library(shinyjs)  # ShinyJS zur Unterstuetzung ...
 library(chron)    # Handling von Zeit und Datum...
 library(XML)      # Einlesen von XML-Dateien ...
 library(leaflet)  # Darstellung der Karten ... 
-library(ggplot2)  # Darstellung der Plots ...
+#library(ggplot2)  # Darstellung der Plots ...
 
 # ---------------------------
 # Globale Variablendefinition
@@ -259,11 +259,13 @@ shinyServer(function(input, output, session) {
     
       # ... die Daten selbst im Plot darstellen
   output$explorationPlot <- renderPlot({
-    x <- times(coroData()[,c(input$axisXSelect)])
-    y <- as.numeric(coroData()[,c(input$axisYSelect)])
-    
-    test <<- y
-    plot(x, y, main = "Titel", xlab = "x", ylab = "y")
+    x <- times(coroDataPlot()[,c(input$axisXSelect)])
+    y <- as.numeric(coroDataPlot()[,c(input$axisYSelect)])
+    z <- coroDataPlot()[,c("Group")]
+    mytest <<- z
+
+    plot(x, y, pch = 16, col=z, main = "Titel", xlab = "x", ylab = "y")
+
     
   
     
@@ -752,7 +754,6 @@ shinyServer(function(input, output, session) {
     })
     
     # entferne Millisekunden und ZULU-timezone tag
-    test <<- newDataAll$Time
     timeZ <-   grepl("(\\.[0-9]{3})?Z|(\\.[0-9]{3}?\\+[0-9]{2}:[0-9]{2})", newDataAll$Time)
     # timeZ <- grepl("(\\.[0-9]{3})?Z", newDataAll$Time)
     if (sum(timeZ, na.rm=TRUE) == nrow(newDataAll)) {
@@ -764,12 +765,13 @@ shinyServer(function(input, output, session) {
       errormsg <- paste(errormsg, "Fehler bei Datum-Zeit-Konversion")
     }
     
-    # konvertiere chr zu numeric mit 6 (Lat/Lon) bzw. 1 (Altitude, Distance) Nachkommastelle
+    # konvertiere chr zu numeric mit 6 (Lat/Lon), 0 (HeartRate) bzw. 1 (Altitude, Distance) Nachkommastelle
     options(digits=10)
     newDataAll$LatitudeDegrees <- round(as.numeric(newDataAll$LatitudeDegrees), 6)
     newDataAll$LongitudeDegrees <- round(as.numeric(newDataAll$LongitudeDegrees), 6)
     newDataAll$AltitudeMeters <- round(as.numeric(newDataAll$AltitudeMeters), 1)
     newDataAll$DistanceMeters <- round(as.numeric(newDataAll$DistanceMeters), 1)
+    newDataAll$HeartRateBpm <- round(as.numeric(newDataAll$HeartRateBpm), 0)
     
     newDataAll$GPS <- ifelse(is.na(newDataAll$LatitudeDegrees) | is.na(newDataAll$LatitudeDegrees), "-", "+")
     newDataAll$Id <- ifelse(is.na(newDataAll$Id), "???", newDataAll$Id)
@@ -872,6 +874,13 @@ shinyServer(function(input, output, session) {
       return(df[cols])
     }
   }
+# -------------------------------------------------------------------------------------------------------------- 
+  
+  assignGroups <- function(df, hrmin, hrmax) {
+    if (is.null(df)) {return(NULL)}
+    df$Group <- ifelse(df[,4]<hrmin, basicCol1, ifelse(df[,4]>hrmax, basicCol3, basicCol2))
+    return(df)
+  }
   
 # -------------------------------------------------------------------------------------------------------------- 
   
@@ -893,6 +902,10 @@ shinyServer(function(input, output, session) {
   coroData <- reactive({
     modifyDF(coroRawData(), input$language, input$filterById, input$filterByIdSelect,
              input$filterByDate, input$filterByDateSelect)
+  })
+  
+  coroDataPlot <- reactive({
+    assignGroups(coroData(), input$hfBer[1], input$hfBer[2])
   })
 
 # --------------------------------------------------------------------------------------------------------------
@@ -959,7 +972,7 @@ shinyServer(function(input, output, session) {
   output$daten_t <- renderText({translate("Daten", input$language)})
   tableRenderer <- function(languageStyle) {
     output$coroTable <- renderDataTable({
-      coroData()
+      coroDataPlot()
     }, options = list(
       lengthMenu = c(10, 25, 100),
       pageLength = 10,

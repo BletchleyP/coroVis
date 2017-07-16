@@ -215,12 +215,22 @@ shinyUI(fluidPage(
                            hr(),
                            plotOutput("explorationPlot"),
                            fluidRow(
-                             column(4, offset = 2, align="center",
+                             column(4, offset = 1, align="eft",
                                     selectInput("axisXSelect", textOutput("axisXSelectLabel"),
-                                                choices = c("Zeit"))),
-                             column(4, align="center",
+                                                choices = c("Zeit", "Entfernung")),
+                                    sliderInput("axisXZoom", "Zoom X", min = 0, max = 10, value = c(3,7))),
+                             column(4, align="left",
                                     selectInput("axisYSelect", textOutput("axisYSelectLabel"),
-                                                choices = c("Herzfrequenz", "Höhe", "Entfernung")))
+                                                choices = c("Herzfrequenz", "Höhe", "Entfernung")),
+                                    sliderInput("axisYZoom", "Zoom Y", min = 0, max = 10, value = c(3,7))),
+                             column(1, align="center",
+                                    numericInput("plotPointsize", "Pointsize", 1,
+                                                 min = 0, max = 3, step = 0.25),
+                                    numericInput("plotTextsize", "Textsize", 1,
+                                                 min = 0, max = 3, step = 0.25)),
+                             column(2, align="center",
+                                    checkboxInput("plotInclude0", "Wertebereich Y mit 0"),
+                                    actionButton("plotDownload", "Speichern"))
                            )
                   ),
                   tabPanel(textOutput("karte_t"), icon = icon("road"), value = "tP3",
