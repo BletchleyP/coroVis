@@ -1,5 +1,6 @@
 library(shiny)
 library(leaflet)
+library(colourpicker)
 
 # modifizierter fileInput
 coroVisFileInput <- function(inputId, label = NULL, labelIcon = NULL, multiple = FALSE, 
@@ -242,6 +243,18 @@ shinyUI(fluidPage(
                            tableOutput("tOut2")
                   ),
                   tabPanel(textOutput("settings"), icon = icon("sliders"), value = "tP5",
+                           hr(),
+                           h4(textOutput("settingsColorTitle")),
+                           fluidRow(column(3,
+                                           colourInput("cpUnder", label = textOutput("settingsColor1Label"),
+                                                       value = basicCol[1], showColour = "background"),
+                                           colourInput("cpRight", label = textOutput("settingsColor2Label"),
+                                                       value = basicCol[2], showColour = "background"),
+                                           colourInput("cpAbove", label = textOutput("settingsColor3Label"),
+                                                       value = basicCol[3], showColour = "background")),
+                                    column(3, actionButton("resetColors",
+                                                           label = textOutput("settingsColorResetLabel")))
+                           ),
                            hr(),
                            uiOutput("settingsOut")
                   )

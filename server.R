@@ -2,7 +2,8 @@ library(shiny)    # Shiny selbst...
 library(shinyjs)  # ShinyJS zur Unterstuetzung ...
 library(chron)    # Handling von Zeit und Datum...
 library(XML)      # Einlesen von XML-Dateien ...
-library(leaflet)  # Darstellung der Karten ... 
+library(leaflet)  # Darstellung der Karten ...
+library(colourpicker)
 #library(ggplot2)  # Darstellung der Plots ...
 
 # ---------------------------
@@ -48,13 +49,7 @@ shinyServer(function(input, output, session) {
   hfMaxOut <- 0
   maxFr <- 0
   
-  # Fuer die Farbdarstellungen der Herzfrequenzreferenzbereiche
-  basicCol1 <- "#ffcc00"
-  basicCol2 <- "#00ff00"
-  basicCol3 <- "#ff0000"
-  underRef <- "#ffcc00"
-  inRef <- "#00ff00"
-  aboveRef <- "#ff0000"
+
   
   # ----------------------------------------------------------------
   # Einmaliges Festlegen der Reaktion auf Klick auf die Flagge, usw.
@@ -148,14 +143,7 @@ shinyServer(function(input, output, session) {
     output$settingsOut <- renderUI({
       tagList(
         div(id = "colors",
-            h4(translate("Farbwerte")),
-            fluidRow(
-              column(3, colourInput("cpUnder", label = translate("UnterRef"), value = underRef, showColour = "background"),
-                     colourInput("cpRight", label = translate("ImRef"), value = inRef, showColour = "background"),
-                     colourInput("cpAbove", label = translate("ÜberRef"), value = aboveRef, showColour = "background")),
-              column(3, actionButton("resetColors", label = translate("FarbenZurück")))
-            ),
-            hr(),
+            
             h4(translate("maximaleHF")),
             sliderInput("overrideMaxHF", label = NULL, value = hfMaxGeneral, min = 100, max = 240, step = 1),
             hr()
@@ -270,8 +258,7 @@ shinyServer(function(input, output, session) {
   
     
     
-    
-    #points(x, y1, col = ifelse(yb, underRef, ifelse(yc, aboveRef, inRef)))
+
   
  })
     
@@ -303,32 +290,9 @@ shinyServer(function(input, output, session) {
   
   # Karte im TabPanel darstellen
   renderMapPlot <- function() {
-    
     output$tOut1 <- renderLeaflet({
-      
-      # Sind ueberhaupt GPS-Daten geladen?
-      gpsAvailable <- grep("LatitudeDegrees", names(viewportDF))
-      if (length(gpsAvailable) > 0) {
-        
-        # Dataframe zusammenstellen...
-        testdata <- viewportDF[,c("Time", "LatitudeDegrees", "LongitudeDegrees")]
-        colnames(testdata) <- c("lat", "lng", "hr")
-        testdata$lat <- as.numeric(as.character(viewportDF$LatitudeDegrees))
-        testdata$lng <- as.numeric(as.character(viewportDF$LongitudeDegrees))
-        testdata$hr <- as.numeric(as.character(viewportDF$HeartRateBpm))
-        testdata$colorcode <- ifelse(testdata$hr<rVal$hfBu, underRef, ifelse(testdata$hr>rVal$hfBo, aboveRef, inRef))
-        testdata$hr <- as.factor(testdata$hr)
-    
-        # Karte generieren...
-        m <- leaflet() %>% addTiles() %>% addMarkers(lng = testdata$lng[1],  lat = testdata$lat[1], popup = "Start") %>%
-              addProviderTiles(providers$CartoDB.Positron) %>% addCircles(data = testdata, lat = ~lat, lng = ~lng, popup= ~hr, radius=5, color= ~colorcode, stroke = TRUE, fillOpacity = 1)
-        m
-      
-      # ... ansonsten leere Karte generieren  
-      } else {
         m <- leaflet() %>% addTiles() 
         m
-      }
     })
   }
   
@@ -606,28 +570,6 @@ shinyServer(function(input, output, session) {
 
   
 
-
-  # Wenn die Farben für die Herzfrequenzreferenzbereichsanzeige geaendert oder zurueckgesetzt wird
-  observeEvent(input$cpUnder, {
-    underRef <- input$cpUnder
-  })
-  
-  observeEvent(input$cpRight, {
-    inRef <- input$cpRight
-  })
-  
-  observeEvent(input$cpUnder, {
-    aboveRef <- input$cpAbove
-  })
-  
-  observeEvent(input$resetColors, {
-    underRef <- basicCol1
-    inRef <- basicCol2
-    aboveRef <- basicCol3
-    updateColourInput(session, "cpUnder", value = underRef)
-    updateColourInput(session, "cpRight", value = inRef)
-    updateColourInput(session, "cpAbove", value = aboveRef)
-  })
   
   observeEvent(input$createPDF, {
     pdf("test1.pdf")
@@ -876,9 +818,9 @@ shinyServer(function(input, output, session) {
   }
 # -------------------------------------------------------------------------------------------------------------- 
   
-  assignGroups <- function(df, hrmin, hrmax) {
+  assignGroups <- function(df, hrmin, hrmax, col1, col2, col3) {
     if (is.null(df)) {return(NULL)}
-    df$Group <- ifelse(df[,4]<hrmin, basicCol1, ifelse(df[,4]>hrmax, basicCol3, basicCol2))
+    df$Group <- ifelse(df[,4]<hrmin, col1, ifelse(df[,4]>hrmax, col3, col2))
     return(df)
   }
   
@@ -905,7 +847,7 @@ shinyServer(function(input, output, session) {
   })
   
   coroDataPlot <- reactive({
-    assignGroups(coroData(), input$hfBer[1], input$hfBer[2])
+    assignGroups(coroData(), input$hfBer[1], input$hfBer[2], input$cpUnder, input$cpRight, input$cpAbove)
   })
 
 # --------------------------------------------------------------------------------------------------------------
@@ -1000,6 +942,14 @@ shinyServer(function(input, output, session) {
   # TODO
   output$settings <- renderText({translate("Einstellungen", input$language)})
   
+  output$settingsColorTitle <- renderText({translate("Farbwerte", input$language)})
+  output$settingsColor1Label <- renderText({translate("UnterRef", input$language)})
+  output$settingsColor2Label <- renderText({translate("ImRef", input$language)})
+  output$settingsColor3Label <- renderText({translate("ÜberRef", input$language)})
+  output$settingsColorResetLabel <- renderText({translate("FarbenZurück", input$language)})
+  
+
+  
   # helpPanel
   output$helpTitle <- renderText({translate("Hilfe", input$language)})
   output$helpBackLabel <- renderText({translate("Zur?ck", input$language)})
@@ -1078,4 +1028,11 @@ shinyServer(function(input, output, session) {
     updateTabsetPanel(session, "tP", selected = "tP1")
   })
 # --------------------------------------------------------------------------------------------------------------
+  
+  observeEvent(input$resetColors, {
+    #TODO Farben zurücksetzen
+    updateColourInput(session, "cpUnder", value = basicCol[1])
+    updateColourInput(session, "cpRight", value = basicCol[2])
+    updateColourInput(session, "cpAbove", value = basicCol[3])
+  })
 })

@@ -29,6 +29,7 @@ heartRateLimits <- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (hfMaxGeneral - 40)
 # Header-Vorgabe für Datenimport
 myHeader <- c("Time", "Id", "HeartRateBpm", "LatitudeDegrees", "LongitudeDegrees",
               "AltitudeMeters", "DistanceMeters")
+basicCol <- c("#ffcc00", "#00ff00", "#ff0000")
 
 # --------------------------------------------------------------------------------------------------------------
 
