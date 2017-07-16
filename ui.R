@@ -264,7 +264,8 @@ shinyUI(fluidPage(
                                            colourpicker::colourInput("cpAbove", label = textOutput("settingsColor3Label"),
                                                        value = basicCol[3], showColour = "background")),
                                     column(3, actionButton("resetColors",
-                                                           label = textOutput("settingsColorResetLabel")))
+                                                           label = textOutput("settingsColorResetLabel"))),
+                                    column(3, selectInput("mapTilesSelect", "Select map layer", choices = providers))
                            ),
                            hr(),
                            h4(textOutput("settingsHFmaxTitle")),

@@ -6,13 +6,6 @@ library(leaflet)  # Darstellung der Karten ...
 library(colourpicker)
 #library(ggplot2)  # Darstellung der Plots ...
 
-# ---------------------------
-# Globale Variablendefinition
-# ---------------------------
-
-# Fuer die Berechnungen
-einJahr <- 365
-
 # -------------------------------------------------------------------
 # Allgemeine Translate-Funktionen fuer die unterschiedlichen Sprachen
 # -------------------------------------------------------------------
@@ -28,9 +21,7 @@ rev_translate <- function(word) {
 
 shinyServer(function(input, output, session) {
   
-  # --------------------------------
   # Max upload Filegroesse bis 15 MB
-  # --------------------------------
   options(shiny.maxRequestSize=15*1024^2)
   
   session$onSessionEnded(function() {
@@ -114,9 +105,7 @@ shinyServer(function(input, output, session) {
   
   # Fuer das Landesfaehnchen...
   renderFlag <- function() {
-    output$flag <- renderUI({
-      tags$img(src = paste0("data:image/png;base64,",translate("flag")), id = "languageflag")
-    })
+
   }
   
 
@@ -156,9 +145,6 @@ shinyServer(function(input, output, session) {
     renderGesch()
         
     # Sidebar
-
-
-
     renderRiskClass()
     renderStrIntensity()
     output$risiko_t <- renderText({ paste(translate("Belastungsintensitaet")) })
@@ -166,29 +152,12 @@ shinyServer(function(input, output, session) {
     # mainPanel
     output$selAxisX <- renderText({ paste(translate("XAchse"))})
     output$selAxis <- renderText({ paste(translate("YAchse")) })
-    
 
-
-    
     # Wieder Einstellen von bestimmten ausgewaehlten Parametern nach dem Sprachwechsel...
     updateDateInput(session, "inpAlter", value = NULL)        # Alter wieder einstellen
     updateRadioButtons(session, "inpGesch", selected = currentSex)        # Geschlecht wieder einstellen
-    # renderDataPlot()                                          # Datenplot neu beschriften
-    renderMapPlot()                                           # Kartenplot ausfuehren
-
-
   }
-  
 
-
-  
-  
-  
-  # Karte im TabPanel darstellen
-  renderMapPlot <- function() {
-    
-  }
-  
   # ------------------------------------------------------
   # Funktionen fuer die Aufbereitung der Daten zur Ausgabe
   # ------------------------------------------------------
@@ -759,6 +728,9 @@ shinyServer(function(input, output, session) {
   
   # Flag
   # TODO
+  output$flag <- renderUI({
+    tags$img(src = paste0("data:image/png;base64,",translate("flag", input$language)), id = "languageflag")
+  })
   
   # headerPanel
   # TODO
@@ -845,22 +817,16 @@ shinyServer(function(input, output, session) {
   # workingPanel > mainPanel > tp3
   # TODO
   output$karte_t <- renderText({translate("Karte", input$language)})
-  
   output$tOut1 <- renderLeaflet({
     if (is.null(coroDataPlot())) {
       m <- leaflet() %>% addTiles() 
-      m
     } else {
       mydata <- assignGroups(coroRawData(), input$hfBer[1], input$hfBer[2], input$cpUnder, input$cpRight, input$cpAbove)
-      mytest <<- mydata
-      m <- leaflet() %>% addTiles() %>% addCircles(data = mydata,
+      m <- leaflet() %>% addProviderTiles(input$mapTilesSelect) %>% addCircles(data = mydata,
                                                lat = ~LatitudeDegrees, lng = ~LongitudeDegrees,
                                                popup= ~HeartRateBpm, radius=5,
-                                               color= ~Group,
-                                               stroke = TRUE, fillOpacity = 1)
-      m
+                                               color= ~Group, stroke = TRUE, fillOpacity = 1)
     }
-    
   })
   
   

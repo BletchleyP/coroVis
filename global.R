@@ -9,9 +9,6 @@ mytest <- NULL
 
 # --------------------------------------------------------------------------------------------------------------
 
-# Fuer die Berechnungen eines Jahres
-einJahr <- 365
-
 # Dataframe fuer alle eingelesenen Daten aus den Trainingseinheiten
 viewportDF <- NULL
 
@@ -59,7 +56,7 @@ calculateBMI <- function(groesse, gewicht) {
 
 # berechnet Alter aus date-of-birth
 calculateAge <- function(dob) {
-  if (is.null(dob)) {return(NULL)} else {return(round(difftime(Sys.time(), dob)/einJahr , 1))}
+  if (is.null(dob)) {return(NULL)} else {return(round(difftime(Sys.time(), dob)/365 , 1))}
 }
 
 # --------------------------------------------------------------------------------------------------------------
