@@ -812,16 +812,12 @@ shinyServer(function(input, output, session) {
       cols <- colnames(coroDataPlot())
       i <- match(translate("LatitudeDegrees", input$language), cols)
       myLat <- coroDataPlot()[,i]
-      mytest <<- myLat
-      
       i <- match(translate("LongitudeDegrees", input$language), cols)
       myLng <- coroDataPlot()[,i]
       i <- match(translate("HeartRateBpm", input$language), cols)
       myHR <- coroDataPlot()[,i]
       m <- leaflet() %>% addProviderTiles(input$mapTilesSelect) %>% addCircles(data = coroDataPlot(),
-                                               lat = ~myLat,
-                                               lng = ~myLng,
-                                               popup= ~myHR, radius=5,
+                                               lat = ~myLat, lng = ~myLng, popup= ~myHR, radius=5,
                                                color= ~Group, stroke = TRUE, fillOpacity = 1)
     }
   })
