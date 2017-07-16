@@ -214,6 +214,8 @@ shinyServer(function(input, output, session) {
          xlim = c(input$axisXZoom[1], input$axisXZoom[2]), ylim = c(ymin, input$axisYZoom[2]),
          cex = input$plotPointsize, las = 1,
          cex.lab = input$plotTextsize, cex.main = input$plotTextsize)
+    if ("2" %in% input$plotInclude0) {lines(x, y, pch=16)}
+    
  })
   
   

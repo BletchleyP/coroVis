@@ -232,7 +232,7 @@ shinyUI(fluidPage(
                                                     min = 1, max = 2, step = 0.25)),
                                 column(2, align="left",
                                        checkboxGroupInput("plotInclude0", "Optionen",
-                                                          choices = c("ymin <= 0" = 1)))
+                                                          choices = c("ymin <= 0" = 1, "Linie" = 2)))
                               )
                            )
                            
