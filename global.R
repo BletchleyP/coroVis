@@ -26,6 +26,13 @@ heartRateLimits <- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (hfMaxGeneral - 40)
 # Header-Vorgabe für Datenimport
 myHeader <- c("Time", "Id", "HeartRateBpm", "LatitudeDegrees", "LongitudeDegrees",
               "AltitudeMeters", "DistanceMeters")
+polarheader1 <- paste0("Name,Sport,Date,Start time,Duration,Total distance (km),Average heart rate (bpm),A",
+                       "verage speed (km/h),Max speed (km/h),Average pace (min/km),Max pace (min/km),Calor",
+                       "ies,Fat percentage of calories(%),Average cadence (rpm),Average stride length (cm)",
+                       ",Running index,Training load,Ascent (m),Descent (m),Notes,Height (cm),Weight (kg),",
+                       "HR max,HR sit,VO2max,")
+polarheader2 <- paste0("Sample rate,Time,HR (bpm),Speed (km/h),Pace (min/km),Cadence,Altitude (m),Stride l",
+                       "ength (m),Distances (m),Temperatures (C),Power (W),")
 basicCol <- c("#ffcc00", "#00ff00", "#ff0000")
 
 # --------------------------------------------------------------------------------------------------------------
@@ -78,10 +85,60 @@ showMessage <- function(msg, languageID) {
 
 # --------------------------------------------------------------------------------------------------------------
 
+# helper function: converts HH:MM:SS to seconds
+getSeconds <- function(raw) {
+  elem <- unlist(strsplit(raw, ":"))
+  return(strtoi(elem[1], base = 10)*3600 + strtoi(elem[2], base = 10)*60 + strtoi(elem[3], base = 10))
+}
+
+# helper function: converts relative time to absolute date-time
+# @startdate: DD-MM-YYYY
+# @starttime: HH:MM:SS
+getDateTime <- function(startdate, starttime, reltime, difftime=0) {
+  start <- as.POSIXct(paste(startdate, starttime, sep="T"), format = "%d-%m-%YT%H:%M:%S", tz="UTC")
+  return(as.character(start + getSeconds(reltime) - (difftime*3600)))
+}
+
+# --------------------------------------------------------------------------------------------------------------
+
 # extrahiert aus CSV-Datei einen Dataframe
 importDataCSV <- function(myFile) {
-  # TODO
-  return(NULL)
+  # to be safe: read data as raw textfile
+  conn <- file(myFile, open="r")
+  rawdata <- readLines(conn)
+  close(conn)
+  n <- length(rawdata)
+  
+  
+  
+  # evaluate rawdata
+  if (n == 0) {
+    return(NULL) # "File is empty"
+  } else if (n >= 3) {
+    if (rawdata[1] == polarheader1 & rawdata[3] == polarheader2) {
+      # Polar CSV detected
+      mydf <- read.csv(text=paste(rawdata[1], rawdata[2], sep = "\n"), stringsAsFactors = FALSE)
+      startdate <- mydf[1, c(3:4)]
+      mydf <- read.csv(myFile, skip = 2, header = TRUE, stringsAsFactors = FALSE)
+      mydf <- mydf[,c(2:3,7,9)]
+      colnames(mydf) <- c("Time", "HeartRateBpm", "AltitudeMeters", "DistanceMeters")
+      mydf$Time <- sapply(mydf$Time, function(x) getDateTime(startdate[1], startdate[2], x, -4))
+      
+      mydf$Id <- NA
+      mydf$LatitudeDegrees <- NA
+      mydf$LongitudeDegrees <- NA
+      mydf$Time <- as.POSIXct(mydf$Time, format = "%Y-%m-%d %H:%M:%S", tz="UTC")
+      
+      
+    } else {
+      return(NULL) # "Data error"
+    }
+  } else {
+    return(NULL) # "Data error"
+  }
+  
+  
+  return(mydf)
 }
 
 # --------------------------------------------------------------------------------------------------------------
@@ -119,17 +176,9 @@ importDataGPX <- function(gpxfile) {
 # testet Dateityp und liefert Typ oder Fehlermeldung als String
 checkFileformat <- function(myFile) {
 
-  if (myFile$type == "text/csv" & sub(".*\\.", "", myFile$name)=="csv") {
+  if (myFile$type %in% c("text/csv", "application/vnd.ms-excel") & sub(".*\\.", "", myFile$name)=="csv") {
     
     # Typ ist CSV-Datei, teste auf Polar-Format
-    polarheader1 <- paste0("Name,Sport,Date,Start time,Duration,Total distance (km),Average heart rate (bpm),A",
-                           "verage speed (km/h),Max speed (km/h),Average pace (min/km),Max pace (min/km),Calor",
-                           "ies,Fat percentage of calories(%),Average cadence (rpm),Average stride length (cm)",
-                           ",Running index,Training load,Ascent (m),Descent (m),Notes,Height (cm),Weight (kg),",
-                           "HR max,HR sit,VO2max,")
-    polarheader2 <- paste0("Sample rate,Time,HR (bpm),Speed (km/h),Pace (min/km),Cadence,Altitude (m),Stride l",
-                           "ength (m),Distances (m),Temperatures (C),Power (W),")
-    
     conn <- file(myFile$datapath, open="r")
     rawdata <- readLines(conn)
     close(conn)

@@ -527,17 +527,20 @@ shinyServer(function(input, output, session) {
       }
     })
     
-    # entferne Millisekunden und ZULU-timezone tag
-    timeZ <-   grepl("(\\.[0-9]{3})?Z|(\\.[0-9]{3}?\\+[0-9]{2}:[0-9]{2})", newDataAll$Time)
-    # timeZ <- grepl("(\\.[0-9]{3})?Z", newDataAll$Time)
-    if (sum(timeZ, na.rm=TRUE) == nrow(newDataAll)) {
-      newDataAll$Time <- sub("(\\.[0-9]{3})?Z|(\\.[0-9]{3}?\\+[0-9]{2}:[0-9]{2})", "", newDataAll$Time)
-      newDataAll$Time <- as.POSIXct(newDataAll$Time, format = "%Y-%m-%dT%H:%M:%S", tz = "UTC")
-    } else {
-      newDataAll <- NULL
-      
-      errormsg <- paste(errormsg, "Fehler bei Datum-Zeit-Konversion")
+    if (result != "CSV") {
+      # entferne Millisekunden und ZULU-timezone tag
+      timeZ <-   grepl("(\\.[0-9]{3})?Z|(\\.[0-9]{3}?\\+[0-9]{2}:[0-9]{2})", newDataAll$Time)
+      # timeZ <- grepl("(\\.[0-9]{3})?Z", newDataAll$Time)
+      if (sum(timeZ, na.rm=TRUE) == nrow(newDataAll)) {
+        newDataAll$Time <- sub("(\\.[0-9]{3})?Z|(\\.[0-9]{3}?\\+[0-9]{2}:[0-9]{2})", "", newDataAll$Time)
+        newDataAll$Time <- as.POSIXct(newDataAll$Time, format = "%Y-%m-%dT%H:%M:%S", tz = "UTC")
+      } else {
+        newDataAll <- NULL
+        
+        errormsg <- paste(errormsg, "Fehler bei Datum-Zeit-Konversion")
+      }
     }
+    
     
     # konvertiere chr zu numeric mit 6 (Lat/Lon), 0 (HeartRate) bzw. 1 (Altitude, Distance) Nachkommastelle
     options(digits=10)
@@ -547,7 +550,7 @@ shinyServer(function(input, output, session) {
     newDataAll$DistanceMeters <- round(as.numeric(newDataAll$DistanceMeters), 1)
     newDataAll$HeartRateBpm <- round(as.numeric(newDataAll$HeartRateBpm), 0)
     
-    newDataAll$GPS <- ifelse(is.na(newDataAll$LatitudeDegrees) | is.na(newDataAll$LatitudeDegrees), "-", "+")
+    newDataAll$GPS <- ifelse(is.na(newDataAll$LatitudeDegrees) | is.na(newDataAll$LongitudeDegrees), "-", "+")
     newDataAll$Id <- ifelse(is.na(newDataAll$Id), "???", newDataAll$Id)
     
     if (!is.null(newDataAll)) {
