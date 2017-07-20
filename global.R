@@ -96,7 +96,38 @@ getSeconds <- function(raw) {
 # @starttime: HH:MM:SS
 getDateTime <- function(startdate, starttime, reltime, difftime=0) {
   start <- as.POSIXct(paste(startdate, starttime, sep="T"), format = "%d-%m-%YT%H:%M:%S", tz="UTC")
-  return(as.character(start + getSeconds(reltime) - (difftime*3600)))
+  return(as.character(start + getSeconds(reltime) + 1 - (difftime*3600)))
+}
+
+# --------------------------------------------------------------------------------------------------------------
+
+mergeDF <- function(old, new, mergeBy) {
+  
+  #temporary:
+  timeZ <-   grepl("(\\.[0-9]{3})?Z|(\\.[0-9]{3}?\\+[0-9]{2}:[0-9]{2})", new$Time)
+  new$Time <- sub("(\\.[0-9]{3})?Z|(\\.[0-9]{3}?\\+[0-9]{2}:[0-9]{2})", "", new$Time)
+  new$Time <- as.POSIXct(new$Time, format = "%Y-%m-%dT%H:%M:%S", tz = "UTC")
+  
+  
+  
+  # assertion: ncol(old)==ncol(new); colnames(old)==colnames(new)
+  i <- which(colnames(old)==mergeBy)
+  cols <- ncol(old)
+  
+  # merge dataframes
+  merged <- merge(old, new, by = mergeBy, all = TRUE)
+  mytest <<- merged
+  for (k in 2:cols) {
+    merged[,k] <- ifelse(is.na(merged[,k]), merged[,k+cols-1], merged[,k])
+  }
+  
+  # keep only first ncol(old) columns
+  merged <- merged[,1:cols]
+  
+  # rename colnames: mergeby, colnames without mergeby
+  colnames(merged) <- c(mergeBy, colnames(old)[-i])
+  
+  return(merged[colnames(old)])
 }
 
 # --------------------------------------------------------------------------------------------------------------
@@ -138,7 +169,7 @@ importDataCSV <- function(myFile) {
   }
   
   
-  return(mydf)
+  return(mydf[myHeader])
 }
 
 # --------------------------------------------------------------------------------------------------------------
