@@ -20,6 +20,7 @@ iLang <- 1                                                      # TEMP: Abwaerts
 
 # Variablen für die Herzfrequenzeinstellungen festelegen
 hfMaxGeneral <- 220
+hfMinGeneral <- 60
 hfBereiche <- list("minimal" = 1,"leicht" = 2, "moderat" = 3, "schwer" = 4, "sehr schwer" = 5, "maximal" = 6)
 heartRateLimits <- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (hfMaxGeneral - 40) + 40
 
@@ -33,6 +34,8 @@ polarheader1 <- paste0("Name,Sport,Date,Start time,Duration,Total distance (km),
                        "HR max,HR sit,VO2max,")
 polarheader2 <- paste0("Sample rate,Time,HR (bpm),Speed (km/h),Pace (min/km),Cadence,Altitude (m),Stride l",
                        "ength (m),Distances (m),Temperatures (C),Power (W),")
+
+# Basisfarben für die Darstellung des Referenzbereiches
 basicCol <- c("#ffcc00", "#00ff00", "#ff0000")
 
 # --------------------------------------------------------------------------------------------------------------

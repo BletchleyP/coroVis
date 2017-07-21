@@ -374,7 +374,7 @@ shinyServer(function(input, output, session) {
 
   observeEvent(input$inpRiskClass, {
     
-    heartRateLimits <<- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (as.numeric(input$inpRiskClass) - 40) + 40
+    heartRateLimits <<- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (as.numeric(input$inpRiskClass) - hfMinGeneral) + hfMinGeneral
     maxFr <<- as.numeric(input$inpRiskClass)
 
     updateSliderInput(session, "overrideMaxHF", value = maxFr)
@@ -384,7 +384,7 @@ shinyServer(function(input, output, session) {
   
   observeEvent(input$hfMax, {
     
-    heartRateLimits <<- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (input$hfMax - 40) + 40
+    heartRateLimits <<- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (input$hfMax - hfMinGeneral) + hfMinGeneral
     limit <- hfBereiche[[ifelse(is.null(input$risk), 1, input$risk)]]
     rVal$hfBu <- heartRateLimits[limit]
     rVal$hfBo <- heartRateLimits[limit+1]
