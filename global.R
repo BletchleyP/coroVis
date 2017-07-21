@@ -9,6 +9,7 @@ mytest <- NULL
 
 # --------------------------------------------------------------------------------------------------------------
 
+options(digits=10)
 # Dataframe fuer alle eingelesenen Daten aus den Trainingseinheiten
 viewportDF <- NULL
 
@@ -57,6 +58,21 @@ getPage <- function(filename) {
 
 # --------------------------------------------------------------------------------------------------------------
 
+cleanData <- function(df) {
+  df$Time <- sub("(\\.[0-9]{3})?Z|(\\.[0-9]{3}?\\+[0-9]{2}:[0-9]{2})", "", df$Time)
+  df$Time <- as.POSIXct(df$Time, format = "%Y-%m-%dT%H:%M:%S", tz = "UTC")
+  
+  df$HeartRateBpm <- round(as.numeric(df$HeartRateBpm), 0)
+  df$LatitudeDegrees <- round(as.numeric(df$LatitudeDegrees), 6)
+  df$LongitudeDegrees <- round(as.numeric(df$LongitudeDegrees), 6)
+  df$AltitudeMeters <- round(as.numeric(df$AltitudeMeters), 1)
+  df$DistanceMeters <- round(as.numeric(df$DistanceMeters), 1)
+  
+  return(df)
+}
+
+# --------------------------------------------------------------------------------------------------------------
+
 # berechnet BMI aus Groesse [cm] und Gewicht [kg]
 calculateBMI <- function(groesse, gewicht) {
   return(round(gewicht/((groesse/100)^2), 1))
@@ -99,20 +115,14 @@ getSeconds <- function(raw) {
 # @starttime: HH:MM:SS
 getDateTime <- function(startdate, starttime, reltime, difftime=0) {
   start <- as.POSIXct(paste(startdate, starttime, sep="T"), format = "%d-%m-%YT%H:%M:%S", tz="UTC")
-  return(as.character(start + getSeconds(reltime) + 1 - (difftime*3600)))
+  start <- start + getSeconds(reltime) + 1 - (difftime*3600)
+  start <- format(start, format = "%Y-%m-%dT%H:%M:%S")
+  return(start)
 }
 
 # --------------------------------------------------------------------------------------------------------------
 
 mergeDF <- function(old, new, mergeBy) {
-  
-  #temporary:
-  timeZ <-   grepl("(\\.[0-9]{3})?Z|(\\.[0-9]{3}?\\+[0-9]{2}:[0-9]{2})", new$Time)
-  new$Time <- sub("(\\.[0-9]{3})?Z|(\\.[0-9]{3}?\\+[0-9]{2}:[0-9]{2})", "", new$Time)
-  new$Time <- as.POSIXct(new$Time, format = "%Y-%m-%dT%H:%M:%S", tz = "UTC")
-  
-  
-  
   # assertion: ncol(old)==ncol(new); colnames(old)==colnames(new)
   i <- which(colnames(old)==mergeBy)
   cols <- ncol(old)
@@ -143,8 +153,6 @@ importDataCSV <- function(myFile) {
   close(conn)
   n <- length(rawdata)
   
-  
-  
   # evaluate rawdata
   if (n == 0) {
     return(NULL) # "File is empty"
@@ -157,12 +165,9 @@ importDataCSV <- function(myFile) {
       mydf <- mydf[,c(2:3,7,9)]
       colnames(mydf) <- c("Time", "HeartRateBpm", "AltitudeMeters", "DistanceMeters")
       mydf$Time <- sapply(mydf$Time, function(x) getDateTime(startdate[1], startdate[2], x, -4))
-      
       mydf$Id <- NA
       mydf$LatitudeDegrees <- NA
       mydf$LongitudeDegrees <- NA
-      mydf$Time <- as.POSIXct(mydf$Time, format = "%Y-%m-%d %H:%M:%S", tz="UTC")
-      
       
     } else {
       return(NULL) # "Data error"

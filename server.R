@@ -145,200 +145,6 @@ shinyServer(function(input, output, session) {
     updateRadioButtons(session, "inpGesch", selected = currentSex)        # Geschlecht wieder einstellen
   }
 
-  # ------------------------------------------------------
-  # Funktionen fuer die Aufbereitung der Daten zur Ausgabe
-  # ------------------------------------------------------
-  
-  # Dateien für die Trainingseinheit einer Polar M200 - Watch zusammenstellen (d.h. ...)
-  lookForExerciseUnitPolarM200 <- function(datInfo) {
-    
-    unitList <<- NULL
-    exerciseData <<- NULL
-    viewportDF <<- NULL
-    
-    dN <- list()
-    necData <- list()
-    endings <- c("gpx", "csv")
-    vp_df <- NULL
-    readFiles <- 0
-    givenFiles <- nrow(datInfo)
-    
-    withProgress(message = translate("Bereite Daten auf"), {
-    
-    for(k in endings) {
-      dI <- which(grepl(paste0("[:print:]*.", k), datInfo$name))
-      prog <- length(endings) * length(dI)
-      
-      for(i in dI){
-        liIt <- gsub(k, "", datInfo$name[i])
-        switch(k,
-               
-               csv = {
-                 
-                 tryCatch({
-                   if (datInfo$type[i] == "text/csv") {
-                     
-                     # Allgemeine Patientendaten einlesen
-                     pData <- read.csv(datInfo$datapath[i], header = TRUE, nrows = 1)
-                     # Trainingsdaten einlesen
-                     dN[[liIt]] <- read.csv(datInfo$datapath[i], header = TRUE, skip = 2)
-                     
-                     # Update der Felder mit den Patientendaten
-                     splitname <- strsplit(as.character(pData$Name), " ")[[1]]
-                     updateTextInput(session, "nachname", value = splitname[[2]][1])
-                     updateTextInput(session, "vorname", value =  splitname[[1]][1])
-                     updateSliderInput(session, "groesse", value=pData$Height..cm.)
-                     updateSliderInput(session, "gewicht", value=pData$Weight..kg.)
-                  
-                     # Dataframe herrichten
-                     tData <- data.frame(dN[[liIt]]$Time, 
-                                         dN[[liIt]]$HR..bpm., 
-                                         dN[[liIt]]$Altitude..m.,
-                                         dN[[liIt]]$Distances..m.)
-
-                     filename <- rep(liIt, len = nrow(tData))
-                     id <- rep(pData$Start.time, len = nrow(tData))
-                     tData <- cbind(id, tData)
-                     tData <- cbind(filename, tData)
-                     colnames(tData) <- c("Filename", "Id", "Time", "HeartRateBpm", "AltitudeMeters", "DistanceMeters")
-                     
-                     if (!is.null(necData[[liIt]]$Time[1])) {
-                       startTime <- necData[[liIt]]$Time[1]
-                       tData$Time <- times(tData$Time) + times(startTime)
-                       necData[[liIt]] <- merge(necData[[liIt]], tData, all = FALSE) # Einen Join der gleichen Elemente erzeugen
-                     } else {
-                       necData[[liIt]] <- tData # Einen Eintrag der CSV-Daten erzeugen
-                     }
-                     
-                   }
-                   incProgress(1/prog, detail = paste(translate("aus"), liIt, k))
-                   readFiles <- readFiles + 1
-                 },
-                 
-                 error = function(e) { 
-                   m = modalDialog(
-                     h2(translate("Fehlerhafte Daten")),
-                     title = translate("Bitte korrigieren"),
-                     footer = modalButton(translate("Weiter"))
-                   )
-                   showModal(m)
-                 })
-                 
-               },
-               
-               gpx = {
-                 
-                 tab <- xmlParse(datInfo$datapath[i])
-                 nodes <- getNodeSet(tab, "//ns:trkpt", "ns")
-                 asTab <- plyr::ldply(nodes, as.data.frame(xmlToList))
-                 
-                 choice <- duplicated(asTab$value.time)                        # Gedoppelte Zeiten finden
-                 gpx_time <- times(substr(asTab$value.time[choice], 12, 19))   # Zeiten aus dem String ausschneiden und als times-Objekt speichern
-                 #gpx_time <- times(asTab$value.time[choice])
-                 gpx_y <- asTab$value..attrs[choice]                           # Laenge...
-                 gpx_x <- asTab$value..attrs[which(choice)-1]                  # ... und Breite merken
-                 
-                 tData <- data.frame(gpx_time, gpx_x, gpx_y)                   # Hilfsdataframe entwickeln
-                 colnames(tData) <- c("Time", "LatitudeDegrees", "LongitudeDegrees")  # Spalten bezeichnen und zwar so, das 'Time' in beiden Dataframes Gleiches bezeichnet
-                 
-                 if (!is.null(necData[[liIt]]$Time[1])) {
-                   necData[[liIt]] <- merge(necData[[liIt]], tData, all = FALSE) # Einen Join der gleichen Elemente erzeugen
-                 } else {
-                   necData[[liIt]] <- tData # Einen Eintrag der CSV-Daten erzeugen
-                 }                 
-                 incProgress(1/prog, detail = paste(translate("aus"), liIt, k))
-                 readFiles <- readFiles + 1
-               })
-      }      
-    }
-    })
-    
-    if (givenFiles > readFiles) {
-      
-      m = modalDialog(
-        h2(paste(givenFiles - readFiles), translate("Dateien nicht eingelesen")),
-        title = translate("Falsches Format"),
-        footer = modalButton(translate("Weiter"))
-      )
-      showModal(m)
-      
-    }
-    
-    if (readFiles > 0) {
-      
-      for(i in 1:length(necData)) {
-        vp_df <- rbind(vp_df, necData[[i]])
-      }
-    
-      gt <- paste(names(necData), "#", 'Alle Daten')
-      unitList <<- gt                 # Damit werden die Namen der Trainingseinheiten angezeigt, die geladen sind.
-                                      # Bereits geladene werden nur ueberschrieben, neue hinzugefuegt, egal
-                                      # wieviele bereits ausgewaehlt oder geladen wurden
-      exerciseData <<- necData
-      viewportDF <<- vp_df
-    }
-  }
-  
-  # Dateien für die Trainingseinheit einer Garmin-Watch (im TCX-Format) zusammenstellen
-  lookForExerciseUnitGarmin <- function(datInfo) {
-    
-    unitList <<- NULL
-    exerciseData <<- NULL
-    viewportDF <<- NULL
-    
-    necData <- list()
-    endings <- c("tcx")
-    vp_df <- NULL
-    readFiles <- 0
-    givenFiles <- nrow(datInfo)
-    selList <- NULL
-    
-    withProgress(message = translate("Bereite Daten auf"), {
-      
-      for(k in endings) {
-        dI <- which(grepl(paste0("[:print:]*.", k), datInfo$name))
-        # Hier Test auf Vorhandensein einer TCX-Datei
-        prog <- length(endings) * length(dI)
-        for(i in dI){
-          
-          liIt <- gsub(k, "", datInfo$name[i])
-          switch(k,
-                 tcx = {
-                   ret_list <- importDataTCX(datInfo[i,])
-                   necData[[datInfo$name[i]]] <- ret_list[[2]]
-                   vp_df <- rbind(vp_df, necData[[datInfo$name[i]]])
-                   incProgress(1/prog, detail = paste(translate("aus"), liIt, k))
-                   readFiles <- readFiles + 1
-                   
-                   ft <- rep(names(necData), length(ret_list[[1]]))
-                   ft <- paste(ft, "#", ret_list[[1]])
-                   gt <- paste(names(necData), "#", 'Alle Daten')
-                   ft <- c(gt, ft)
-
-                   selList <- c(selList, ft)
-                 })
-        }
-        
-      }
-
-    })
-    
-    if (givenFiles > readFiles) {
-      m = modalDialog(
-        h2(paste(givenFiles - readFiles), translate("Dateien nicht eingelesen")),
-        title = translate("Falsches Format"),
-        footer = modalButton(translate("Weiter"))
-      )
-      showModal(m)
-    }
-    
-    if (readFiles > 0) {
-      unitList <<- selList
-      exerciseData <<- necData
-      viewportDF <<- vp_df    
-    }
-  }
-
   # -----------------------
   # UI - Beschriftungen ...
   # -----------------------
@@ -476,7 +282,7 @@ shinyServer(function(input, output, session) {
     }
     
     if (file.exists("temp.csv")) {file.remove("temp.csv")}
-
+    
     return(df_trackpoints)
   }
   
@@ -513,7 +319,9 @@ shinyServer(function(input, output, session) {
             errormsg <- paste(errormsg, paste0("No data in file: ", currentFile$name, ";"))
   
           } else {
-            # merge neue Daten mit newDataAll
+            # bereinige und merge neue Daten mit newDataAll
+            newData <- cleanData(newData)
+          
             if (is.null(newDataAll)) {
               newDataAll <- newData
             } else {
@@ -526,29 +334,6 @@ shinyServer(function(input, output, session) {
         incProgress(i/n)
       }
     })
-    
-    # if (result != "CSV") {
-    #   # entferne Millisekunden und ZULU-timezone tag
-    #   timeZ <-   grepl("(\\.[0-9]{3})?Z|(\\.[0-9]{3}?\\+[0-9]{2}:[0-9]{2})", newDataAll$Time)
-    #   # timeZ <- grepl("(\\.[0-9]{3})?Z", newDataAll$Time)
-    #   if (sum(timeZ, na.rm=TRUE) == nrow(newDataAll)) {
-    #     newDataAll$Time <- sub("(\\.[0-9]{3})?Z|(\\.[0-9]{3}?\\+[0-9]{2}:[0-9]{2})", "", newDataAll$Time)
-    #     newDataAll$Time <- as.POSIXct(newDataAll$Time, format = "%Y-%m-%dT%H:%M:%S", tz = "UTC")
-    #   } else {
-    #     newDataAll <- NULL
-    #     
-    #     errormsg <- paste(errormsg, "Fehler bei Datum-Zeit-Konversion")
-    #   }
-    # }
-    
-    
-    # konvertiere chr zu numeric mit 6 (Lat/Lon), 0 (HeartRate) bzw. 1 (Altitude, Distance) Nachkommastelle
-    options(digits=10)
-    newDataAll$LatitudeDegrees <- round(as.numeric(newDataAll$LatitudeDegrees), 6)
-    newDataAll$LongitudeDegrees <- round(as.numeric(newDataAll$LongitudeDegrees), 6)
-    newDataAll$AltitudeMeters <- round(as.numeric(newDataAll$AltitudeMeters), 1)
-    newDataAll$DistanceMeters <- round(as.numeric(newDataAll$DistanceMeters), 1)
-    newDataAll$HeartRateBpm <- round(as.numeric(newDataAll$HeartRateBpm), 0)
     
     newDataAll$GPS <- ifelse(is.na(newDataAll$LatitudeDegrees) | is.na(newDataAll$LongitudeDegrees), "-", "+")
     newDataAll$Id <- ifelse(is.na(newDataAll$Id), "???", newDataAll$Id)
