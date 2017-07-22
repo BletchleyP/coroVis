@@ -306,20 +306,6 @@ shinyServer(function(input, output, session) {
     newDataAll$Date <- format(newDataAll$DTG, "%Y-%m-%d")
     newDataAll$Time <- format(newDataAll$DTG, "%H:%M:%S")
     
-    # entferne bei neu geladenen Daten immer alle globalen Filter
-    updateCheckboxInput(session, "filterById", value = FALSE)
-    updateSelectInput(session, "filterByIdSelect",
-                      choices = unique(newDataAll[,match("Label", colnames(newDataAll))]))
-    updateCheckboxInput(session, "filterByDate", value = FALSE)
-    updateSelectInput(session, "filterByDateSelect",
-                      choices = unique(newDataAll[,match("Date", colnames(newDataAll))]))
-    
-    if (is.null(newDataAll)) {
-      updateCheckboxInput(session, "dataAvailable", value = FALSE)
-    } else {
-      updateCheckboxInput(session, "dataAvailable", value = TRUE)
-    }
-
     return(newDataAll)
   }
   
@@ -695,8 +681,18 @@ shinyServer(function(input, output, session) {
   
   observeEvent(input$userfiles, {
     values$coroRawData <- importFiles(input$userfiles)
+    # entferne bei neu geladenen Daten immer alle globalen Filter
+    updateCheckboxInput(session, "filterById", value = FALSE)
+    updateCheckboxInput(session, "filterByDate", value = FALSE)
+    updateSelectInput(session, "filterByIdSelect",
+                      choices = unique(values$coroRawData[,match("Label", colnames(values$coroRawData))]))
+    updateSelectInput(session, "filterByDateSelect",
+                      choices = unique(values$coroRawData[,match("Date", colnames(values$coroRawData))]))
+    
     if (!is.null(values$coroRawData)) {
       updateTabsetPanel(session, "tP", selected = "tP1")
+      updateCheckboxInput(session, "dataAvailable", value = TRUE)
+      
       showModal(modalDialog(title = translate("question", isolate(input$language)),
                             translate("PersonenDaten", isolate(input$language)),
                             footer = tagList(
@@ -704,6 +700,8 @@ shinyServer(function(input, output, session) {
                               actionButton("patientNew", translate("no", isolate(input$language)))
                             )
       ))
+    } else {
+      updateCheckboxInput(session, "dataAvailable", value = FALSE)
     }
   })
 # --------------------------------------------------------------------------------------------------------------
