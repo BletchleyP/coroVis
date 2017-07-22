@@ -270,7 +270,6 @@ shinyServer(function(input, output, session) {
           } else {
             # bereinige und merge neue Daten mit newDataAll
             newData <- cleanData(newData)
-          
             if (is.null(newDataAll)) {
               newDataAll <- newData
             } else {
@@ -284,14 +283,25 @@ shinyServer(function(input, output, session) {
       }
     })
     
-    newDataAll$GPS <- ifelse(is.na(newDataAll$LatitudeDegrees) | is.na(newDataAll$LongitudeDegrees), "-", "+")
-    newDataAll$Id <- ifelse(is.na(newDataAll$Id), "???", newDataAll$Id)
-    
+    # sortieren, umbennen und erweitern von Spalten
     if (!is.null(newDataAll)) {
-      # entferne Zeilen ohne datetime-Signatur
-      # entferne Dupletten auf Basis datetime-Signatur
-      # order by datetime-Signatur
-      # berechne weitere Spalten
+      newDataAll <- newDataAll[!is.na(newDataAll$HeartRateBpm),]
+      newDataAll <- newDataAll[order(newDataAll$Time),]
+      row.names(newDataAll) <- NULL
+      newDataAll$GPS <- ifelse(is.na(newDataAll$LatitudeDegrees) | is.na(newDataAll$LongitudeDegrees), "-", "+")
+      newDataAll$Id <- ifelse(is.na(newDataAll$Id), "???", newDataAll$Id)
+      colnames(newDataAll)[match("Time", colnames(newDataAll))] <- "DTG"
+      colnames(newDataAll)[match("Id", colnames(newDataAll))] <- "Label"
+      newDataAll$Date <- format(newDataAll$DTG, "%Y-%m-%d")
+      newDataAll$Time <- format(newDataAll$DTG, "%H:%M:%S")
+      newDataAll <- newDataAll[!duplicated(newDataAll),]
+      newDataAll$DeltaTime <- c(0, as.numeric(newDataAll$DTG[2:nrow(newDataAll)] - newDataAll$DTG[1:nrow(newDataAll)-1]))
+      
+      # wenn durch quality filter keine Daten verbleiben:
+      if (nrow(newDataAll)==0) {
+        newDataAll <- NULL
+        errormsg <- paste(errormsg, "After quality filter no data left!")
+      }
     }
 
     # Meldung zu Fehlern behandeln
@@ -299,13 +309,7 @@ shinyServer(function(input, output, session) {
       errormsg <- paste0("@Fehlermeldung@", errormsg)
       showMessage(errormsg, input$language)
     }
-    
-    # umbennen und erweitern von Spalten
-    colnames(newDataAll)[match("Time", colnames(newDataAll))] <- "DTG"
-    colnames(newDataAll)[match("Id", colnames(newDataAll))] <- "Label"
-    newDataAll$Date <- format(newDataAll$DTG, "%Y-%m-%d")
-    newDataAll$Time <- format(newDataAll$DTG, "%H:%M:%S")
-    
+    mytest <<- newDataAll
     return(newDataAll)
   }
   

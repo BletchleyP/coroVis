@@ -59,6 +59,7 @@ getPage <- function(filename) {
 # --------------------------------------------------------------------------------------------------------------
 
 cleanData <- function(df) {
+  df <- df[!is.na(df$Time),]
   df$Time <- sub("(\\.[0-9]{3})?Z|(\\.[0-9]{3}?\\+[0-9]{2}:[0-9]{2})", "", df$Time)
   df$Time <- as.POSIXct(df$Time, format = "%Y-%m-%dT%H:%M:%S", tz = "UTC")
   
@@ -129,7 +130,6 @@ mergeDF <- function(old, new, mergeBy) {
   
   # merge dataframes
   merged <- merge(old, new, by = mergeBy, all = TRUE)
-  mytest <<- merged
   for (k in 2:cols) {
     merged[,k] <- ifelse(is.na(merged[,k]), merged[,k+cols-1], merged[,k])
   }
