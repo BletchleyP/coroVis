@@ -466,14 +466,10 @@ shinyServer(function(input, output, session) {
 
 # --------------------------------------------------------------------------------------------------------------
 
-  values <- reactiveValues(reactiveDF = NULL)
-  
-  coroRawData <- reactive({
-    importFiles(input$userfiles)
-  })
+  values <- reactiveValues(coroRawData = NULL)
   
   coroData <- reactive({
-    modifyDF(coroRawData(), input$language, input$filterById, input$filterByIdSelect,
+    modifyDF(values$coroRawData, input$language, input$filterById, input$filterByIdSelect,
              input$filterByDate, input$filterByDateSelect)
   })
   
@@ -483,7 +479,7 @@ shinyServer(function(input, output, session) {
   })
   
   coroDataSummary <- reactive({
-    calculateSummary(coroRawData(), input$hfBer[1], input$hfBer[2])
+    calculateSummary(values$coroRawData, input$hfBer[1], input$hfBer[2])
   })
 
 # --------------------------------------------------------------------------------------------------------------
@@ -718,7 +714,9 @@ shinyServer(function(input, output, session) {
 # --------------------------------------------------------------------------------------------------------------
   
   observeEvent(input$userfiles, {
+    values$coroRawData <- importFiles(input$userfiles)
     updateTabsetPanel(session, "tP", selected = "tP1")
+    showModal(modalDialog(title = "Important message", translate("PersonenDaten", isolate(input$language))))
   })
 # --------------------------------------------------------------------------------------------------------------
   
