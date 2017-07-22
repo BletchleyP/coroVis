@@ -60,6 +60,15 @@ shinyUI(fluidPage(
                       border-radius: 5px;
                       background-color: WhiteSmoke;
                     }
+                    .checkbox label{
+                      font-weight: 700;
+                    }
+                    .checkbox {
+                      margin: 0;
+                    }
+                    .form-group {
+                      margin-bottom: 5px;
+                    }
                     .modal-title {
                       color: red;
                     }
@@ -142,12 +151,18 @@ shinyUI(fluidPage(
                   fluidRow(
                     column(2, textInput("nachname", label = textOutput("name_t"))),
                     column(2, textInput("vorname", label = textOutput("vorname_t"))),
-                    column(2, uiOutput("gebdat")),
-                    column(2, uiOutput("gesch")),
-                    column(2, sliderInput("groesse", label = textOutput("groesse_t"),
-                                          value = 170, min = 120, max = 210)),
-                    column(2, sliderInput("gewicht", label = textOutput("gewicht_t"),
-                                          value = 70, min = 45, max = 180))
+                    column(2, checkboxInput("inpAlterKA", label = textOutput("gebdat_t"), value = FALSE),
+                           conditionalPanel("input.inpAlterKA", uiOutput("gebdat"))),
+                    column(2, checkboxInput("geschKA", label = textOutput("gesch_t"), value = FALSE),
+                           conditionalPanel("input.geschKA",
+                                radioButtons("inpGesch", label = NULL, choiceValues = list("m", "f"),
+                                             choiceNames = list("m", "f")))),
+                    column(2, checkboxInput("groesseKA", label = textOutput("groesse_t"), value = FALSE),
+                           conditionalPanel("input.groesseKA",
+                                sliderInput("groesse", label = NULL, value = 170, min = 120, max = 210))),
+                    column(2, checkboxInput("gewichtKA", label = textOutput("gewicht_t"), value = FALSE),
+                           conditionalPanel("input.gewichtKA",
+                                sliderInput("gewicht", label = NULL, value = 70, min = 45, max = 180)))
                   )
                 ), hr()
               ),

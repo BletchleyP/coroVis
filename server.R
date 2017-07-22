@@ -28,25 +28,13 @@ shinyServer(function(input, output, session) {
     stopApp()
   })
   
-  # --------------------------------------------------------------------------------------
-  # Fuer das Merken von Einstellungen der UI (Geburtsdatum, Geschlecht, Status InputPanel) 
-  # --------------------------------------------------------------------------------------
-  currentBirthDate <- NULL
-  currentSex <- NULL
-  iPanel <- TRUE
-  
   # Fuer die Herzfrequenzeingaben, hier auf Session-Ebene
   rVal <- reactiveValues(hfBo=0, hfBu=0)
   hfMaxOut <- 0
   maxFr <- 0
-  
 
   
-  # ----------------------------------------------------------------
-  # Einmaliges Festlegen der Reaktion auf Klick auf die Flagge, usw.
-  # ----------------------------------------------------------------
-  shinyjs::onclick("decrease", iPanelOn)
-  shinyjs::onclick("increase", iPanelOn)
+  
 
   # ----------------------------------------------------------------
   # Allgemeine Variablen - fuer die extrahierten Mess- und GPS-Daten
@@ -57,28 +45,6 @@ shinyServer(function(input, output, session) {
   # ------------------------------------------
   # Vorbereitungsfunktionen zum Rendern des UI
   # ------------------------------------------
-  
-  # Fuer das Geburtsdatum
-  renderGebDat <- function(){
-    output$gebdat <- renderUI({
-      tagList(
-        dateInput("inpAlter", value = NULL, label = translate("Geburtsdatum"), format = translate("dd.mm.yyyy"), language = translate("de"))
-      )
-    })
-  }
-  
-  # Fuer das Geschlecht
-  renderGesch <- function(){
-    output$gesch <- renderUI({
-      mask <- as.character(translate("maennlich"))
-      fem <- as.character(translate("weiblich"))
-      tagList(
-        radioButtons("inpGesch", label = translate("Geschlecht"), choiceNames = list(mask, fem), choiceValues = list('m', 'f'), inline = TRUE, width = '100%')
-      )
-    })
-  }
-  
-
   
   # Fuer die Risikoklasse
   renderRiskClass <- function() {
@@ -113,24 +79,13 @@ shinyServer(function(input, output, session) {
     iLang <<- ifelse(iLang > numDics-1, 1, iLang+1)
     setFlag()
   }
-  
-
-  
-  # Funktion zum An- und Ausschalten des Inputpanels
-  iPanelOn <- function() {
-    iPanel <- input$iPanelOn
-    updateCheckboxInput(session, "iPanelOn", value = !iPanel)
-  }
 
   # -------------------------------------------------------
   # Sprache auf dem UI einstellen bzw. auf Klick hin setzen
   # -------------------------------------------------------
   
   setFlag <- function() {
-    # Input-Panel
-    renderGebDat()
-    renderGesch()
-        
+
     # Sidebar
     renderRiskClass()
     renderStrIntensity()
@@ -142,7 +97,7 @@ shinyServer(function(input, output, session) {
 
     # Wieder Einstellen von bestimmten ausgewaehlten Parametern nach dem Sprachwechsel...
     updateDateInput(session, "inpAlter", value = NULL)        # Alter wieder einstellen
-    updateRadioButtons(session, "inpGesch", selected = currentSex)        # Geschlecht wieder einstellen
+
   }
 
   # -----------------------
@@ -159,12 +114,6 @@ shinyServer(function(input, output, session) {
   rVal <- reactiveValues(hfBo=0, hfBu=0, hfMaxOut = 0, maxFr = 0)
     
   observe({
-    
-    # Immer wieder ...
-    currentBirthDate <<- input$inpAlter  # Geburtsdatum merken ...
-    currentSex <<- input$inpGesch  # Geschlecht merken, um beim Sprachwechsel das wieder aktualisieren zu koennen (ansonsten waere in der
-                            # Konstellation mit dem JS-Script ein Update der Infos nicht so leicht moeglich)
-
     # Die ausgewaehlten Panels (hinterlegt in einer CheckboxGroup) werden mit folgender Anweisung dargestellt
     # Die Tabs muessen als integer-Vektor uebergeben werden. Innerhalb der Observe-Funktion werden Aenderungen
     # der CheckboxGroup wahrgenommen und das TabsetPanel aktualisiert.
@@ -514,6 +463,16 @@ shinyServer(function(input, output, session) {
   # TODO
   output$name_t <- renderText({translate("Name", input$language)})
   output$vorname_t <- renderText({translate("Vorname", input$language)})
+  
+  output$gebdat_t <- renderText({translate("Geburtsdatum", input$language)})
+  output$gebdat_f <- renderUI({translate("dd.mm.yyyy", input$language)})
+  output$gebdat_l <- renderUI({translate("de", input$language)})
+  dateReRenderer <- function(lang) {
+    output$gebdat <- renderUI({dateInput("inpAlter", value = NULL, label = NULL,
+                                         format = translate("dd.mm.yyyy", lang), language = translate("de", lang))
+    })
+  }
+  output$gesch_t <- renderText({translate("Geschlecht", input$language)})
   output$groesse_t <- renderText({translate("Groesse", input$language)})
   output$gewicht_t <- renderText({translate("Gewicht", input$language)})
   
@@ -676,6 +635,10 @@ shinyServer(function(input, output, session) {
     updateSelectInput(session, inputId = "currentPanel", selected = "imprintPanel")
   })
   
+  # Ein-/Ausblenden des patientPanels
+  shinyjs::onclick("decrease", updateCheckboxInput(session, "iPanelOn", value = !input$iPanelOn))
+  shinyjs::onclick("increase", updateCheckboxInput(session, "iPanelOn", value = !input$iPanelOn))
+  
 # ##############################################################################################################
 #
 #    Registriere Observer-Ereignisse
@@ -709,6 +672,9 @@ shinyServer(function(input, output, session) {
                     "emptyTable" = translate("emptyTable", input$language),
                     "infoFiltered" = translate("infoFiltered", input$language))
     tableReRenderer(languageList)
+    dateReRenderer(input$language)
+    updateRadioButtons(session, "inpGesch", choiceValues = list("m", "f"), inline = TRUE, selected = input$inpGesch,
+        choiceNames = list(translate("maennlich", input$language), translate("weiblich", input$language)))
   })
   
 # --------------------------------------------------------------------------------------------------------------
@@ -726,6 +692,15 @@ shinyServer(function(input, output, session) {
       ))
     }
   })
+# --------------------------------------------------------------------------------------------------------------
+  
+  observeEvent(input$patientNew, {
+    updateTextInput(session, "nachname", value = "")
+    updateCheckboxInput(session, "groesseKA", value = FALSE)
+    updateCheckboxInput(session, "gewichtKA", value = FALSE)
+    removeModal()
+  })
+  
 # --------------------------------------------------------------------------------------------------------------
   
   observeEvent(input$resetColors, {
