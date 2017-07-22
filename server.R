@@ -468,7 +468,7 @@ shinyServer(function(input, output, session) {
   output$gebdat_f <- renderUI({translate("dd.mm.yyyy", input$language)})
   output$gebdat_l <- renderUI({translate("de", input$language)})
   dateReRenderer <- function(lang) {
-    output$gebdat <- renderUI({dateInput("inpAlter", value = NULL, label = NULL,
+    output$gebdat <- renderUI({dateInput("inpAlter", value = isolate(input$inpAlter), label = NULL,
                                          format = translate("dd.mm.yyyy", lang), language = translate("de", lang))
     })
   }
@@ -489,9 +489,23 @@ shinyServer(function(input, output, session) {
     }
   })
   output$filterTitle <- renderText({translate("filterTitle", input$language)})
-  output$bmi <- renderText({calculateBMI(input$groesse, input$gewicht)})
+  output$bmiTitle <- renderText({translate("bmi", input$language)})
+  output$bmi <- renderText({
+    if (input$groesseKA & input$gewichtKA) {
+      calculateBMI(input$groesse, input$gewicht)
+    } else {
+      translate("nd", input$language)
+    }
+  })
   output$ageTitle <- renderText({translate("Alter", input$language)})
-  output$alterausgabe <- renderText({calculateAge(input$inpAlter)})
+  output$alterausgabe <- renderText({
+    if (input$inpAlterKA) {
+      calculateAge(input$inpAlter)
+    } else {
+      translate("nd", input$language)
+    }
+    
+  })
   
   
   
@@ -696,6 +710,9 @@ shinyServer(function(input, output, session) {
   
   observeEvent(input$patientNew, {
     updateTextInput(session, "nachname", value = "")
+    updateTextInput(session, "vorname", value = "")
+    updateCheckboxInput(session, "inpAlterKA", value = FALSE)
+    updateCheckboxInput(session, "geschKA", value = FALSE)
     updateCheckboxInput(session, "groesseKA", value = FALSE)
     updateCheckboxInput(session, "gewichtKA", value = FALSE)
     removeModal()

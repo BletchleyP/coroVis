@@ -69,6 +69,9 @@ shinyUI(fluidPage(
                     .form-group {
                       margin-bottom: 5px;
                     }
+                    #xxx > .form-group {
+                      margin-bottom: 15px;
+                    }
                     .modal-title {
                       color: red;
                     }
@@ -150,7 +153,7 @@ shinyUI(fluidPage(
                 div(id = "patient",
                   fluidRow(
                     column(2, textInput("nachname", label = textOutput("name_t"))),
-                    column(2, textInput("vorname", label = textOutput("vorname_t"))),
+                    column(2, id = "xxx", textInput("vorname", label = textOutput("vorname_t"))),
                     column(2, checkboxInput("inpAlterKA", label = textOutput("gebdat_t"), value = FALSE),
                            conditionalPanel("input.inpAlterKA", uiOutput("gebdat"))),
                     column(2, checkboxInput("geschKA", label = textOutput("gesch_t"), value = FALSE),
@@ -198,7 +201,7 @@ shinyUI(fluidPage(
                 fluidRow(
                   column(4, align="center", h5(textOutput("ageTitle")),
                          verbatimTextOutput("alterausgabe", placeholder = TRUE)),
-                  column(4, align="center", h5("BMI"), verbatimTextOutput("bmi")),
+                  column(4, align="center", h5(textOutput("bmiTitle")), verbatimTextOutput("bmi")),
                   column(4, align="center", br(), uiOutput("riskclass"))    # Risikoklasse auswaehlen
                 ),
                 fluidRow(
