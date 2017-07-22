@@ -58,7 +58,7 @@ Dateien nicht eingelesen;Datei(en) nicht eingelesen;File(s) not importet;Donnee(
 Falsches Format;Falsches Format;Wrong file format;Format de fichier incorrect
 Zeitraum analysieren;Zeitraum analysieren?;Analyse Range of Training Data ...;Analyser periode de donnees d'exercise ...
 bis;bis;to;a
-PersonenDaten;Geh?ren die neu geladenen Daten zum aktuellen Patienten?;Do the newly loaded data belong to the current patient?;Inclure les nouvelles donnees chargees pour les patients actuels?
+PersonenDaten;Gehören die neu geladenen Daten zum aktuellen Patienten?;Do the newly loaded data belong to the current patient?;Inclure les nouvelles donnees chargees pour les patients actuels?
 Bitte beachten;Bitte beachten;Please note;Notez, s'il vous plait
 IncImpressum;Imprint_DE.html;Imprint_GB.html;Imprint_FR.html
 Zur?ck;Zurueck;Back;Retour
@@ -110,3 +110,6 @@ filterTitle;Welcher globale Filter soll angewendet werden?;Apply global filter:;
 filterId;nach Bezeichnung filtern;filter by label;[fr]
 filterDate;nach Datum filtern;filter by date;[fr]
 Statistik;Hier eine kleine Statistik;[en];[fr]
+yes;Ja;Yes;Oui
+no;Nein;No;Non
+question;Eine Frage ...;Just a question ...;Reste à savoir si ...

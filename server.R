@@ -370,7 +370,7 @@ shinyServer(function(input, output, session) {
     } else {
       updateCheckboxInput(session, "dataAvailable", value = TRUE)
     }
-    
+
     return(newDataAll)
   }
   
@@ -715,8 +715,16 @@ shinyServer(function(input, output, session) {
   
   observeEvent(input$userfiles, {
     values$coroRawData <- importFiles(input$userfiles)
-    updateTabsetPanel(session, "tP", selected = "tP1")
-    showModal(modalDialog(title = "Important message", translate("PersonenDaten", isolate(input$language))))
+    if (!is.null(values$coroRawData)) {
+      updateTabsetPanel(session, "tP", selected = "tP1")
+      showModal(modalDialog(title = translate("question", isolate(input$language)),
+                            translate("PersonenDaten", isolate(input$language)),
+                            footer = tagList(
+                              modalButton(translate("yes", isolate(input$language))),
+                              actionButton("patientNew", translate("no", isolate(input$language)))
+                            )
+      ))
+    }
   })
 # --------------------------------------------------------------------------------------------------------------
   
