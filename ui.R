@@ -312,8 +312,9 @@ shinyUI(fluidPage(
   # imprintPanel zur Anzeige des Impressums
   conditionalPanel("input.currentPanel == 'imprintPanel'",
                    h3(textOutput("imprintTitle")),
-                   br(),
+                   hr(),
                    htmlOutput("imprintHTML"),
+                   hr(),
                    actionButton("imprintBack", textOutput("imprintBackLabel"))
   )
   
