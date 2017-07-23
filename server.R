@@ -312,7 +312,7 @@ shinyServer(function(input, output, session) {
       newDataAll$absDist <- c(NA, newDataAll$dist[2:l]-newDataAll$dist[1:l-1])
       newDataAll$absDist <- ifelse(newDataAll$absDist<=0, NA, newDataAll$absDist)
       newDataAll$deltaDist <- ifelse(is.na(newDataAll$absDist), newDataAll$delta, newDataAll$absDist)
-      newDataAll$cumDist <- cumsum(newDataAll$deltaDist)
+      newDataAll$cumDist <- round(cumsum(newDataAll$deltaDist), 1)
       newDataAll$speed <- 3.6 * newDataAll$deltaDist / newDataAll$deltaTime
       newDataAll <- newDataAll[-seq(k+1,k+4,1)]
       
@@ -328,7 +328,6 @@ shinyServer(function(input, output, session) {
       errormsg <- paste0("@Fehlermeldung@", errormsg)
       showMessage(errormsg, input$language)
     }
-    mytest <<- newDataAll
     return(newDataAll)
   }
   
@@ -366,12 +365,13 @@ shinyServer(function(input, output, session) {
     if (is.null(df)) {
       return(NULL)
     } else {
+      # Sprachvariabler Header
       colnames(df)[match("Time", colnames(df))] <- translate("Time", lang)
-      colnames(df)[match("HeartRateBpm", colnames(df))] <- translate("HeartRateBpm", lang)
-      colnames(df)[match("LatitudeDegrees", colnames(df))] <- translate("LatitudeDegrees", lang)
-      colnames(df)[match("LongitudeDegrees", colnames(df))] <- translate("LongitudeDegrees", lang)
-      colnames(df)[match("AltitudeMeters", colnames(df))] <- translate("AltitudeMeters", lang)
-      colnames(df)[match("DistanceMeters", colnames(df))] <- translate("DistanceMeters", lang)
+      colnames(df)[match("HR", colnames(df))] <- translate("HeartRateBpm", lang)
+      colnames(df)[match("lat", colnames(df))] <- translate("LatitudeDegrees", lang)
+      colnames(df)[match("lon", colnames(df))] <- translate("LongitudeDegrees", lang)
+      colnames(df)[match("alt", colnames(df))] <- translate("AltitudeMeters", lang)
+      colnames(df)[match("cumDist", colnames(df))] <- translate("DistanceMeters", lang)
 
 
 
@@ -516,15 +516,9 @@ shinyServer(function(input, output, session) {
     
   })
   
-  
-  
   # TODO
   output$hfMax_t <- renderText({translate("Maximale Herzfrequenz", input$language)})
   output$frequenzbereich_t <- renderText({translate("Frequenzbereich", input$language)})
-  
-  
-  
-  
   
   # workingPanel > mainPanel > tp0
   output$start <- renderText({translate("Start", input$language)})
