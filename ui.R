@@ -265,6 +265,7 @@ shinyUI(fluidPage(
                   tabPanel(textOutput("gesamt_t"), icon = icon("pie-chart"), value = "tP4",
                            hr(),
                            h4(textOutput("summaryTitle")),
+                           downloadButton("report", "Download report"),
                            fluidRow(column(6, align="center",
                                            tableOutput("tOut2")),
                                     column(6, align="center",

@@ -1,0 +1,23 @@
+---
+title: "coroVis Testbericht"
+output: pdf_document
+params:
+  n: NA
+  pat: NA
+---
+# Patientendaten:  
+
+```{r, echo=FALSE}
+# The `params` object is available in the document.
+params$pat
+```
+
+## Und hier mal ein kleiner Plot mit roten Punkten. Übrigens, unser Patient hieß `r params$pat`, erinnerst Du Dich?  
+
+# Häh?  
+
+
+```{r, echo=FALSE}
+plot(rnorm(params$n), rnorm(params$n), col="red")
+```
+

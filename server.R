@@ -612,6 +612,20 @@ shinyServer(function(input, output, session) {
               col = c(input$cpUnder, input$cpRight, input$cpAbove))
     }, height = hsize)    
   }
+  output$report <- downloadHandler(
+    filename = "coroVisReport.pdf",
+    content = function(file) {
+      tempReport <- file.path(tempdir(), "coroVisReport.Rmd")
+      file.copy("coroVisReport.Rmd", tempReport, overwrite = TRUE)
+      
+      params <- list(n = input$hfBer[1], pat = input$vorname)
+      rmarkdown::render(tempReport, output_file = file,
+                        params = params,
+                        envir = new.env(parent = globalenv()),
+                        encoding = "UTF-8"
+      )
+    }
+  )
 
   
   # workingPanel > mainPanel > tp5 SETTINGS
