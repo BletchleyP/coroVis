@@ -98,13 +98,13 @@ importFileMsg;Importiere %i Datei(en);Import of %i file(s);[fr]
 importDataMsg;Importiere %i Messwert(e);Import of %i row(s);[fr]
 Label;Bezeichnung;Label;[fr]
 Date;Datum;Date;[fr]
-Time;Zeit;Time;[fr]
+Time;Zeit;Time;temps
 DTG;Datum-Zeit-Gruppe;Date-Time-Group;[fr]
-HeartRateBpm;Herzfrequenz;HeartRateBpm;[fr]
+HeartRateBpm;Herzfrequenz;HeartRateBpm;fréquence cardiaque
 LatitudeDegrees;Breitengrad;LatitudeDegrees;[fr]
 LongitudeDegrees;Längengrad;LongitudeDegrees;[fr]
-AltitudeMeters;Höhe;AltitudeMeters;[fr]
-DistanceMeters;Entfernung;DistanceMeters;[fr]
+AltitudeMeters;Höhe;AltitudeMeters;altitude
+DistanceMeters;Entfernung;DistanceMeters;distance
 maximaleHF;Maximale Herzfrequenz korrigieren;Override maximum heart rate;Corriger la frequence cardiaque
 filterTitle;Welcher globale Filter soll angewendet werden?;Apply global filter:;[fr]
 filterId;nach Bezeichnung filtern;filter by label;[fr]

@@ -97,6 +97,22 @@ translate <- function(keyword, languageID = 0) {
 
 # --------------------------------------------------------------------------------------------------------------
 
+getNewSelection <- function(oldSel, newLang, choices) {
+  myVector <- NULL
+  for (i in 1:numDics) {
+    myVector <- c(myVector, translate(choices, i))
+  }
+  i <- match(oldSel, myVector) - 1
+  if (is.na(i)) {
+    newSel <- translate(choices[1], newLang)
+  } else {
+    newSel <- translate(choices[(i %% length(choices)) + 1], newLang)
+  }
+  return(newSel)
+}
+
+# --------------------------------------------------------------------------------------------------------------
+
 showMessage <- function(msg, languageID) {
   part <- strsplit(msg, "@")[[1]]
   showModal(modalDialog(title = translate(part[2], languageID), translate(part[3], languageID),

@@ -238,12 +238,14 @@ shinyUI(fluidPage(
                               fluidRow(
                                 column(4, align="left", offset = 1,
                                        selectInput("axisXSelect", textOutput("axisXSelectLabel"),
-                                                   choices = c("Entfernung", "Zeit")),
-                                       sliderInput("axisXZoom", "Zoom X", min = 0, max = 3000, value = c(0,3000))),
+                                                   choices = c("Zeit", "Entfernung"))
+                                       #sliderInput("axisXZoom", "Zoom X", min = 0, max = 3000, value = c(0,3000))
+                                       ),
                                 column(4, align="left",
                                        selectInput("axisYSelect", textOutput("axisYSelectLabel"),
-                                                   choices = c("Herzfrequenz", "Höhe", "Entfernung")),
-                                       sliderInput("axisYZoom", "Zoom Y", min = 70, max = 130, value = c(70,130))),
+                                                   choices = c("Herzfrequenz", "Höhe", "Entfernung"))
+                                       #("axisYZoom", "Zoom Y", min = 70, max = 130, value = c(70,130))
+                                       ),
                                 column(1, align="center",
                                        numericInput("plotPointsize", "Pointsize", 1,
                                                     min = 0, max = 3, step = 0.25),
@@ -263,9 +265,9 @@ shinyUI(fluidPage(
                   tabPanel(textOutput("gesamt_t"), icon = icon("pie-chart"), value = "tP4",
                            hr(),
                            h4(textOutput("summaryTitle")),
-                           fluidRow(column(4, align="center",
+                           fluidRow(column(6, align="center",
                                            tableOutput("tOut2")),
-                                    column(8, align="center",
+                                    column(6, align="center",
                                            numericInput("summaryPlotExpander", "Change plot size", 1,
                                                         min = 0.25, max = 5, step = 0.25),
                                            plotOutput("summaryPlot",  width = "100%"))

@@ -300,26 +300,27 @@ shinyServer(function(input, output, session) {
       newDataAll$Date <- format(newDataAll$DTG, "%Y-%m-%d")
       newDataAll$Time <- format(newDataAll$DTG, "%H:%M:%S")
       newDataAll <- newDataAll[!duplicated(newDataAll),]
-      newDataAll$deltaTime <- c(0, as.numeric(newDataAll$DTG[2:nrow(newDataAll)] - newDataAll$DTG[1:nrow(newDataAll)-1]))
-      
-      # berechne Entfernung zwischen aufeinanderfolgenden GPS-Koordinaten, wenn nicht als DistanceMeters verfügbar
-      k <- ncol(newDataAll)
-      l <- nrow(newDataAll)
-      newDataAll$latDiff <- c(NA, newDataAll$lat[2:l]-newDataAll$lat[1:l-1]) * 60 * 1852
-      newDataAll$lonDiff <- c(NA, newDataAll$lon[2:l]-newDataAll$lon[1:l-1]) * 60 * 1852 * cos(newDataAll$lat*pi/180)
-      newDataAll$delta <- sqrt(newDataAll$latDiff^2 + newDataAll$lonDiff^2)
-      newDataAll$delta <- ifelse(is.na(newDataAll$delta), 0, newDataAll$delta)
-      newDataAll$absDist <- c(NA, newDataAll$dist[2:l]-newDataAll$dist[1:l-1])
-      newDataAll$absDist <- ifelse(newDataAll$absDist<=0, NA, newDataAll$absDist)
-      newDataAll$deltaDist <- ifelse(is.na(newDataAll$absDist), newDataAll$delta, newDataAll$absDist)
-      newDataAll$cumDist <- round(cumsum(newDataAll$deltaDist), 1)
-      newDataAll$speed <- 3.6 * newDataAll$deltaDist / newDataAll$deltaTime
-      newDataAll <- newDataAll[-seq(k+1,k+4,1)]
       
       # wenn durch quality filter keine Daten verbleiben:
       if (nrow(newDataAll)==0) {
         newDataAll <- NULL
         errormsg <- paste(errormsg, "After quality filter no data left!")
+      } else {
+        newDataAll$deltaTime <- c(0, as.numeric(newDataAll$DTG[2:nrow(newDataAll)] - newDataAll$DTG[1:nrow(newDataAll)-1]))
+        
+        # berechne Entfernung zwischen aufeinanderfolgenden GPS-Koordinaten, wenn nicht als DistanceMeters verfügbar
+        k <- ncol(newDataAll)
+        l <- nrow(newDataAll)
+        newDataAll$latDiff <- c(NA, newDataAll$lat[2:l]-newDataAll$lat[1:l-1]) * 60 * 1852
+        newDataAll$lonDiff <- c(NA, newDataAll$lon[2:l]-newDataAll$lon[1:l-1]) * 60 * 1852 * cos(newDataAll$lat*pi/180)
+        newDataAll$delta <- sqrt(newDataAll$latDiff^2 + newDataAll$lonDiff^2)
+        newDataAll$delta <- ifelse(is.na(newDataAll$delta), 0, newDataAll$delta)
+        newDataAll$absDist <- c(NA, newDataAll$dist[2:l]-newDataAll$dist[1:l-1])
+        newDataAll$absDist <- ifelse(newDataAll$absDist<=0, NA, newDataAll$absDist)
+        newDataAll$deltaDist <- ifelse(is.na(newDataAll$absDist), newDataAll$delta, newDataAll$absDist)
+        newDataAll$cumDist <- round(cumsum(newDataAll$deltaDist), 1)
+        newDataAll$speed <- 3.6 * newDataAll$deltaDist / newDataAll$deltaTime
+        newDataAll <- newDataAll[-seq(k+1,k+4,1)]
       }
     }
 
@@ -403,12 +404,12 @@ shinyServer(function(input, output, session) {
   
   calculateSummary <- function(df, hrmin, hrmax) {
     if (is.null(df)) {return(NULL)}
-    df$Group1 <- ifelse(df[,c("HeartRateBpm")]<hrmin, 1, 0)
-    df$Group2 <- ifelse(df[,c("HeartRateBpm")]<=hrmax, 1, 0)
+    df$Group1 <- ifelse(df[,c("HR")]<hrmin, 1, 0)
+    df$Group2 <- ifelse(df[,c("HR")]<=hrmax, 1, 0)
     df$Group2 <- df$Group2 - df$Group1
-    df$Group3 <- ifelse(df[,c("HeartRateBpm")]>hrmax, 1, 0)
-     
-    mydf <- aggregate(df[,c("Group1", "Group2", "Group3")], by=list(Label=df$Label), FUN=sum, na.rm=TRUE)
+    df$Group3 <- ifelse(df[,c("HR")]>hrmax, 1, 0)
+    
+    mydf <- aggregate(df[,c("Group1", "Group2", "Group3")], by=list(Date=df$Date), FUN=sum, na.rm=TRUE)
     
     return(mydf)
   }
@@ -551,11 +552,11 @@ shinyServer(function(input, output, session) {
     x <- times(coroDataPlot()[,input$axisXSelect])
     y <- as.numeric(coroDataPlot()[,input$axisYSelect])
     z <- coroDataPlot()[,c("Group")]
-    ymin <- ifelse("1" %in% input$plotInclude0 && 0<input$axisYZoom[1], 0, input$axisYZoom[1])
+    #ymin <- ifelse("1" %in% input$plotInclude0 && 0<input$axisYZoom[1], 0, input$axisYZoom[1])
     
     par(mar = c(5, 5, 0.2, 2))
     plot(x, y, pch = 16, col=z, main = NULL, xlab = input$axisXSelect, ylab = input$axisYSelect,
-         xlim = c(input$axisXZoom[1], input$axisXZoom[2]), ylim = c(ymin, input$axisYZoom[2]),
+         #xlim = c(input$axisXZoom[1], input$axisXZoom[2]), ylim = c(ymin, input$axisYZoom[2]),
          cex = input$plotPointsize, las = 1,
          cex.lab = input$plotTextsize, cex.main = input$plotTextsize)
     if ("2" %in% input$plotInclude0) {lines(x, y, pch=16)}
@@ -588,7 +589,17 @@ shinyServer(function(input, output, session) {
   # TODO
   output$gesamt_t <- renderText({translate("Zusammenfassung", input$language)})
   output$summaryTitle <- renderText({translate("Statistik", input$language)})
-  output$tOut2 <- renderTable(coroDataSummary(), digits = 0)
+  output$tOut2 <- renderTable({
+    if (is.null(coroDataSummary())) {
+      return(NULL)
+    } else {
+      mydf <- coroDataSummary()
+      colnames(mydf) <- translate(c("Date", "UnterRef", "ImRef", "ÜberRef"), input$language)
+      return(mydf)
+    }
+    
+    
+    }, digits = 0)
   plotReRenderer <- function(hsize) {
     output$summaryPlot <- renderPlot({
       
@@ -597,7 +608,7 @@ shinyServer(function(input, output, session) {
       counts <- counts[,ncol(counts):1]
       
       par(mar = c(5, 12, 0.2, 2))
-      barplot(counts, horiz = TRUE, names.arg = rev(coroDataSummary()$Label), las=1,
+      barplot(counts, horiz = TRUE, names.arg = rev(coroDataSummary()$Date), las=1,
               col = c(input$cpUnder, input$cpRight, input$cpAbove))
     }, height = hsize)    
   }
@@ -692,6 +703,19 @@ shinyServer(function(input, output, session) {
     dateReRenderer(input$language)
     updateRadioButtons(session, "inpGesch", choiceValues = list("m", "f"), inline = TRUE, selected = input$inpGesch,
         choiceNames = list(translate("maennlich", input$language), translate("weiblich", input$language)))
+    
+    myChoices <- c("Time", "DistanceMeters")
+    newSelection <- getNewSelection(input$axisXSelect, input$language, myChoices)
+    newChoices <- c(translate(myChoices, input$language))
+    updateSelectInput(session, "axisXSelect", choices = newChoices, selected = newSelection)
+    
+    myChoices <- c("HeartRateBpm", "AltitudeMeters", "DistanceMeters")
+    newSelection <- getNewSelection(input$axisYSelect, input$language, myChoices)
+    newChoices <- c(translate(myChoices, input$language))
+    updateSelectInput(session, "axisYSelect", choices = newChoices, selected = newSelection)
+    
+    
+    
   })
   
 # --------------------------------------------------------------------------------------------------------------
@@ -735,13 +759,24 @@ shinyServer(function(input, output, session) {
   
 # --------------------------------------------------------------------------------------------------------------
   
+  # observeEvent(input$axisXSelect, {
+  #   mytest <<- coroDataPlot()
+  #   myMin <- min(mytest$DTG)
+  #   myMax <- max(mytest$DTG)
+  #   updateSliderInput(session, "axisXZoom", min = myMin, max = myMax, value = c(myMin, myMax))
+  # })
+  
+# --------------------------------------------------------------------------------------------------------------
+  
   observeEvent(input$resetColors, {
-    #TODO Farben zurücksetzen
+    # Farben zurücksetzen
     updateColourInput(session, "cpUnder", value = basicCol[1])
     updateColourInput(session, "cpRight", value = basicCol[2])
     updateColourInput(session, "cpAbove", value = basicCol[3])
   })
-  
+
+# --------------------------------------------------------------------------------------------------------------
+    
   observeEvent(input$summaryPlotExpander, {
     plotReRenderer(input$summaryPlotExpander*400)
   })
