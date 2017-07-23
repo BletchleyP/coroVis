@@ -313,6 +313,7 @@ shinyServer(function(input, output, session) {
       newDataAll$absDist <- ifelse(newDataAll$absDist<=0, NA, newDataAll$absDist)
       newDataAll$deltaDist <- ifelse(is.na(newDataAll$absDist), newDataAll$delta, newDataAll$absDist)
       newDataAll$cumDist <- cumsum(newDataAll$deltaDist)
+      newDataAll$speed <- 3.6 * newDataAll$deltaDist / newDataAll$deltaTime
       newDataAll <- newDataAll[-seq(k+1,k+4,1)]
       
       # wenn durch quality filter keine Daten verbleiben:
