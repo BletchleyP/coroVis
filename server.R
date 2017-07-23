@@ -292,10 +292,28 @@ shinyServer(function(input, output, session) {
       newDataAll$Id <- ifelse(is.na(newDataAll$Id), "???", newDataAll$Id)
       colnames(newDataAll)[match("Time", colnames(newDataAll))] <- "DTG"
       colnames(newDataAll)[match("Id", colnames(newDataAll))] <- "Label"
+      colnames(newDataAll)[match("HeartRateBpm", colnames(newDataAll))] <- "HR"
+      colnames(newDataAll)[match("LatitudeDegrees", colnames(newDataAll))] <- "lat"
+      colnames(newDataAll)[match("LongitudeDegrees", colnames(newDataAll))] <- "lon"
+      colnames(newDataAll)[match("AltitudeMeters", colnames(newDataAll))] <- "alt"
+      colnames(newDataAll)[match("DistanceMeters", colnames(newDataAll))] <- "dist"
       newDataAll$Date <- format(newDataAll$DTG, "%Y-%m-%d")
       newDataAll$Time <- format(newDataAll$DTG, "%H:%M:%S")
       newDataAll <- newDataAll[!duplicated(newDataAll),]
-      newDataAll$DeltaTime <- c(0, as.numeric(newDataAll$DTG[2:nrow(newDataAll)] - newDataAll$DTG[1:nrow(newDataAll)-1]))
+      newDataAll$deltaTime <- c(0, as.numeric(newDataAll$DTG[2:nrow(newDataAll)] - newDataAll$DTG[1:nrow(newDataAll)-1]))
+      
+      # berechne Entfernung zwischen aufeinanderfolgenden GPS-Koordinaten, wenn nicht als DistanceMeters verfügbar
+      k <- ncol(newDataAll)
+      l <- nrow(newDataAll)
+      newDataAll$latDiff <- c(NA, newDataAll$lat[2:l]-newDataAll$lat[1:l-1]) * 60 * 1852
+      newDataAll$lonDiff <- c(NA, newDataAll$lon[2:l]-newDataAll$lon[1:l-1]) * 60 * 1852 * cos(newDataAll$lat*pi/180)
+      newDataAll$delta <- sqrt(newDataAll$latDiff^2 + newDataAll$lonDiff^2)
+      newDataAll$delta <- ifelse(is.na(newDataAll$delta), 0, newDataAll$delta)
+      newDataAll$absDist <- c(NA, newDataAll$dist[2:l]-newDataAll$dist[1:l-1])
+      newDataAll$absDist <- ifelse(newDataAll$absDist<=0, NA, newDataAll$absDist)
+      newDataAll$deltaDist <- ifelse(is.na(newDataAll$absDist), newDataAll$delta, newDataAll$absDist)
+      newDataAll$cumDist <- cumsum(newDataAll$deltaDist)
+      newDataAll <- newDataAll[-seq(k+1,k+4,1)]
       
       # wenn durch quality filter keine Daten verbleiben:
       if (nrow(newDataAll)==0) {
