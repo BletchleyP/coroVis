@@ -259,7 +259,7 @@ shinyServer(function(input, output, session) {
           if (result == "TCX") {
             newData <- importDataTCX(currentFile$datapath)
           } else if (result == "CSV") {
-            newData <- importDataCSV(currentFile$datapath)
+            newData <- importDataCSV(currentFile$datapath, isolate(input$timezoneSlider))
           } else {
             newData <- importDataGPX(currentFile$datapath)
           }
@@ -776,9 +776,6 @@ shinyServer(function(input, output, session) {
 # --------------------------------------------------------------------------------------------------------------
   
   # observeEvent(input$axisXSelect, {
-  #   mytest <<- coroDataPlot()
-  #   myMin <- min(mytest$DTG)
-  #   myMax <- max(mytest$DTG)
   #   updateSliderInput(session, "axisXZoom", min = myMin, max = myMax, value = c(myMin, myMax))
   # })
   

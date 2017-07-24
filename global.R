@@ -58,6 +58,16 @@ getPage <- function(filename) {
 
 # --------------------------------------------------------------------------------------------------------------
 
+# berechnet default-Wert für Zeitzonenverschiebung aus Systemdatum
+getTZshift <- function() {
+  tz<- round(as.numeric(as.POSIXct(strftime(Sys.time(),
+                                            format = "%Y-%m-%d %H:%M:%S"), tz = "UTC") - Sys.time()),0)
+  if (is.na(tz)) {tz <- 2}
+  return(tz)
+}
+
+# --------------------------------------------------------------------------------------------------------------
+
 cleanData <- function(df) {
   df <- df[!is.na(df$Time),]
   df$Time <- sub("(\\.[0-9]{3})?Z|(\\.[0-9]{3}?\\+[0-9]{2}:[0-9]{2})", "", df$Time)
@@ -162,7 +172,7 @@ mergeDF <- function(old, new, mergeBy) {
 # --------------------------------------------------------------------------------------------------------------
 
 # extrahiert aus CSV-Datei einen Dataframe
-importDataCSV <- function(myFile) {
+importDataCSV <- function(myFile, timezoneshift) {
   # to be safe: read data as raw textfile
   conn <- file(myFile, open="r")
   rawdata <- readLines(conn)
@@ -180,7 +190,7 @@ importDataCSV <- function(myFile) {
       mydf <- read.csv(myFile, skip = 2, header = TRUE, stringsAsFactors = FALSE)
       mydf <- mydf[,c(2:3,7,9)]
       colnames(mydf) <- c("Time", "HeartRateBpm", "AltitudeMeters", "DistanceMeters")
-      mydf$Time <- sapply(mydf$Time, function(x) getDateTime(startdate[1], startdate[2], x, -4))
+      mydf$Time <- sapply(mydf$Time, function(x) getDateTime(startdate[1], startdate[2], x, timezoneshift))
       mydf$Id <- NA
       mydf$LatitudeDegrees <- NA
       mydf$LongitudeDegrees <- NA
