@@ -105,6 +105,7 @@ HeartRateBpm;Herzfrequenz;HeartRateBpm;fréquence cardiaque
 LatitudeDegrees;Breitengrad;LatitudeDegrees;[fr]
 LongitudeDegrees;Längengrad;LongitudeDegrees;[fr]
 AltitudeMeters;Höhe;AltitudeMeters;altitude
+Speed;Geschwindigkeit;Speed;vitesse
 DistanceMeters;Entfernung;DistanceMeters;distance
 maximaleHF;Maximale Herzfrequenz korrigieren;Override maximum heart rate;Corriger la frequence cardiaque
 filterTitle;Welcher globale Filter soll angewendet werden?;Apply global filter:;[fr]
