@@ -554,10 +554,13 @@ shinyServer(function(input, output, session) {
     y <- as.numeric(coroDataPlot()[,input$axisYSelect])
     z <- coroDataPlot()[,c("Group")]
     #ymin <- ifelse("1" %in% input$plotInclude0 && 0<input$axisYZoom[1], 0, input$axisYZoom[1])
+    ylim <- ifelse("1" %in% input$plotInclude0 && 0<min(y, na.rm = TRUE), 0, min(y, na.rm = TRUE))
+    ylim <- c(ylim, max(y, na.rm = TRUE))
     
     par(mar = c(5, 5, 0.2, 2))
     plot(x, y, pch = 16, col=z, main = NULL, xlab = input$axisXSelect, ylab = input$axisYSelect,
          #xlim = c(input$axisXZoom[1], input$axisXZoom[2]), ylim = c(ymin, input$axisYZoom[2]),
+         ylim = ylim,
          cex = input$plotPointsize, las = 1,
          cex.lab = input$plotTextsize, cex.main = input$plotTextsize)
     if ("2" %in% input$plotInclude0) {lines(x, y, pch=16)}

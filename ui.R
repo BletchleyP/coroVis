@@ -246,12 +246,7 @@ shinyUI(fluidPage(
                                                    choices = c("Herzfrequenz", "Höhe", "Entfernung"))
                                        #("axisYZoom", "Zoom Y", min = 70, max = 130, value = c(70,130))
                                        ),
-                                column(1, align="center",
-                                       numericInput("plotPointsize", "Pointsize", 1,
-                                                    min = 0, max = 3, step = 0.25),
-                                       numericInput("plotTextsize", "Textsize", 1,
-                                                    min = 1, max = 2, step = 0.25)),
-                                column(2, align="left",
+                                column(3, align="left",
                                        checkboxGroupInput("plotInclude0", "Optionen",
                                                           choices = c("ymin <= 0" = 1, "Linie" = 2)))
                               )
@@ -288,7 +283,11 @@ shinyUI(fluidPage(
                                                            label = textOutput("settingsColorResetLabel"))),
                                     column(3, selectInput("mapTilesSelect", "Select map layer", choices = providers),
                                            sliderInput("timezoneSlider", "Zeitverschiebung von CSV-Dateien",
-                                                       min = -12, max = 12, step = 1, value = getTZshift()))
+                                                       min = -12, max = 12, step = 1, value = getTZshift()),
+                                           numericInput("plotPointsize", "Pointsize", 1,
+                                                        min = 0, max = 3, step = 0.25),
+                                           numericInput("plotTextsize", "Textsize", 1,
+                                                        min = 1, max = 2, step = 0.25))
                            ),
                            hr(),
                            h4(textOutput("settingsHFmaxTitle")),
