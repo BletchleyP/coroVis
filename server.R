@@ -317,10 +317,12 @@ shinyServer(function(input, output, session) {
         newDataAll$delta <- sqrt(newDataAll$latDiff^2 + newDataAll$lonDiff^2)
         newDataAll$delta <- ifelse(is.na(newDataAll$delta), 0, newDataAll$delta)
         newDataAll$absDist <- c(NA, newDataAll$dist[2:l]-newDataAll$dist[1:l-1])
-        newDataAll$absDist <- ifelse(newDataAll$absDist<=0, NA, newDataAll$absDist)
+        newDataAll$absDist <- ifelse(newDataAll$absDist<=0, NA, newDataAll$absDist)                     # filter out 0
+        newDataAll$absDist <- ifelse(newDataAll$absDist/newDataAll$delta > 100, NA, newDataAll$absDist) # filter out wrong input data
         newDataAll$deltaDist <- ifelse(is.na(newDataAll$absDist), newDataAll$delta, newDataAll$absDist)
         newDataAll$cumDist <- round(cumsum(newDataAll$deltaDist), 1)
-        newDataAll$speed <- 3.6 * newDataAll$deltaDist / newDataAll$deltaTime
+        newDataAll$speed <- ifelse(newDataAll$deltaTime == 0, NA, 3.6 * newDataAll$deltaDist / newDataAll$deltaTime)
+        mytest <<- newDataAll
         newDataAll <- newDataAll[-seq(k+1,k+4,1)]
       }
     }
@@ -374,6 +376,7 @@ shinyServer(function(input, output, session) {
       colnames(df)[match("lon", colnames(df))] <- translate("LongitudeDegrees", lang)
       colnames(df)[match("alt", colnames(df))] <- translate("AltitudeMeters", lang)
       colnames(df)[match("cumDist", colnames(df))] <- translate("DistanceMeters", lang)
+      colnames(df)[match("speed", colnames(df))] <- translate("Speed", lang)
 
 
 
@@ -556,7 +559,7 @@ shinyServer(function(input, output, session) {
     #ymin <- ifelse("1" %in% input$plotInclude0 && 0<input$axisYZoom[1], 0, input$axisYZoom[1])
     ylim <- ifelse("1" %in% input$plotInclude0 && 0<min(y, na.rm = TRUE), 0, min(y, na.rm = TRUE))
     ylim <- c(ylim, max(y, na.rm = TRUE))
-    
+
     par(mar = c(5, 5, 0.2, 2))
     plot(x, y, pch = 16, col=z, main = NULL, xlab = input$axisXSelect, ylab = input$axisYSelect,
          #xlim = c(input$axisXZoom[1], input$axisXZoom[2]), ylim = c(ymin, input$axisYZoom[2]),
@@ -728,7 +731,7 @@ shinyServer(function(input, output, session) {
     newChoices <- c(translate(myChoices, input$language))
     updateSelectInput(session, "axisXSelect", choices = newChoices, selected = newSelection)
     
-    myChoices <- c("HeartRateBpm", "AltitudeMeters", "DistanceMeters")
+    myChoices <- c("HeartRateBpm", "AltitudeMeters", "DistanceMeters", "Speed")
     newSelection <- getNewSelection(input$axisYSelect, input$language, myChoices)
     newChoices <- c(translate(myChoices, input$language))
     updateSelectInput(session, "axisYSelect", choices = newChoices, selected = newSelection)
