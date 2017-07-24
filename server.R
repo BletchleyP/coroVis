@@ -643,6 +643,7 @@ shinyServer(function(input, output, session) {
   
   # helpPanel
   output$helpTitle <- renderText({translate("Hilfe", input$language)})
+  output$helpHTML <- renderUI({getPage(translate("IncHilfe", input$language))})
   output$helpBackLabel <- renderText({translate("Zur?ck", input$language)})
   
   # imprintPanel

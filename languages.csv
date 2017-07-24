@@ -60,8 +60,9 @@ Zeitraum analysieren;Zeitraum analysieren?;Analyse Range of Training Data ...;An
 bis;bis;to;a
 PersonenDaten;Gehören die neu geladenen Daten zum aktuellen Patienten?;Do the newly loaded data belong to the current patient?;Inclure les nouvelles donnees chargees pour les patients actuels?
 Bitte beachten;Bitte beachten;Please note;Notez, s'il vous plait
+IncHilfe;Help_DE.html;Help_GB.html;Help_FR.html
 IncImpressum;Imprint_DE.html;Imprint_GB.html;Imprint_FR.html
-Zur?ck;Zurueck;Back;Retour
+Zur?ck;Zurück;Back;Retour
 HFq;Herzfrequenz;Heartrate;Frequence cardiaque
 Optimale Belastung;Optimale Belastung;Optimal Intensity;Intensite optimale
 XAchse;X-Achse;X-Axis;X-Axe

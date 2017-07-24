@@ -303,8 +303,9 @@ shinyUI(fluidPage(
   # helpPanel zur Anzeige des Impressums
   conditionalPanel("input.currentPanel == 'helpPanel'",
                    h3(textOutput("helpTitle")),
-                   br(),
-                   tags$video(src='bref.mp4', type='video/mp4', width='40%', controls='controls'),
+                   hr(),
+                   htmlOutput("helpHTML"),
+                   hr(),
                    actionButton("helpBack", textOutput("helpBackLabel"))
   ),
 
