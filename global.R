@@ -20,10 +20,10 @@ numDics <- length(availableLang)
 iLang <- 1                                                      # TEMP: Abwaertskompatibilitaet zu alter Version
 
 # Variablen für die Herzfrequenzeinstellungen festelegen
-hfMaxGeneral <- 220
-hfMinGeneral <- 60
-hfBereiche <- list("minimal" = 1,"leicht" = 2, "moderat" = 3, "schwer" = 4, "sehr schwer" = 5, "maximal" = 6)
-heartRateLimits <- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (hfMaxGeneral - 40) + 40
+# hfMaxGeneral <- 220
+# hfMinGeneral <- 60
+# hfBereiche <- list("minimal" = 1,"leicht" = 2, "moderat" = 3, "schwer" = 4, "sehr schwer" = 5, "maximal" = 6)
+# heartRateLimits <- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (hfMaxGeneral - 40) + 40
 
 # Header-Vorgabe für Datenimport
 myHeader <- c("Time", "Id", "HeartRateBpm", "LatitudeDegrees", "LongitudeDegrees",
@@ -64,6 +64,23 @@ getTZshift <- function() {
                                             format = "%Y-%m-%d %H:%M:%S"), tz = "UTC") - Sys.time()),0)
   if (is.na(tz)) {tz <- 2}
   return(tz)
+}
+
+# --------------------------------------------------------------------------------------------------------------
+
+getRange <- function(minHR=60, maxHR=180, level="5", HRmax=FALSE) {
+  intensity <- strtoi(level)
+  myRange <- c(0, 0.3, 0.4, 0.5, 0.6, 0.8, 1)
+  # c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0)
+  if (HRmax) {
+    lowerLimit <- myRange[intensity]*maxHR
+    upperLimit <- myRange[intensity+1]*maxHR
+  } else {
+    lowerLimit <- myRange[intensity]*(maxHR - minHR) + minHR
+    upperLimit <- myRange[intensity+1]*(maxHR - minHR) + minHR
+  }
+  
+  return(c(lowerLimit, upperLimit))
 }
 
 # --------------------------------------------------------------------------------------------------------------

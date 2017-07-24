@@ -30,9 +30,9 @@ shinyServer(function(input, output, session) {
   })
   
   # Fuer die Herzfrequenzeingaben, hier auf Session-Ebene
-  rVal <- reactiveValues(hfBo=0, hfBu=0)
-  hfMaxOut <- 0
-  maxFr <- 0
+  #rVal <- reactiveValues(hfBo=0, hfBu=0)
+  #hfMaxOut <- 0
+  # maxFr <- 0
 
   
   
@@ -47,28 +47,28 @@ shinyServer(function(input, output, session) {
   # Vorbereitungsfunktionen zum Rendern des UI
   # ------------------------------------------
   
-  # Fuer die Risikoklasse
-  renderRiskClass <- function() {
-    output$riskclass <- renderUI({
-      tagList(
-        radioButtons("inpRiskClass", label = a(href = 'LL_KActiv.pdf', translate("Risikoklasse"), target = "_blank"), choiceNames = list('A', 'B', 'C', 'D'), choiceValues = list(hfMaxGeneral, hfMaxGeneral*0.8, hfMaxGeneral*0.6, hfMaxGeneral*0.5), inline = TRUE)
-      )
-    })
-  }
+  # # Fuer die Risikoklasse
+  # renderRiskClass <- function() {
+  #   output$riskclass <- renderUI({
+  #     tagList(
+  #       radioButtons("inpRiskClass", label = a(href = 'LL_KActiv.pdf', translate("Risikoklasse"), target = "_blank"), choiceNames = list('A', 'B', 'C', 'D'), choiceValues = list(hfMaxGeneral, hfMaxGeneral*0.8, hfMaxGeneral*0.6, hfMaxGeneral*0.5), inline = TRUE)
+  #     )
+  #   })
+  # }
   
-  # Fuer die Belastungsintensitaet
-  renderStrIntensity <- function() {
-    output$intensity <- renderUI({
-      tagList(
-        selectInput("risk", label = textOutput("risiko_t"), choices = list(translate("minimal"), 
-                                                                           translate("leicht"),
-                                                                           translate("moderat"),
-                                                                           translate("schwer"),
-                                                                           translate("sehr schwer"),
-                                                                           translate("maximal")), selected = 1)
-      )      
-    })
-  }
+  # # Fuer die Belastungsintensitaet
+  # renderStrIntensity <- function() {
+  #   output$intensity <- renderUI({
+  #     tagList(
+  #       selectInput("risk", label = textOutput("risiko_t"), choices = list(translate("minimal"), 
+  #                                                                          translate("leicht"),
+  #                                                                          translate("moderat"),
+  #                                                                          translate("schwer"),
+  #                                                                          translate("sehr schwer"),
+  #                                                                          translate("maximal")), selected = 1)
+  #     )      
+  #   })
+  # }
 
   # -------------------
   # Hilfsfunktionen ...
@@ -87,9 +87,9 @@ shinyServer(function(input, output, session) {
   
   setFlag <- function() {
 
-    # Sidebar
-    renderRiskClass()
-    renderStrIntensity()
+    # # Sidebar
+    # # renderRiskClass()
+    # renderStrIntensity()
     output$risiko_t <- renderText({ paste(translate("Belastungsintensitaet")) })
     
     # mainPanel
@@ -112,7 +112,7 @@ shinyServer(function(input, output, session) {
   # ----------------------------------------------------
   
   # Reaktive Variablen festelegen
-  rVal <- reactiveValues(hfBo=0, hfBu=0, hfMaxOut = 0, maxFr = 0)
+  #rVal <- reactiveValues(hfBo=0, hfBu=0, hfMaxOut = 0, maxFr = 0)
     
   observe({
     # Die ausgewaehlten Panels (hinterlegt in einer CheckboxGroup) werden mit folgender Anweisung dargestellt
@@ -128,41 +128,41 @@ shinyServer(function(input, output, session) {
 
   # Wenn die Risikoklasse, die Belastungsintensität oder die Maximalherzfrequenz eingestellt wird
 
-  observeEvent(input$inpRiskClass, {
-    
-    heartRateLimits <<- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (as.numeric(input$inpRiskClass) - hfMinGeneral) + hfMinGeneral
-    maxFr <<- as.numeric(input$inpRiskClass)
-
-    updateSliderInput(session, "overrideMaxHF", value = maxFr)
-    updateSliderInput(session, "hfMax", max = maxFr, value = maxFr)
-    
-  })
+  # observeEvent(input$inpRiskClass, {
+  #   
+  #   heartRateLimits <<- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (as.numeric(input$inpRiskClass) - hfMinGeneral) + hfMinGeneral
+  #   maxFr <<- as.numeric(input$inpRiskClass)
+  # 
+  #   updateSliderInput(session, "overrideMaxHF", value = maxFr)
+  #   updateSliderInput(session, "hfMax", max = maxFr, value = maxFr)
+  #   
+  # })
   
   observeEvent(input$hfMax, {
     
-    heartRateLimits <<- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (input$hfMax - hfMinGeneral) + hfMinGeneral
-    limit <- hfBereiche[[ifelse(is.null(input$risk), 1, input$risk)]]
-    rVal$hfBu <- heartRateLimits[limit]
-    rVal$hfBo <- heartRateLimits[limit+1]
+    # heartRateLimits <<- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (input$hfMax - hfMinGeneral) + hfMinGeneral
+    # limit <- hfBereiche[[ifelse(is.null(input$risk), 1, input$risk)]]
+    # rVal$hfBu <- heartRateLimits[limit]
+    # rVal$hfBo <- heartRateLimits[limit+1]
     
-    updateSliderInput(session, "hfBer", max = heartRateLimits[7], value = c(rVal$hfBu, rVal$hfBo))
+    updateSliderInput(session, "hfBer", max = input$hfMax[2], value = getRange(input$hfMax[1], input$hfMax[2], input$intensity))
     
   })
   
-  observeEvent(input$risk, {
+  observeEvent(input$intensity, {
     
-    limit <- hfBereiche[[ifelse(is.null(input$risk), 1, input$risk)]]
-    rVal$hfBu <- heartRateLimits[limit]
-    rVal$hfBo <- heartRateLimits[limit+1]
+    # limit <- hfBereiche[[ifelse(is.null(input$risk), 1, input$risk)]]
+    # rVal$hfBu <- heartRateLimits[limit]
+    # rVal$hfBo <- heartRateLimits[limit+1]
  
-    updateSliderInput(session, "hfBer", max = heartRateLimits[7], value = c(rVal$hfBu, rVal$hfBo))
+    updateSliderInput(session, "hfBer", value = getRange(input$hfMax[1], input$hfMax[2], input$intensity))
 
   })
   
-  observeEvent(input$hfBer, {
-    rVal$hfBu <- input$hfBer[1]
-    rVal$hfBo <- input$hfBer[2]
-  })
+  # observeEvent(input$hfBer, {
+  #   rVal$hfBu <- input$hfBer[1]
+  #   rVal$hfBo <- input$hfBer[2]
+  # })
   
 
 
@@ -736,7 +736,8 @@ shinyServer(function(input, output, session) {
     newChoices <- c(translate(myChoices, input$language))
     updateSelectInput(session, "axisYSelect", choices = newChoices, selected = newSelection)
     
-    
+    newChoices <- list("Level1"=1, "Level2"=2, "Level3"=3, "Level4"=4, "Level5"=5, "Level6"=6)
+    updateSelectInput(session, "intensity", choices = newChoices)
     
   })
   

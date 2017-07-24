@@ -194,24 +194,25 @@ shinyUI(fluidPage(
                   ),
                   hr()
                 ),
-                
-                
-                
-                
                 fluidRow(
                   column(4, align="center", h5(textOutput("ageTitle")),
                          verbatimTextOutput("alterausgabe", placeholder = TRUE)),
-                  column(4, align="center", h5(textOutput("bmiTitle")), verbatimTextOutput("bmi")),
-                  column(4, align="center", br(), uiOutput("riskclass"))    # Risikoklasse auswaehlen
+                  column(4, align="center", h5(textOutput("bmiTitle")), verbatimTextOutput("bmi"))
+                  # ,
+                  # column(4, align="center", br(), uiOutput("riskclass"))    # Risikoklasse auswaehlen
                 ),
-                fluidRow(
-                  column(6, align="center", sliderInput("hfMax", label = textOutput("hfMax_t"), value = 70,
-                                                        min = 40, max = hfMaxGeneral)),
-                  column(6, align="center", uiOutput("intensity"))          # Belastungsintensitaet auswaehlen
-                ),
-                # Herzfrequenzbereich fuer die Belastung auswaehlen
-                sliderInput("hfBer", label = textOutput("frequenzbereich_t"), value = c(60, 80),
-                            min = 40, max = hfMaxGeneral)
+                # Herzfrequenzgrenzen
+                sliderInput("hfMax", label = textOutput("hfMax_t"),
+                            min = 0, max = 200, value = c(60, 180)),
+                
+                # Belastungslevel
+                #uiOutput("intensity"),
+                selectInput("intensity", label = textOutput("risiko_t"),
+                            choices = list("Level1"=1, "Level2"=2, "Level3"=3, "Level4"=4, "Level5"=5, "Level6"=6)),
+                
+                # Trainingsfrequenzbereich
+                sliderInput("hfBer", label = textOutput("frequenzbereich_t"),
+                            min = 0, max = 200, value = c(60, 80))
               ),
                      
           # ----------------------------------------------------------------------------------------------------
@@ -291,8 +292,8 @@ shinyUI(fluidPage(
                            ),
                            hr(),
                            h4(textOutput("settingsHFmaxTitle")),
-                           sliderInput("overrideMaxHF", label = NULL, value = hfMaxGeneral,
-                                       min = 100, max = 240, step = 1),
+                           sliderInput("overrideMaxHF", label = NULL,
+                                       min = 100, max = 240, step = 1, value = 200),
                            hr()
                   )
                 )
