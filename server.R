@@ -653,6 +653,9 @@ shinyServer(function(input, output, session) {
   output$settingsHFmaxTitle <- renderText({translate("maximaleHF", input$language)})
   
   output$SelectMapLayer <- renderText({ translate("SelectMapLayer", input$language)})
+  output$timeShiftCSV <- renderText({ translate("ZeitVCSV", input$language)})
+  output$spotSize <- renderText({ translate("PunktGr", input$language)})#
+  output$textSize <- renderText({ translate("TextGr", input$language)})
   
   # helpPanel
   output$helpTitle <- renderText({translate("Hilfe", input$language)})

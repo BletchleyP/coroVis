@@ -14,7 +14,7 @@ Geburtsdatum;Geburtsdatum;Date of birth;Date de naissance
 Geschlecht;Geschlecht;Sex;Sexe
 Groesse;Größe;Height;La taille du corps
 Gewicht;Gewicht;Weight;Poids corporel
-Maximale Herzfrequenz;Herzfrequenzgrenzen;Maximum heart rate;Frequence cardiaque maxmiale
+Maximale Herzfrequenz;Herzfrequenzgrenzen;Range of heart rate;Limites de fréquence cardiaque
 Belastungsintensitaet;Belastungsintensität;Stress level;L'intensite du stress
 Frequenzbereich;Trainingsfrequenzbereich;Best range of Heart rate;Meilleur gamme de frequences
 dd.mm.yyyy;dd.mm.yyyy;yyyy-mm-dd;dd.mm.yyyy
@@ -93,7 +93,7 @@ FarbenZurück;Farben zurücksetzen;Reset colors;Retour couleurs
 filesLoaded0;Keine Dateien geladen;No files loaded;Aucun sont charges
 filesLoaded1;1 Datei geladen;1 file loaded;1 fichier charge
 filesLoaded2;Dateien geladen;files loaded;fichiers charges
-filesButton;Trainingsdaten laden ...;Upload data ...;telecharger des donnees de formation ...
+filesButton;Trainingsdaten laden ...;Upload data ...;Charger des donnees de formation ...
 filesHeader;Welche Dateien sollen analysiert werden?;Choose file(s) for analysis:;Les fichiers à analyser?
 importFileMsg;Importiere %i Datei(en);Import of %i file(s);Importer %i fichier(s)
 importDataMsg;Importiere %i Messwert(e);Import of %i row(s);Importer %i valeur(s)
@@ -108,9 +108,9 @@ AltitudeMeters;Höhe;AltitudeMeters;Altitude
 Speed;Geschwindigkeit;Speed;Vitesse
 DistanceMeters;Entfernung;DistanceMeters;Distance
 maximaleHF;Maximale Herzfrequenz korrigieren;Override maximum heart rate;Corriger la frequence cardiaque
-filterTitle;Welcher globale Filter soll angewendet werden?;Apply global filter:;Quel filtre global devrait être appliqué?
-filterId;nach Bezeichnung filtern;filter by label;Filtrer par nom
-filterDate;nach Datum filtern;filter by date;Filtrer par date
+filterTitle;Welche Messwerte sollen angezeigt werden?;Which training data should be shown?;Quelles sont les donnees de formation a afficher?
+filterId;Werte nach Trainingseinheit;Values by training unit;Les valeurs après l'entraînement
+filterDate;Werte nach Tag;Values by day;Les valeurs après jour
 Statistik;Statistik im Überblick;Overview of statistics;Statistiques en bref
 yes;Ja;Yes;Oui
 no;Nein;No;Non
@@ -118,3 +118,6 @@ question;Eine Frage ...;Just a question ...;Reste à savoir si ...
 nd;keine Angaben;no data;non disponible
 bmi;BMI;BMI;IMC
 SelectMapLayer;Karte auswählen;Select Map Layer;Selectionner une couche de la carte
+ZeitVCSV;Zeitverschiebung von CSV-Dateien;Time shift of CSV files;Decalage des fichiers CSV
+PunktGr;Punktgröße;Spot size;La taille du spot
+TextGr;Textgröße;Text size;La taille du text
