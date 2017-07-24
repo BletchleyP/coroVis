@@ -622,15 +622,20 @@ shinyServer(function(input, output, session) {
   output$report <- downloadHandler(
     filename = "coroVisReport.pdf",
     content = function(file) {
-      tempReport <- file.path(tempdir(), "coroVisReport.Rmd")
-      file.copy("coroVisReport.Rmd", tempReport, overwrite = TRUE)
+      pdf(file, paper = "a4")
+      plot(NA, xlim=c(0,5), ylim=c(0,5), bty='n',
+           xaxt='n', yaxt='n', xlab='', ylab='')
+      text(1,4,isolate(input$nachname), pos=4)
+      text(1,3,isolate(input$vorname), pos=4)
+      text(1,2,isolate(input$groesse), pos=4)
+      text(1,1,isolate(input$gewicht), pos=4)
+      points(rep(1,4),1:4, pch=15)
       
-      params <- list(n = input$hfBer[1], pat = input$vorname)
-      rmarkdown::render(tempReport, output_file = file,
-                        params = params,
-                        envir = new.env(parent = globalenv()),
-                        encoding = "UTF-8"
-      )
+      # par(mar = c(5, 12, 0.2, 2), new=TRUE)
+      # barplot(counts, horiz = TRUE, names.arg = rev(coroDataSummary()$Date), las=1,
+      #         col = c(input$cpUnder, input$cpRight, input$cpAbove))
+      
+      dev.off()
     }
   )
 
