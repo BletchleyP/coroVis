@@ -14,9 +14,9 @@ Geburtsdatum;Geburtsdatum;Date of birth;Date de naissance
 Geschlecht;Geschlecht;Sex;Sexe
 Groesse;Größe;Height;La taille du corps
 Gewicht;Gewicht;Weight;Poids corporel
-Maximale Herzfrequenz;Maximale Herzfrequenz;Maximum heart rate;Frequence cardiaque maxmiale
+Maximale Herzfrequenz;Herzfrequenzgrenzen;Maximum heart rate;Frequence cardiaque maxmiale
 Belastungsintensitaet;Belastungsintensität;Stress level;L'intensite du stress
-Frequenzbereich;Optimaler Frequenzbereich;Best range of Heart rate;Meilleur gamme de frequences
+Frequenzbereich;Trainingsfrequenzbereich;Best range of Heart rate;Meilleur gamme de frequences
 dd.mm.yyyy;dd.mm.yyyy;yyyy-mm-dd;dd.mm.yyyy
 de;de;en;fr
 maennlich;männlich;male;male
@@ -37,12 +37,12 @@ Zusammenfassung;Zusammenfassung;Summary;Resume
 Hilfe;Hilfe;Help;Aider
 Impressum;Impressum;Imprint;Empreinte
 Daten werden aufbereitet...;Daten werden aufbereitet...;Data are processed ?;Donnees sont traitees
-minimal;Sehr leicht;minimal;minimal
-leicht;Leicht;light;facile
-moderat;Moderat;moderate;modere
-schwer;Schwer;vigorous;difficile
-sehr schwer;Sehr schwer;very heavy;tres difficile
-maximal;Maximal;maximum;maximal
+level1;Sehr leicht;minimal;minimal
+level2;Leicht;light;facile
+level3;Moderat;moderate;modere
+level4;Schwer;vigorous;difficile
+level5;Sehr schwer;very heavy;tres difficile
+level6;Maximal;maximum;maximal
 Los;Los?;Browse ?;On y va?
 Keine Datei gew?hlt;Keine Datei gew?hlt;No file selected;Aucun fichier selectionne
 Bereite Daten auf;Bereite Daten auf ?;Preparing data;Preparer les dates

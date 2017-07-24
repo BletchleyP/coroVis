@@ -622,15 +622,20 @@ shinyServer(function(input, output, session) {
   output$report <- downloadHandler(
     filename = "coroVisReport.pdf",
     content = function(file) {
-      tempReport <- file.path(tempdir(), "coroVisReport.Rmd")
-      file.copy("coroVisReport.Rmd", tempReport, overwrite = TRUE)
+      pdf(file, paper = "a4")
+      plot(NA, xlim=c(0,5), ylim=c(0,5), bty='n',
+           xaxt='n', yaxt='n', xlab='', ylab='')
+      text(1,4,isolate(input$nachname), pos=4)
+      text(1,3,isolate(input$vorname), pos=4)
+      text(1,2,isolate(input$groesse), pos=4)
+      text(1,1,isolate(input$gewicht), pos=4)
+      points(rep(1,4),1:4, pch=15)
       
-      params <- list(n = input$hfBer[1], pat = input$vorname)
-      rmarkdown::render(tempReport, output_file = file,
-                        params = params,
-                        envir = new.env(parent = globalenv()),
-                        encoding = "UTF-8"
-      )
+      # par(mar = c(5, 12, 0.2, 2), new=TRUE)
+      # barplot(counts, horiz = TRUE, names.arg = rev(coroDataSummary()$Date), las=1,
+      #         col = c(input$cpUnder, input$cpRight, input$cpAbove))
+      
+      dev.off()
     }
   )
 
@@ -712,6 +717,7 @@ shinyServer(function(input, output, session) {
 # --------------------------------------------------------------------------------------------------------------
 
   observeEvent(input$language, {
+    lang <- input$language
     languageList <- list("paginate" = list("next" = translate("next", input$language),
                                       "previous" = translate("previous", input$language)),
                     "search" = translate("search", input$language),
@@ -724,22 +730,23 @@ shinyServer(function(input, output, session) {
                     "emptyTable" = translate("emptyTable", input$language),
                     "infoFiltered" = translate("infoFiltered", input$language))
     tableReRenderer(languageList)
-    dateReRenderer(input$language)
+    dateReRenderer(lang)
     updateRadioButtons(session, "inpGesch", choiceValues = list("m", "f"), inline = TRUE, selected = input$inpGesch,
-        choiceNames = list(translate("maennlich", input$language), translate("weiblich", input$language)))
+        choiceNames = list(translate("maennlich", lang), translate("weiblich", lang)))
     
     myChoices <- c("Time", "DistanceMeters")
-    newSelection <- getNewSelection(input$axisXSelect, input$language, myChoices)
-    newChoices <- c(translate(myChoices, input$language))
+    newSelection <- getNewSelection(input$axisXSelect, lang, myChoices)
+    newChoices <- c(translate(myChoices, lang))
     updateSelectInput(session, "axisXSelect", choices = newChoices, selected = newSelection)
     
     myChoices <- c("HeartRateBpm", "AltitudeMeters", "DistanceMeters", "Speed")
-    newSelection <- getNewSelection(input$axisYSelect, input$language, myChoices)
-    newChoices <- c(translate(myChoices, input$language))
+    newSelection <- getNewSelection(input$axisYSelect, lang, myChoices)
+    newChoices <- c(translate(myChoices, lang))
     updateSelectInput(session, "axisYSelect", choices = newChoices, selected = newSelection)
     
-    newChoices <- list("Level1"=1, "Level2"=2, "Level3"=3, "Level4"=4, "Level5"=5, "Level6"=6)
-    updateSelectInput(session, "intensity", choices = newChoices)
+    newChoices <- list(1,2,3,4,5,6)
+    names(newChoices) <- translate(c("level1", "level2", "level3", "level4", "level5", "level6"), lang)
+    updateSelectInput(session, "intensity", choices = newChoices, selected = input$intensity)
     
   })
   

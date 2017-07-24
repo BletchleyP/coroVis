@@ -70,8 +70,7 @@ getTZshift <- function() {
 
 getRange <- function(minHR=60, maxHR=180, level="5", HRmax=FALSE) {
   intensity <- strtoi(level)
-  myRange <- c(0, 0.3, 0.4, 0.5, 0.6, 0.8, 1)
-  # c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0)
+  myRange <- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0)
   if (HRmax) {
     lowerLimit <- myRange[intensity]*maxHR
     upperLimit <- myRange[intensity+1]*maxHR
