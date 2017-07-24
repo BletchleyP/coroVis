@@ -282,7 +282,7 @@ shinyUI(fluidPage(
                                                        value = basicCol[3], showColour = "background")),
                                     column(3, actionButton("resetColors",
                                                            label = textOutput("settingsColorResetLabel"))),
-                                    column(3, selectInput("mapTilesSelect", "Select map layer", choices = providers),
+                                    column(3, selectInput("mapTilesSelect", textOutput("SelectMapLayer"), choices = providers),
                                            sliderInput("timezoneSlider", "Zeitverschiebung von CSV-Dateien",
                                                        min = -12, max = 12, step = 1, value = getTZshift()),
                                            numericInput("plotPointsize", "Pointsize", 1,

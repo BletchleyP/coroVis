@@ -647,6 +647,8 @@ shinyServer(function(input, output, session) {
   
   output$settingsHFmaxTitle <- renderText({translate("maximaleHF", input$language)})
   
+  output$SelectMapLayer <- renderText({ translate("SelectMapLayer", input$language)})
+  
   # helpPanel
   output$helpTitle <- renderText({translate("Hilfe", input$language)})
   output$helpHTML <- renderUI({getPage(translate("IncHilfe", input$language))})
