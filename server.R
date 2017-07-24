@@ -710,6 +710,7 @@ shinyServer(function(input, output, session) {
 # --------------------------------------------------------------------------------------------------------------
 
   observeEvent(input$language, {
+    lang <- input$language
     languageList <- list("paginate" = list("next" = translate("next", input$language),
                                       "previous" = translate("previous", input$language)),
                     "search" = translate("search", input$language),
@@ -722,22 +723,23 @@ shinyServer(function(input, output, session) {
                     "emptyTable" = translate("emptyTable", input$language),
                     "infoFiltered" = translate("infoFiltered", input$language))
     tableReRenderer(languageList)
-    dateReRenderer(input$language)
+    dateReRenderer(lang)
     updateRadioButtons(session, "inpGesch", choiceValues = list("m", "f"), inline = TRUE, selected = input$inpGesch,
-        choiceNames = list(translate("maennlich", input$language), translate("weiblich", input$language)))
+        choiceNames = list(translate("maennlich", lang), translate("weiblich", lang)))
     
     myChoices <- c("Time", "DistanceMeters")
-    newSelection <- getNewSelection(input$axisXSelect, input$language, myChoices)
-    newChoices <- c(translate(myChoices, input$language))
+    newSelection <- getNewSelection(input$axisXSelect, lang, myChoices)
+    newChoices <- c(translate(myChoices, lang))
     updateSelectInput(session, "axisXSelect", choices = newChoices, selected = newSelection)
     
     myChoices <- c("HeartRateBpm", "AltitudeMeters", "DistanceMeters", "Speed")
-    newSelection <- getNewSelection(input$axisYSelect, input$language, myChoices)
-    newChoices <- c(translate(myChoices, input$language))
+    newSelection <- getNewSelection(input$axisYSelect, lang, myChoices)
+    newChoices <- c(translate(myChoices, lang))
     updateSelectInput(session, "axisYSelect", choices = newChoices, selected = newSelection)
     
-    newChoices <- list("Level1"=1, "Level2"=2, "Level3"=3, "Level4"=4, "Level5"=5, "Level6"=6)
-    updateSelectInput(session, "intensity", choices = newChoices)
+    newChoices <- list(1,2,3,4,5,6)
+    names(newChoices) <- translate(c("level1", "level2", "level3", "level4", "level5", "level6"), lang)
+    updateSelectInput(session, "intensity", choices = newChoices, selected = input$intensity)
     
   })
   
