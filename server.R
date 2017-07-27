@@ -118,7 +118,7 @@ shinyServer(function(input, output, session) {
     # Die ausgewaehlten Panels (hinterlegt in einer CheckboxGroup) werden mit folgender Anweisung dargestellt
     # Die Tabs muessen als integer-Vektor uebergeben werden. Innerhalb der Observe-Funktion werden Aenderungen
     # der CheckboxGroup wahrgenommen und das TabsetPanel aktualisiert.
-    showTabsInTabset("tP", as.integer(input$tabsToShow))
+    #showTabsInTabset("tP", as.integer(input$tabsToShow))
     
   })
   
@@ -622,18 +622,37 @@ shinyServer(function(input, output, session) {
   output$report <- downloadHandler(
     filename = "coroVisReport.pdf",
     content = function(file) {
-      pdf(file, paper = "a4")
-      plot(NA, xlim=c(0,5), ylim=c(0,5), bty='n',
-           xaxt='n', yaxt='n', xlab='', ylab='')
-      text(1,4,isolate(input$nachname), pos=4)
-      text(1,3,isolate(input$vorname), pos=4)
-      text(1,2,isolate(input$groesse), pos=4)
-      text(1,1,isolate(input$gewicht), pos=4)
-      points(rep(1,4),1:4, pch=15)
+      pdf(file, paper = "a4", height = 25)
+      # plot(NA, xlim=c(0,5), ylim=c(0,5), bty='n',
+      #      xaxt='n', yaxt='n', xlab='', ylab='')
+      # text(1,4,isolate(input$nachname), pos=4)
+      # text(1,3,isolate(input$vorname), pos=4)
+      # text(1,2,isolate(input$groesse), pos=4)
+      # text(1,1,isolate(input$gewicht), pos=4)
+      # points(rep(1,4),1:4, pch=15)
       
+      layout(matrix(c(1,1,2,3), 2, 2, byrow = TRUE), widths=c(2,1), heights=c(3,3))
+      plot(NA, xlim=c(0, 10), ylim = c(0, 10), xaxt = "n", yaxt = "n", xlab = NA, ylab = NA, cex = 3)
+      text(1,7,paste("Nachname:", isolate(input$nachname)), pos=4)
+      text(1,6.5,paste("Vorname:", isolate(input$vorname)), pos=4)
+      text(1,6,paste("Geburtsdatum:", isolate(input$inpAlter)), pos=4)
+      text(1,5.5,paste("Größe:", isolate(input$groesse)), pos=4)
+      text(1,5,paste("Gewicht:", isolate(input$gewicht)), pos=4)
+      text(1,4.5,paste("BMI:", calculateBMI(input$groesse, input$gewicht)), pos=4)
+      text(1,4,paste("Alter:", calculateAge(input$inpAlter)), pos=4)
+      
+      
+
+      
+      x <- times(coroDataPlot()[,input$axisXSelect])
+      y <- as.numeric(coroDataPlot()[,input$axisYSelect])
+      z <- coroDataPlot()[,c("Group")]
+      plot(x, y, pch = 16, col=z, main = NULL, xlab = input$axisXSelect, ylab = input$axisYSelect)
       # par(mar = c(5, 12, 0.2, 2), new=TRUE)
-      # barplot(counts, horiz = TRUE, names.arg = rev(coroDataSummary()$Date), las=1,
-      #         col = c(input$cpUnder, input$cpRight, input$cpAbove))
+      counts <- t(as.matrix(coroDataSummary()[2:4]))
+      counts <- counts[,ncol(counts):1]
+      barplot(counts, horiz = TRUE, names.arg = rev(coroDataSummary()$Date), las=1,
+              col = c(input$cpUnder, input$cpRight, input$cpAbove))
       
       dev.off()
     }
@@ -766,8 +785,9 @@ shinyServer(function(input, output, session) {
                       choices = unique(values$coroRawData[,match("Date", colnames(values$coroRawData))]))
     
     if (!is.null(values$coroRawData)) {
-      updateTabsetPanel(session, "tP", selected = "tP1")
       updateCheckboxInput(session, "dataAvailable", value = TRUE)
+      
+      
       
       showModal(modalDialog(title = translate("question", isolate(input$language)),
                             translate("PersonenDaten", isolate(input$language)),
@@ -778,6 +798,17 @@ shinyServer(function(input, output, session) {
       ))
     } else {
       updateCheckboxInput(session, "dataAvailable", value = FALSE)
+    }
+  })
+# --------------------------------------------------------------------------------------------------------------
+  
+  observe({
+    if (is.null(values$coroRawData)) {
+      updateTabsetPanel(session, "tP", selected = "tP0")
+      for (i in 1:4) {hideTab(mytabsetName = "tP", child = i, status = 0)}
+    } else {
+      for (i in 1:4) {hideTab(mytabsetName = "tP", child = i, status = 1)}
+      updateTabsetPanel(session, "tP", selected = "tP1")
     }
   })
 # --------------------------------------------------------------------------------------------------------------
