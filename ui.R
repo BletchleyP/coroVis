@@ -1,8 +1,19 @@
+# ###################################################################################################################
+#                                                                                                                   #
+#    CoroVis - ui.R                                                                                                 #
+#    Coding vom ....                                                                                                #
+#    Copyright by Shiny-AG                                                                                          #
+#                                                                                                                   #
+# ###################################################################################################################
+
+# Benoetigte Packages -----------------------------------------------------------------------------------------------
+
 library(shiny)
 library(leaflet)
 library(colourpicker)
 
-# modifizierter fileInput
+# Modifizierter FileInput -------------------------------------------------------------------------------------------
+
 coroVisFileInput <- function(inputId, label = NULL, labelIcon = NULL, multiple = FALSE, 
                        accept = NULL, width = NULL, progress = TRUE, ...) {
   inputTag <- tags$input(id = inputId, name = inputId, type = "file", class = "coroVisFileIn")
@@ -18,13 +29,16 @@ coroVisFileInput <- function(inputId, label = NULL, labelIcon = NULL, multiple =
   )
 }
 
+# UI-Funktion -------------------------------------------------------------------------------------------------------
+
 shinyUI(fluidPage(
 
-# --------------------------------------------------------------------------------------------------------------
-  # Skripte des HTML-Head-Teils
+# Skripte des HTML-Head-Teils ---------------------------------------------------------------------------------------
+
   shinyjs::useShinyjs(),
   
-  # CSS
+# CSS ---------------------------------------------------------------------------------------------------------------
+  
   tags$head(
     tags$style(HTML("
                     #flag {
@@ -90,7 +104,7 @@ shinyUI(fluidPage(
                     "))
     ),
     
-    # JavaScript Funktionalitaet zum Toggeln der Tabs
+# JavaScript Funktionalitaet zum Toggeln der Tabs --------------------------------------------------------------
     tags$head(tags$script(HTML(
                            "Shiny.addCustomMessageHandler('hideTab', function(message){
                               var tabsetTarget = document.getElementById(message.tabsetName);
@@ -322,3 +336,5 @@ shinyUI(fluidPage(
   )
   
 ))
+
+# *** ENDE *** --------------------------------------------------------------------------------------------------

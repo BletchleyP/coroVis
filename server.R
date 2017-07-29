@@ -1,24 +1,22 @@
-library(shiny)    # Shiny selbst...
-library(shinyjs)  # ShinyJS zur Unterstuetzung ...
-library(chron)    # Handling von Zeit und Datum...
-library(XML)      # Einlesen von XML-Dateien ...
-library(leaflet)  # Darstellung der Karten ...
+# ###################################################################################################################
+#                                                                                                                   #
+#    CoroVis - server.R                                                                                             #
+#    Coding vom ....                                                                                                #
+#    Copyright by Shiny-AG                                                                                          #
+#                                                                                                                   #
+# ###################################################################################################################
+
+# Benoetigte Packages -----------------------------------------------------------------------------------------------
+
+library(shiny)    
+library(shinyjs)  
+library(chron)    
+library(XML)     
+library(leaflet)
 library(colourpicker)
 library(rmarkdown)
-#library(ggplot2)  # Darstellung der Plots ...
 
-# -------------------------------------------------------------------
-# Allgemeine Translate-Funktionen fuer die unterschiedlichen Sprachen
-# -------------------------------------------------------------------
-
-# die Funktion sucht fuer die eingegebene Übersetzung das Schluesselwort ...
-#rev_translate <- function(word) {
-#  return(dic[which(dic[availableLang[iLang]]==word), 1])
-#}
-
-# ----------------------------------
-# Shiny-Server-Funktion beginnt ....
-# ----------------------------------
+# Server-Funktion ---------------------------------------------------------------------------------------------------
 
 shinyServer(function(input, output, session) {
   

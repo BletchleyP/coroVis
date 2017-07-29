@@ -1,10 +1,20 @@
+# ###################################################################################################################
+#                                                                                                                   #
+#    CoroVis - global.R                                                                                             #
+#    Coding vom ....                                                                                                #
+#    Copyright by Shiny-AG                                                                                          #
+#                                                                                                                   #
+# ###################################################################################################################
+
+
 # ##############################################################################################################
 #
 #    Definiere globale Variablen
 #
 # ##############################################################################################################
 
-# temporär zur Fehlerbehandlung
+# temporär zur Fehlerbehandlung --------------------------------------------------------------------------------
+
 mytest <- NULL
 
 # --------------------------------------------------------------------------------------------------------------
@@ -50,14 +60,12 @@ basicCol <- c("#ffcc00", "#00ff00", "#ff0000")
 # ##############################################################################################################
 
 # --------------------------------------------------------------------------------------------------------------
-
 # stellt HTML aus Datei zum Rendern bereit
 getPage <- function(filename) {
   return(includeHTML(filename))
 }
 
 # --------------------------------------------------------------------------------------------------------------
-
 # berechnet default-Wert für Zeitzonenverschiebung aus Systemdatum
 getTZshift <- function() {
   tz<- round(as.numeric(as.POSIXct(strftime(Sys.time(),
@@ -67,7 +75,7 @@ getTZshift <- function() {
 }
 
 # --------------------------------------------------------------------------------------------------------------
-
+# berechnet den optimalen Herzfrequenzbereich nach der vorgegebenen Belastungsintensitaet
 getRange <- function(minHR=60, maxHR=180, level="5", HRmax=FALSE) {
   intensity <- strtoi(level)
   myRange <- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0)
@@ -99,21 +107,18 @@ cleanData <- function(df) {
 }
 
 # --------------------------------------------------------------------------------------------------------------
-
 # berechnet BMI aus Groesse [cm] und Gewicht [kg]
 calculateBMI <- function(groesse, gewicht) {
   return(round(gewicht/((groesse/100)^2), 1))
 }
 
 # --------------------------------------------------------------------------------------------------------------
-
 # berechnet Alter aus date-of-birth
 calculateAge <- function(dob) {
   if (is.null(dob)) {return(NULL)} else {return(round(difftime(Sys.time(), dob)/365 , 1))}
 }
 
 # --------------------------------------------------------------------------------------------------------------
-
 # stellt zu keyword und Sprache die passende Vokabel bereit; wird keyword nicht gefunden -> return keyword
 translate <- function(keyword, languageID = 0) {
   i <- ifelse(languageID == 0, iLang, languageID)               # TEMP: Abwaertskompatibilitaet zu alter Version
@@ -146,14 +151,13 @@ showMessage <- function(msg, languageID) {
 }
 
 # --------------------------------------------------------------------------------------------------------------
-
-# helper function: converts HH:MM:SS to seconds
+# Hilfsfuntkion: konvertiert HH:MM:SS zu Sekunden
 getSeconds <- function(raw) {
   elem <- unlist(strsplit(raw, ":"))
   return(strtoi(elem[1], base = 10)*3600 + strtoi(elem[2], base = 10)*60 + strtoi(elem[3], base = 10))
 }
 
-# helper function: converts relative time to absolute date-time
+# Hilfsfunktion: konvertiert relative Zeit absolute Date-Time
 # @startdate: DD-MM-YYYY
 # @starttime: HH:MM:SS
 getDateTime <- function(startdate, starttime, reltime, difftime=0) {
@@ -186,8 +190,7 @@ mergeDF <- function(old, new, mergeBy) {
 }
 
 # --------------------------------------------------------------------------------------------------------------
-
-# extrahiert aus CSV-Datei einen Dataframe
+# Extrahiert aus CSV-Datei einen Dataframe
 importDataCSV <- function(myFile, timezoneshift) {
   # to be safe: read data as raw textfile
   conn <- file(myFile, open="r")
@@ -218,13 +221,11 @@ importDataCSV <- function(myFile, timezoneshift) {
     return(NULL) # "Data error"
   }
   
-  
   return(mydf[myHeader])
 }
 
 # --------------------------------------------------------------------------------------------------------------
-
-# extrahiert dataframe aus gpxfile; bei fehlerhaften Daten wird insgesamt NULL zurückgeliefert
+# Extrahiert dataframe aus gpxfile; bei fehlerhaften Daten wird insgesamt NULL zurückgeliefert
 importDataGPX <- function(gpxfile) {
   newData <- NULL
   doc <- xmlParse(gpxfile)
@@ -253,8 +254,7 @@ importDataGPX <- function(gpxfile) {
 }
 
 # --------------------------------------------------------------------------------------------------------------
-
-# testet Dateityp und liefert Typ oder Fehlermeldung als String
+# Testet Dateityp und liefert Typ oder Fehlermeldung als String
 checkFileformat <- function(myFile) {
 
   if (myFile$type %in% c("text/csv", "application/vnd.ms-excel") & sub(".*\\.", "", myFile$name)=="csv") {
@@ -292,4 +292,4 @@ checkFileformat <- function(myFile) {
   return(msg)
 }
 
-# --------------------------------------------------------------------------------------------------------------
+# *** ENDE *** -------------------------------------------------------------------------------------------------
