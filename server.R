@@ -12,9 +12,9 @@ library(rmarkdown)
 # -------------------------------------------------------------------
 
 # die Funktion sucht fuer die eingegebene Übersetzung das Schluesselwort ...
-rev_translate <- function(word) {
-  return(dic[which(dic[availableLang[iLang]]==word), 1])
-}
+#rev_translate <- function(word) {
+#  return(dic[which(dic[availableLang[iLang]]==word), 1])
+#}
 
 # ----------------------------------
 # Shiny-Server-Funktion beginnt ....
