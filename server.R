@@ -145,7 +145,7 @@ shinyServer(function(input, output, session) {
     # rVal$hfBu <- heartRateLimits[limit]
     # rVal$hfBo <- heartRateLimits[limit+1]
     
-    updateSliderInput(session, "hfBer", max = input$hfMax[2], value = getRange(input$hfMax[1], input$hfMax[2], input$intensity))
+    updateSliderInput(session, "hfBer", min = input$hfMax[1], max = input$hfMax[2], value = getRange(input$hfMax[1], input$hfMax[2], input$intensity))
     
   })
   

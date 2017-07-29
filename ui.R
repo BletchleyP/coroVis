@@ -203,7 +203,7 @@ shinyUI(fluidPage(
                 ),
                 # Herzfrequenzgrenzen
                 sliderInput("hfMax", label = textOutput("hfMax_t"),
-                            min = 0, max = 200, value = c(60, 180)),
+                            min = 45, max = 200, value = c(60, 180)),
                 
                 # Belastungslevel
                 #uiOutput("intensity"),
@@ -212,7 +212,7 @@ shinyUI(fluidPage(
                 
                 # Trainingsfrequenzbereich
                 sliderInput("hfBer", label = textOutput("frequenzbereich_t"),
-                            min = 0, max = 200, value = c(60, 80))
+                            min = 45, max = 200, value = c(60, 80))
               ),
                      
           # ----------------------------------------------------------------------------------------------------
