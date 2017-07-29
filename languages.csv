@@ -121,3 +121,5 @@ SelectMapLayer;Karte auswählen;Select Map Layer;Selectionner une couche de la c
 ZeitVCSV;Zeitverschiebung von CSV-Dateien;Time shift of CSV files;Decalage des fichiers CSV
 PunktGr;Punktgröße;Spot size;La taille du spot
 TextGr;Textgröße;Text size;La taille du text
+Report;Report erstellen;Download report;Télécharger le rapport
+PlotSize;Größe der Balken ändern;Change Plot Size;Redimensionner la barre

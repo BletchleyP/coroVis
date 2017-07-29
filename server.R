@@ -596,6 +596,8 @@ shinyServer(function(input, output, session) {
   # TODO
   output$gesamt_t <- renderText({translate("Zusammenfassung", input$language)})
   output$summaryTitle <- renderText({translate("Statistik", input$language)})
+  output$dlReport <- renderText({translate("Report", input$language)})
+  output$chPlotSize <- renderText({translate("PlotSize", input$language)})
   output$tOut2 <- renderTable({
     if (is.null(coroDataSummary())) {
       return(NULL)
