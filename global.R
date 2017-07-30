@@ -256,7 +256,19 @@ getDateTime <- function(startdate, starttime, reltime, difftime=0) {
 }
 
 # --------------------------------------------------------------------------------------------------------------
+# ##############################################################################
 
+
+
+# ##############################################################################
+#' Vereinigen von zwei Dataframes
+#'
+#' @param old bisheriger Dataframe
+#' @param new Dataframe mit zu vereinigenden Zeilen, gleiche Struktur
+#' @param mergeBy Vereinigung auf Basis welcher Spalte
+#'
+#' @return einen gemeinsame Dataframe
+#'
 mergeDF <- function(old, new, mergeBy) {
   # assertion: ncol(old)==ncol(new); colnames(old)==colnames(new)
   i <- which(colnames(old)==mergeBy)
