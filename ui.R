@@ -211,9 +211,8 @@ shinyUI(fluidPage(
                 fluidRow(
                   column(4, align="center", h5(textOutput("ageTitle")),
                          verbatimTextOutput("alterausgabe", placeholder = TRUE)),
-                  column(4, align="center", h5(textOutput("bmiTitle")), verbatimTextOutput("bmi"))
-                  # ,
-                  # column(4, align="center", br(), uiOutput("riskclass"))    # Risikoklasse auswaehlen
+                  column(4, align="center", h5(textOutput("bmiTitle")), verbatimTextOutput("bmi")),
+                  column(4, align="center", h5(textOutput("sex_t")), verbatimTextOutput("sex"))
                 ),
                 # Herzfrequenzgrenzen
                 sliderInput("hfMax", label = textOutput("hfMax_t"),

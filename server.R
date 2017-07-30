@@ -509,6 +509,10 @@ shinyServer(function(input, output, session) {
       calculateBMI(input$groesseKA, input$gewichtKA,
                    input$groesse, input$gewicht, input$language)
   })
+  output$sex_t <- renderText({translate("Geschlecht", input$language)})
+  output$sex <- renderText({
+    getSalutation(input$geschKA, input$inpGesch, input$language, short=FALSE)
+  })
   output$ageTitle <- renderText({translate("Alter", input$language)})
   output$alterausgabe <- renderText({
       calculateAge(input$inpAlterKA, input$inpAlter, input$language)
