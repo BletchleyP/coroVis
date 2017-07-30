@@ -302,8 +302,10 @@ shinyServer(function(input, output, session) {
       
       # Zusatzfilter: DTG-Dupletten entfernen
       DTGduplicates <- grep(TRUE, duplicated(newDataAll$DTG))
-      newDataAll <- newDataAll[-DTGduplicates, ]
-      
+      if (length(DTGduplicates)>0) {
+        newDataAll <- newDataAll[-DTGduplicates, ]
+      }
+
       # wenn durch quality filter keine Daten verbleiben:
       if (nrow(newDataAll)==0) {
         newDataAll <- NULL
