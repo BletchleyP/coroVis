@@ -12,10 +12,12 @@ Name;Name;Lastname;Nom de famille
 Vorname;Vorname;Firstname;Prenom
 Geburtsdatum;Geburtsdatum;Date of birth;Date de naissance
 Geschlecht;Geschlecht;Sex;Sexe
-Groesse;Größe;Height;La taille du corps
-Gewicht;Gewicht;Weight;Poids corporel
+Groesse;Größe [cm];Height [cm];La taille du corps [cm]
+Gewicht;Gewicht [kg];Weight [kg];Poids corporel [kg]
 salutationM;Herr;Mr;Monsieur
 salutationF;Frau;Ms;Madame
+salutation;Anrede;Salutation;Titre
+patientData;Patientendaten;Patient records;Données du patient
 Maximale Herzfrequenz;Herzfrequenzgrenzen;Range of heart rate;Limites de fréquence cardiaque
 Belastungsintensitaet;Belastungsintensität;Stress level;L'intensite du stress
 Frequenzbereich;Trainingsfrequenzbereich;Best range of Heart rate;Meilleur gamme de frequences

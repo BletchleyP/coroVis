@@ -641,7 +641,7 @@ shinyServer(function(input, output, session) {
         "schwer"  # intensity
       )
       myCoroSimuData <- createTestdata()
-      createPDF(myPatient, myParameter, myCoroSimuData, file)
+      createPDF(myPatient, myParameter, myCoroSimuData, file, input$language)
     }
   )
 

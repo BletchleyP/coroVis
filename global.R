@@ -487,10 +487,11 @@ createTestdata <- function(onlyOne=FALSE, g1=400, g2=500, g3=300) {
 #' @param param structured parameters (ranges, colors)
 #' @param hfData data to analyze
 #' @param file fileobject from downloadHandler
+#' @param lang aktuelle Sprache
 #'
 #' @return void
 #'
-createPDF <- function(patData, param, hfData, file) {
+createPDF <- function(patData, param, hfData, file, lang=1) {
   
   # --- calculate some additional data -----------------------------------------
   unitHF <- "SpM"  # translate
@@ -558,18 +559,18 @@ createPDF <- function(patData, param, hfData, file) {
   txtX <- rep(1, 9)
   txtY <- seq(9, 1, -1)
   txtT <- c(
-    "Patientendaten",  # translate
-    "Anrede:",  # translate
-    "Nachname:",  # translate
-    "Vorname:",  # translate
-    "Geburtsdatum:",  # translate
-    "Alter:",  # translate
-    "Größe:",  # translate
-    "Gewicht:",  # translate
-    "BMI:"  # translate
+    paste0(translate("patientData", lang), ":"),
+    paste0(translate("salutation", lang), ":"),
+    paste0(translate("Name", lang), ":"),
+    paste0(translate("Vorname", lang), ":"),
+    paste0(translate("Geburtsdatum", lang), ":"),
+    paste0(translate("Alter", lang), ":"),
+    paste0(translate("Groesse", lang), ":"),
+    paste0(translate("Gewicht", lang), ":"),
+    paste0(translate("bmi", lang), ":")
   )
   text(txtX, txtY, txtT, adj = c(0, 0.5))
-  txtX <- rep(7, 8)
+  txtX <- rep(9, 8)
   txtT <- c("", patData)
   text(txtX, txtY, txtT, adj = c(0, 0.5))
   abline(h = c(9.5, 8.5, 0.5), col = "skyblue")
