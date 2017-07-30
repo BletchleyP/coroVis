@@ -586,6 +586,10 @@ createPDF <- function(patData, param, hfData, file, lang=1) {
   
   # --- calculate some additional data -----------------------------------------
   unitHF <- translate("bpm", lang)
+  
+  # more than 1200 sec = 20 min ist a new session
+  hfData$deltaTime <- ifelse(hfData$deltaTime>1200, 0, hfData$deltaTime)
+  
   hfData$cs <- cumsum(hfData$deltaTime)
   hfData$dup <- duplicated(hfData$cs)
   hfData$label <- rawToChar(as.raw(65))
@@ -620,9 +624,12 @@ createPDF <- function(patData, param, hfData, file, lang=1) {
                                    param[4]))
   myGroups <- aggregate(deltaTime ~ group, hfData, NROW)
   rownames(myGroups) <- myGroups$group
-  lOpt <- myGroups["lOpt", "deltaTime"]
-  iOpt <- myGroups["iOpt", "deltaTime"]
-  uOpt <- myGroups["uOpt", "deltaTime"]
+  n <- myGroups["lOpt", "deltaTime"]
+  lOpt <- ifelse(is.na(n), 0, n)
+  n <- myGroups["iOpt", "deltaTime"]
+  iOpt <- ifelse(is.na(n), 0, n)
+  n <- myGroups["uOpt", "deltaTime"]
+  uOpt <- ifelse(is.na(n), 0, n)
   aOpt <- lOpt + iOpt + uOpt
   
   
@@ -751,9 +758,14 @@ createPDF <- function(patData, param, hfData, file, lang=1) {
     myOrder <- c(myOrder, grep(i, rownames(myBarData)))
   }
   myBarData <- myBarData[myOrder, , drop=FALSE]
+  n <- ifelse(ncol(myBarData)>9, 0.8, 1)
+  if (ncol(myBarData)>18) {
+    n <- 0.5
+    colnames(myBarData) <- gsub("\\n", " ", colnames(myBarData))
+  }
   barplot(myBarData, horiz = TRUE, las = 1, col = rownames(myBarData),
           xlab = translate("percentage", lang),
-          main = translate("trainingSessions", lang))
+          main = translate("trainingSessions", lang), cex.names=n)
   box()
   
   # --- finish PDF document ----------------------------------------------------
