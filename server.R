@@ -619,42 +619,73 @@ shinyServer(function(input, output, session) {
               col = c(input$cpUnder, input$cpRight, input$cpAbove))
     }, height = hsize)    
   }
+  
   output$report <- downloadHandler(
     filename = "coroVisReport.pdf",
     content = function(file) {
-      pdf(file, paper = "a4", height = 25)
-      # plot(NA, xlim=c(0,5), ylim=c(0,5), bty='n',
-      #      xaxt='n', yaxt='n', xlab='', ylab='')
-      # text(1,4,isolate(input$nachname), pos=4)
-      # text(1,3,isolate(input$vorname), pos=4)
-      # text(1,2,isolate(input$groesse), pos=4)
-      # text(1,1,isolate(input$gewicht), pos=4)
-      # points(rep(1,4),1:4, pch=15)
+      # pdf(file, paper = "a4", height = 25)
+      # # plot(NA, xlim=c(0,5), ylim=c(0,5), bty='n',
+      # #      xaxt='n', yaxt='n', xlab='', ylab='')
+      # # text(1,4,isolate(input$nachname), pos=4)
+      # # text(1,3,isolate(input$vorname), pos=4)
+      # # text(1,2,isolate(input$groesse), pos=4)
+      # # text(1,1,isolate(input$gewicht), pos=4)
+      # # points(rep(1,4),1:4, pch=15)
+      # 
+      # layout(matrix(c(1,1,2,3), 2, 2, byrow = TRUE), widths=c(2,1), heights=c(3,3))
+      # plot(NA, xlim=c(0, 10), ylim = c(0, 10), xaxt = "n", yaxt = "n", xlab = NA, ylab = NA, cex = 3)
+      # text(1,7,paste("Nachname:", isolate(input$nachname)), pos=4)
+      # text(1,6.5,paste("Vorname:", isolate(input$vorname)), pos=4)
+      # text(1,6,paste("Geburtsdatum:", isolate(input$inpAlter)), pos=4)
+      # text(1,5.5,paste("Größe:", isolate(input$groesse)), pos=4)
+      # text(1,5,paste("Gewicht:", isolate(input$gewicht)), pos=4)
+      # text(1,4.5,paste("BMI:", calculateBMI(input$groesse, input$gewicht)), pos=4)
+      # text(1,4,paste("Alter:", calculateAge(input$inpAlter)), pos=4)
+      # 
+      # 
+      # 
+      # 
+      # x <- times(coroDataPlot()[,input$axisXSelect])
+      # y <- as.numeric(coroDataPlot()[,input$axisYSelect])
+      # z <- coroDataPlot()[,c("Group")]
+      # plot(x, y, pch = 16, col=z, main = NULL, xlab = input$axisXSelect, ylab = input$axisYSelect)
+      # # par(mar = c(5, 12, 0.2, 2), new=TRUE)
+      # counts <- t(as.matrix(coroDataSummary()[2:4]))
+      # counts <- counts[,ncol(counts):1]
+      # barplot(counts, horiz = TRUE, names.arg = rev(coroDataSummary()$Date), las=1,
+      #         col = c(input$cpUnder, input$cpRight, input$cpAbove))
+      # 
+      # dev.off()
       
-      layout(matrix(c(1,1,2,3), 2, 2, byrow = TRUE), widths=c(2,1), heights=c(3,3))
-      plot(NA, xlim=c(0, 10), ylim = c(0, 10), xaxt = "n", yaxt = "n", xlab = NA, ylab = NA, cex = 3)
-      text(1,7,paste("Nachname:", isolate(input$nachname)), pos=4)
-      text(1,6.5,paste("Vorname:", isolate(input$vorname)), pos=4)
-      text(1,6,paste("Geburtsdatum:", isolate(input$inpAlter)), pos=4)
-      text(1,5.5,paste("Größe:", isolate(input$groesse)), pos=4)
-      text(1,5,paste("Gewicht:", isolate(input$gewicht)), pos=4)
-      text(1,4.5,paste("BMI:", calculateBMI(input$groesse, input$gewicht)), pos=4)
-      text(1,4,paste("Alter:", calculateAge(input$inpAlter)), pos=4)
+      
+      myPatient <- c(
+        "Herr",
+        "Dr. Mustermann",
+        "Max",
+        "06.04.1956",
+        "61 Jahre",
+        "178 cm",
+        "94 kg",
+        "29,7"
+      )
+      myParameter <- c(
+        100,  # lLimit
+        120,  # uLimit
+        "cornflowerblue",  # lCol
+        "limegreen",  # iCol
+        "orange",  # uCol
+        65,  # HFmin
+        170,  # HFmax
+        "schwer"  # intensity
+      )
+      myCoroSimuData <- createTestdata()
+      mytest <<- values$coroRawData
+      createPDF(myPatient, myParameter, myCoroSimuData, file)
       
       
-
       
-      x <- times(coroDataPlot()[,input$axisXSelect])
-      y <- as.numeric(coroDataPlot()[,input$axisYSelect])
-      z <- coroDataPlot()[,c("Group")]
-      plot(x, y, pch = 16, col=z, main = NULL, xlab = input$axisXSelect, ylab = input$axisYSelect)
-      # par(mar = c(5, 12, 0.2, 2), new=TRUE)
-      counts <- t(as.matrix(coroDataSummary()[2:4]))
-      counts <- counts[,ncol(counts):1]
-      barplot(counts, horiz = TRUE, names.arg = rev(coroDataSummary()$Date), las=1,
-              col = c(input$cpUnder, input$cpRight, input$cpAbove))
       
-      dev.off()
+      
     }
   )
 

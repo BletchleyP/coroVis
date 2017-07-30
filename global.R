@@ -395,10 +395,11 @@ createTestdata <- function(onlyOne=FALSE, g1=400, g2=500, g3=300) {
 #' @param patData structured patient data
 #' @param param structured parameters (ranges, colors)
 #' @param hfData data to analyze
+#' @param file fileobject from downloadHandler
 #'
 #' @return void
 #'
-createPDF <- function(patData, param, hfData) {
+createPDF <- function(patData, param, hfData, file) {
   
   # --- calculate some additional data -----------------------------------------
   unitHF <- "SpM"  # translate
@@ -446,7 +447,7 @@ createPDF <- function(patData, param, hfData) {
                          hfData$sessionTime, " ", unitT)
   
   # --- prepare PDF document ---------------------------------------------------
-  pdf("coroVis.pdf", width = 210/25.4, height = 297/25.4)
+  pdf(file, width = 210/25.4, height = 297/25.4)
   layout(matrix(c(1, 1, 2, 3, 4, 4, 5, 6), 4, 2, byrow = TRUE),
          widths=c(1, 1), heights=c(1, lcm(5), 5, 5))
   
