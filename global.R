@@ -1,81 +1,104 @@
-# ###################################################################################################################
-#                                                                                                                   #
-#    CoroVis - global.R                                                                                             #
-#    Coding vom ....                                                                                                #
-#    Copyright by Shiny-AG                                                                                          #
-#                                                                                                                   #
-# ###################################################################################################################
+# ############################################################################ #
+#                                                                              #
+#    CoroVis - global.R                                                        #
+#    Coding vom 30.07.2017                                                     #
+#    Copyright by Gerhard Fuechsl, Enrico Georgi, Janina Rexin                 #
+#                                                                              #
+# ############################################################################ #
 
 
-# ##############################################################################################################
-#
-#    Definiere globale Variablen
-#
-# ##############################################################################################################
 
-# temporär zur Fehlerbehandlung --------------------------------------------------------------------------------
+# ############################################################################ #
+#                                                                              #
+#    Definiere globale Variablen                                               #
+#                                                                              #
+# ############################################################################ #
 
+# Temporär zur Fehlerbehandlung
 mytest <- NULL
 
-# --------------------------------------------------------------------------------------------------------------
-
+# Allgemeine Umgebungsvariablen
 options(digits=10)
-# Dataframe fuer alle eingelesenen Daten aus den Trainingseinheiten
-viewportDF <- NULL
 
-# Vokabelliste als Dataframe
-dic <- read.csv2("languages.csv", header=TRUE, stringsAsFactors = FALSE, row.names=1, fileEncoding="UTF-8")
+# Vokabelliste als Dataframe und sprachbezogene Variablen
+dic <- read.csv2("languages.csv", header=TRUE, stringsAsFactors = FALSE,
+                 row.names=1, fileEncoding="UTF-8")
 availableLang <- names(dic)
 numDics <- length(availableLang)
-iLang <- 1                                                      # TEMP: Abwaertskompatibilitaet zu alter Version
-
-# Variablen für die Herzfrequenzeinstellungen festelegen
-# hfMaxGeneral <- 220
-# hfMinGeneral <- 60
-# hfBereiche <- list("minimal" = 1,"leicht" = 2, "moderat" = 3, "schwer" = 4, "sehr schwer" = 5, "maximal" = 6)
-# heartRateLimits <- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0) * (hfMaxGeneral - 40) + 40
+iLang <- 1                                         # TEMP: Abwaertskompatibilit.
 
 # Header-Vorgabe für Datenimport
-myHeader <- c("Time", "Id", "HeartRateBpm", "LatitudeDegrees", "LongitudeDegrees",
-              "AltitudeMeters", "DistanceMeters")
-polarheader1 <- paste0("Name,Sport,Date,Start time,Duration,Total distance (km),Average heart rate (bpm),A",
-                       "verage speed (km/h),Max speed (km/h),Average pace (min/km),Max pace (min/km),Calor",
-                       "ies,Fat percentage of calories(%),Average cadence (rpm),Average stride length (cm)",
-                       ",Running index,Training load,Ascent (m),Descent (m),Notes,Height (cm),Weight (kg),",
-                       "HR max,HR sit,VO2max,")
-polarheader2 <- paste0("Sample rate,Time,HR (bpm),Speed (km/h),Pace (min/km),Cadence,Altitude (m),Stride l",
-                       "ength (m),Distances (m),Temperatures (C),Power (W),")
+myHeader <- c("Time", "Id", "HeartRateBpm", "LatitudeDegrees",
+              "LongitudeDegrees", "AltitudeMeters", "DistanceMeters")
+polarheader1 <- paste0("Name,Sport,Date,Start time,Duration,Total distance (km",
+                       "),Average heart rate (bpm),Average speed (km/h),Max sp",
+                       "eed (km/h),Average pace (min/km),Max pace (min/km),Cal",
+                       "ories,Fat percentage of calories(%),Average cadence (r",
+                       "pm),Average stride length (cm),Running index,Training ",
+                       "load,Ascent (m),Descent (m),Notes,Height (cm),Weight (",
+                       "kg),HR max,HR sit,VO2max,")
+polarheader2 <- paste0("Sample rate,Time,HR (bpm),Speed (km/h),Pace (min/km),C",
+                       "adence,Altitude (m),Stride length (m),Distances (m),Te",
+                       "mperatures (C),Power (W),")
 
 # Basisfarben für die Darstellung des Referenzbereiches
 basicCol <- c("#ffcc00", "#00ff00", "#ff0000")
 
-# --------------------------------------------------------------------------------------------------------------
+
+
+# ############################################################################ #
+#                                                                              #
+#    Definiere globale Funktionen (ohne Shiny-Interaktion/Reactivity)          #
+#                                                                              #
+# ############################################################################ #
 
 
 
-# ##############################################################################################################
-#
-#    Definiere globale Funktionen (ohne Shiny-Interaktion/Reactivity)
-#
-# ##############################################################################################################
-
-# --------------------------------------------------------------------------------------------------------------
-# stellt HTML aus Datei zum Rendern bereit
+# ##############################################################################
+#' Stellt HTML aus Datei zum Rendern bereit
+#'
+#' @param filename HTML-Dateipfad
+#'
+#' @return HTML-Kontext
+#'
 getPage <- function(filename) {
   return(includeHTML(filename))
 }
+# ##############################################################################
 
-# --------------------------------------------------------------------------------------------------------------
-# berechnet default-Wert für Zeitzonenverschiebung aus Systemdatum
+
+
+# ##############################################################################
+#' Berechnet default-Wert für Zeitzonenverschiebung aus Systemdatum
+#'
+#' @return Zeitverschiebung zu UTC oder 2 wenn NA
+#' @export
+#'
+#' @examples
 getTZshift <- function() {
-  tz<- round(as.numeric(as.POSIXct(strftime(Sys.time(),
-                                            format = "%Y-%m-%d %H:%M:%S"), tz = "UTC") - Sys.time()),0)
-  if (is.na(tz)) {tz <- 2}
+  tz <- round(as.numeric(as.POSIXct(strftime(Sys.time(),
+                                             format = "%Y-%m-%d %H:%M:%S"),
+                                    tz = "UTC") - Sys.time()),0)
+  if (is.na(tz)) {
+    tz <- 2
+  }
   return(tz)
 }
+# ##############################################################################
 
-# --------------------------------------------------------------------------------------------------------------
-# berechnet den optimalen Herzfrequenzbereich nach der vorgegebenen Belastungsintensitaet
+
+
+# ##############################################################################
+#' Berechnet den optimalen Herzfrequenzbereich nach der vorgegebenen
+#' Belastungsintensitaet als Implementierung der Leitlinie
+#'
+#' @param minHR Ruhepuls
+#' @param maxHR maximale Herzfrequenz
+#' @param level Belastungsintensität 1..6
+#' @param HRmax optional Projektion auf 0..maxHR statt minHR..maxHR
+#'
+#' @return untere und obere Trainingsherzfrequenz
+#'
 getRange <- function(minHR=60, maxHR=180, level="5", HRmax=FALSE) {
   intensity <- strtoi(level)
   myRange <- c(0, 0.34, 0.54, 0.69, 0.89, 0.97, 1.0)
@@ -89,12 +112,21 @@ getRange <- function(minHR=60, maxHR=180, level="5", HRmax=FALSE) {
   
   return(c(lowerLimit, upperLimit))
 }
+# ##############################################################################
 
-# --------------------------------------------------------------------------------------------------------------
 
+
+# ##############################################################################
+#' Hilfsfunktion zur Datenreinigung im Kontext importFiles
+#'
+#' @param df zu bereinigender Dataframe
+#'
+#' @return bereinigter Dataframe
+#'
 cleanData <- function(df) {
   df <- df[!is.na(df$Time),]
-  df$Time <- sub("(\\.[0-9]{3})?Z|(\\.[0-9]{3}?\\+[0-9]{2}:[0-9]{2})", "", df$Time)
+  df$Time <- sub("(\\.[0-9]{3})?Z|(\\.[0-9]{3}?\\+[0-9]{2}:[0-9]{2})", "",
+                 df$Time)
   df$Time <- as.POSIXct(df$Time, format = "%Y-%m-%dT%H:%M:%S", tz = "UTC")
   
   df$HeartRateBpm <- round(as.numeric(df$HeartRateBpm), 0)
@@ -105,6 +137,7 @@ cleanData <- function(df) {
   
   return(df)
 }
+# ##############################################################################
 
 
 
@@ -206,16 +239,35 @@ getValue <- function(cbValue, value, lang) {
 }
 # ##############################################################################
 
-# --------------------------------------------------------------------------------------------------------------
-# stellt zu keyword und Sprache die passende Vokabel bereit; wird keyword nicht gefunden -> return keyword
+
+
+# ##############################################################################
+#' Stellt zu keyword und Sprache die passende Vokabel bereit; wird keyword nicht
+#' gefunden -> return keyword
+#'
+#' @param keyword Schluesselbegriff
+#' @param languageID Zielsprache
+#'
+#' @return Uebersetzung oder Schluesselbegriff, wenn nicht gefunden
+#'
 translate <- function(keyword, languageID = 0) {
-  i <- ifelse(languageID == 0, iLang, languageID)               # TEMP: Abwaertskompatibilitaet zu alter Version
+  i <- ifelse(languageID == 0, iLang, languageID)  # TEMP: Abwaertskompatibilit.
   word <- dic[keyword, availableLang[i]]
   return(ifelse(is.na(word), keyword, word))
 }
+# ##############################################################################
 
-# --------------------------------------------------------------------------------------------------------------
 
+
+# ##############################################################################
+#' Hilfsfunktion für Widgetanpassung bei Sprachwechsel
+#'
+#' @param oldSelAuswahl in alter Sprache
+#' @param newLang aktuelle Sprache
+#' @param choices Auswahloptionen
+#'
+#' @return Auswahl in aktueller Sprache
+#'
 getNewSelection <- function(oldSel, newLang, choices) {
   myVector <- NULL
   for (i in 1:numDics) {
@@ -229,33 +281,63 @@ getNewSelection <- function(oldSel, newLang, choices) {
   }
   return(newSel)
 }
+# ##############################################################################
 
-# --------------------------------------------------------------------------------------------------------------
 
+
+# ##############################################################################
+#' Hilfsfunktion Modaldialog
+#'
+#' @param msg Meldung
+#' @param languageID aktuelle Sprache
+#'
+#' @return void; modalDialog
+#'
 showMessage <- function(msg, languageID) {
   part <- strsplit(msg, "@")[[1]]
-  showModal(modalDialog(title = translate(part[2], languageID), translate(part[3], languageID),
+  showModal(modalDialog(title = translate(part[2], languageID),
+                        translate(part[3], languageID),
                         easyClose = TRUE, footer = NULL))
 }
+# ##############################################################################
 
-# --------------------------------------------------------------------------------------------------------------
-# Hilfsfuntkion: konvertiert HH:MM:SS zu Sekunden
+
+
+# ##############################################################################
+#' Hilfsfuntkion: konvertiert HH:MM:SS zu Sekunden
+#'
+#' @param raw Zeitwert im Format HH:MM:SS
+#'
+#' @return Sekundenentsprechung
+#'
 getSeconds <- function(raw) {
   elem <- unlist(strsplit(raw, ":"))
-  return(strtoi(elem[1], base = 10)*3600 + strtoi(elem[2], base = 10)*60 + strtoi(elem[3], base = 10))
+  return(strtoi(elem[1],
+                base = 10)*3600 + strtoi(elem[2], 
+                                         base = 10)*60 + strtoi(elem[3],
+                                                                base = 10))
 }
+# ##############################################################################
 
-# Hilfsfunktion: konvertiert relative Zeit absolute Date-Time
-# @startdate: DD-MM-YYYY
-# @starttime: HH:MM:SS
+
+
+# ##############################################################################
+#' Hilfsfunktion: konvertiert relative Zeit in absolute Date-Time
+#'
+#' @param startdate DD-MM-YYYY (absolut)
+#' @param starttime HH:MM:SS (absolut)
+#' @param reltime 
+#' @param difftime Zeitverschiebung in Stunden
+#'
+#' @return absolute Zeit
+#'
 getDateTime <- function(startdate, starttime, reltime, difftime=0) {
-  start <- as.POSIXct(paste(startdate, starttime, sep="T"), format = "%d-%m-%YT%H:%M:%S", tz="UTC")
+  start <- as.POSIXct(paste(startdate, starttime, sep="T"),
+                      format = "%d-%m-%YT%H:%M:%S", tz="UTC")
   start <- start + getSeconds(reltime) + 1 - (difftime*3600)
   start <- format(start, format = "%Y-%m-%dT%H:%M:%S")
   return(start)
 }
-
-# --------------------------------------------------------------------------------------------------------------
 # ##############################################################################
 
 
