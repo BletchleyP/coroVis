@@ -14,10 +14,13 @@ Geburtsdatum;Geburtsdatum;Date of birth;Date de naissance
 Geschlecht;Geschlecht;Sex;Sexe
 Groesse;Größe;Height;La taille du corps
 Gewicht;Gewicht;Weight;Poids corporel
+salutationM;Herr;Mr;Monsieur
+salutationF;Frau;Ms;Madame
 Maximale Herzfrequenz;Herzfrequenzgrenzen;Range of heart rate;Limites de fréquence cardiaque
 Belastungsintensitaet;Belastungsintensität;Stress level;L'intensite du stress
 Frequenzbereich;Trainingsfrequenzbereich;Best range of Heart rate;Meilleur gamme de frequences
 dd.mm.yyyy;dd.mm.yyyy;yyyy-mm-dd;dd.mm.yyyy
+formatDate;%d.%m.%Y;%Y-%m-%d;%d.%m.%Y
 de;de;en;fr
 maennlich;männlich;male;male
 weiblich;weiblich;female;femelle

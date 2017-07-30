@@ -300,6 +300,10 @@ shinyServer(function(input, output, session) {
       newDataAll$Time <- format(newDataAll$DTG, "%H:%M:%S")
       newDataAll <- newDataAll[!duplicated(newDataAll),]
       
+      # Zusatzfilter: DTG-Dupletten entfernen
+      DTGduplicates <- grep(TRUE, duplicated(newDataAll$DTG))
+      newDataAll <- newDataAll[-DTGduplicates, ]
+      
       # wenn durch quality filter keine Daten verbleiben:
       if (nrow(newDataAll)==0) {
         newDataAll <- NULL
@@ -320,7 +324,6 @@ shinyServer(function(input, output, session) {
         newDataAll$deltaDist <- ifelse(is.na(newDataAll$absDist), newDataAll$delta, newDataAll$absDist)
         newDataAll$cumDist <- round(cumsum(newDataAll$deltaDist), 1)
         newDataAll$speed <- ifelse(newDataAll$deltaTime == 0, NA, 3.6 * newDataAll$deltaDist / newDataAll$deltaTime)
-        mytest <<- newDataAll
         newDataAll <- newDataAll[-seq(k+1,k+4,1)]
       }
     }
@@ -503,20 +506,12 @@ shinyServer(function(input, output, session) {
   output$filterTitle <- renderText({translate("filterTitle", input$language)})
   output$bmiTitle <- renderText({translate("bmi", input$language)})
   output$bmi <- renderText({
-    if (input$groesseKA & input$gewichtKA) {
-      calculateBMI(input$groesse, input$gewicht)
-    } else {
-      translate("nd", input$language)
-    }
+      calculateBMI(input$groesseKA, input$gewichtKA,
+                   input$groesse, input$gewicht, input$language)
   })
   output$ageTitle <- renderText({translate("Alter", input$language)})
   output$alterausgabe <- renderText({
-    if (input$inpAlterKA) {
-      calculateAge(input$inpAlter)
-    } else {
-      translate("nd", input$language)
-    }
-    
+      calculateAge(input$inpAlterKA, input$inpAlter, input$language)
   })
   
   # TODO
@@ -619,54 +614,21 @@ shinyServer(function(input, output, session) {
               col = c(input$cpUnder, input$cpRight, input$cpAbove))
     }, height = hsize)    
   }
-  
+
+  # --- Generiere PDF Report ---------------------------------------------------
   output$report <- downloadHandler(
     filename = "coroVisReport.pdf",
     content = function(file) {
-      # pdf(file, paper = "a4", height = 25)
-      # # plot(NA, xlim=c(0,5), ylim=c(0,5), bty='n',
-      # #      xaxt='n', yaxt='n', xlab='', ylab='')
-      # # text(1,4,isolate(input$nachname), pos=4)
-      # # text(1,3,isolate(input$vorname), pos=4)
-      # # text(1,2,isolate(input$groesse), pos=4)
-      # # text(1,1,isolate(input$gewicht), pos=4)
-      # # points(rep(1,4),1:4, pch=15)
-      # 
-      # layout(matrix(c(1,1,2,3), 2, 2, byrow = TRUE), widths=c(2,1), heights=c(3,3))
-      # plot(NA, xlim=c(0, 10), ylim = c(0, 10), xaxt = "n", yaxt = "n", xlab = NA, ylab = NA, cex = 3)
-      # text(1,7,paste("Nachname:", isolate(input$nachname)), pos=4)
-      # text(1,6.5,paste("Vorname:", isolate(input$vorname)), pos=4)
-      # text(1,6,paste("Geburtsdatum:", isolate(input$inpAlter)), pos=4)
-      # text(1,5.5,paste("Größe:", isolate(input$groesse)), pos=4)
-      # text(1,5,paste("Gewicht:", isolate(input$gewicht)), pos=4)
-      # text(1,4.5,paste("BMI:", calculateBMI(input$groesse, input$gewicht)), pos=4)
-      # text(1,4,paste("Alter:", calculateAge(input$inpAlter)), pos=4)
-      # 
-      # 
-      # 
-      # 
-      # x <- times(coroDataPlot()[,input$axisXSelect])
-      # y <- as.numeric(coroDataPlot()[,input$axisYSelect])
-      # z <- coroDataPlot()[,c("Group")]
-      # plot(x, y, pch = 16, col=z, main = NULL, xlab = input$axisXSelect, ylab = input$axisYSelect)
-      # # par(mar = c(5, 12, 0.2, 2), new=TRUE)
-      # counts <- t(as.matrix(coroDataSummary()[2:4]))
-      # counts <- counts[,ncol(counts):1]
-      # barplot(counts, horiz = TRUE, names.arg = rev(coroDataSummary()$Date), las=1,
-      #         col = c(input$cpUnder, input$cpRight, input$cpAbove))
-      # 
-      # dev.off()
-      
-      
       myPatient <- c(
-        "Herr",
-        "Dr. Mustermann",
-        "Max",
-        "06.04.1956",
-        "61 Jahre",
-        "178 cm",
-        "94 kg",
-        "29,7"
+        getSalutation(input$geschKA, input$inpGesch, input$language),
+        getValue(TRUE, input$nachname, input$language),
+        getValue(TRUE, input$vorname, input$language),
+        getValue(input$inpAlterKA, input$inpAlter, input$language),
+        calculateAge(input$inpAlterKA, input$inpAlter, input$language),
+        getValue(input$groesseKA, input$groesse, input$language),
+        getValue(input$gewichtKA, input$gewicht, input$language),
+        calculateBMI(input$gewichtKA, input$gewichtKA,
+                     input$groesse, input$gewicht, input$language)
       )
       myParameter <- c(
         100,  # lLimit
@@ -679,13 +641,7 @@ shinyServer(function(input, output, session) {
         "schwer"  # intensity
       )
       myCoroSimuData <- createTestdata()
-      mytest <<- values$coroRawData
       createPDF(myPatient, myParameter, myCoroSimuData, file)
-      
-      
-      
-      
-      
     }
   )
 

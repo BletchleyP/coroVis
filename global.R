@@ -106,17 +106,108 @@ cleanData <- function(df) {
   return(df)
 }
 
-# --------------------------------------------------------------------------------------------------------------
-# berechnet BMI aus Groesse [cm] und Gewicht [kg]
-calculateBMI <- function(groesse, gewicht) {
-  return(round(gewicht/((groesse/100)^2), 1))
-}
 
-# --------------------------------------------------------------------------------------------------------------
-# berechnet Alter aus date-of-birth
-calculateAge <- function(dob) {
-  if (is.null(dob)) {return(NULL)} else {return(round(difftime(Sys.time(), dob)/365 , 1))}
+
+# ##############################################################################
+#' Berechnet BMI aus Groesse [cm] und Gewicht [kg]
+#'
+#' @param cbGroesse checkbox-Status Groesse
+#' @param cbGewicht checkbox-Status Gewicht
+#' @param groesse Koerpergroesse
+#' @param gewicht Koerpergewicht
+#' @param lang aktuelle Sprache
+#'
+#' @return BMI bzw. Keine Angaben
+#'
+calculateBMI <- function(cbGroesse, cbGewicht, groesse, gewicht, lang) {
+  if (cbGroesse==TRUE && cbGewicht==TRUE) {
+    return(round(gewicht/((groesse/100)^2), 1))
+  } else {
+    return(translate("nd", lang))
+  }
 }
+# ##############################################################################
+
+
+
+# ##############################################################################
+#' Berechnet Alter aus date-of-birth
+#'
+#' @param cbDOB checkbox-Status Geburtsdatum
+#' @param DOB Geburtsdatum
+#' @param lang aktuelle Sprache
+#'
+#' @return Alter bzw. Keine Angaben
+#'
+calculateAge <- function(cbDOB, DOB, lang) {
+  if (cbDOB==TRUE && !is.null(DOB)) {
+    # TODO "Jahre" ergänzen
+    #DOB <- as.Date(DOB, format=translate("dd.mm.yyyy", lang))
+    return(round(difftime(Sys.time(), DOB)/365 , 1))
+  } else {
+    return(translate("nd", lang))
+  }
+}
+# ##############################################################################
+
+
+
+# ##############################################################################
+#' Liefert Anrede oder Geschlecht zurueck
+#'
+#' @param cbSex checkbox-Status Geschlecht
+#' @param sex Geschlecht
+#' @param lang aktuelle Sprache
+#' @param short Mann/Frau oder maennlich/weiblich
+#'
+#' @return Anrede/Geschlecht bzw. Keine Angaben
+#'
+getSalutation <- function(cbSex, sex, lang, short=TRUE) {
+  if (cbSex==TRUE && !is.null(sex)) {
+    if (sex=="f") {
+      if (short==TRUE) {
+        return(translate("salutationF", lang))
+      } else {
+        return(translate("weiblich", lang))
+      }
+    } else {
+      if (short==TRUE) {
+        return(translate("salutationM", lang))
+      } else {
+        return(translate("maennlich", lang))
+      }      
+    }
+  } else {
+    return(translate("nd", lang))
+  }
+}
+# ##############################################################################
+
+
+
+# ##############################################################################
+#' Liefert Eingabewert oder Keine Angaben zurueck
+#'
+#' @param cbValue checkbox-Status zu Eingabewert
+#' @param value Eingabewert
+#' @param lang aktuelle Sprache
+#'
+#' @return Groesse bzw. Keine Angaben
+#'
+getValue <- function(cbValue, value, lang) {
+  if (class(value)=="Date" && cbValue==TRUE) {
+    mytest <<- value
+    format <- translate("formatDate", lang)
+    return(format(value, format=format))
+  } else {
+    if (cbValue==TRUE && value!="") {
+      return(as.character(value))
+    } else {
+      return(translate("nd", lang))
+    }   
+  }
+}
+# ##############################################################################
 
 # --------------------------------------------------------------------------------------------------------------
 # stellt zu keyword und Sprache die passende Vokabel bereit; wird keyword nicht gefunden -> return keyword
