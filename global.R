@@ -141,8 +141,6 @@ calculateBMI <- function(cbGroesse, cbGewicht, groesse, gewicht, lang) {
 #'
 calculateAge <- function(cbDOB, DOB, lang) {
   if (cbDOB==TRUE && !is.null(DOB)) {
-    # TODO "Jahre" ergänzen
-    #DOB <- as.Date(DOB, format=translate("dd.mm.yyyy", lang))
     return(round(difftime(Sys.time(), DOB)/365 , 1))
   } else {
     return(translate("nd", lang))
@@ -196,7 +194,6 @@ getSalutation <- function(cbSex, sex, lang, short=TRUE) {
 #'
 getValue <- function(cbValue, value, lang) {
   if (class(value)=="Date" && cbValue==TRUE) {
-    mytest <<- value
     format <- translate("formatDate", lang)
     return(format(value, format=format))
   } else {
@@ -494,7 +491,7 @@ createTestdata <- function(onlyOne=FALSE, g1=400, g2=500, g3=300) {
 createPDF <- function(patData, param, hfData, file, lang=1) {
   
   # --- calculate some additional data -----------------------------------------
-  unitHF <- "SpM"  # translate
+  unitHF <- translate("bpm", lang)
   hfData$cs <- cumsum(hfData$deltaTime)
   hfData$dup <- duplicated(hfData$cs)
   hfData$label <- rawToChar(as.raw(65))
@@ -506,14 +503,14 @@ createPDF <- function(patData, param, hfData, file, lang=1) {
   if (max(hfData$cs)>600) {
     hfData$cs <- hfData$cs/60
     hfData$diff <- hfData$diff/60
-    unitT <- "Minuten"  # translate
+    unitT <- translate("minutes", lang)
     if (max(hfData$cs)>180) {
       hfData$cs <- hfData$cs/60
       hfData$diff <- hfData$diff/60
-      unitT <- "Stunden"  # translate
+      unitT <- translate("hours", lang)
     }
   } else {
-    unitT <- "Sekunden"  # translate
+    unitT <- translate("seconds", lang)
   }
   tab <- aggregate(diff ~ label, hfData, sum)
   tab$diff <- round(tab$diff, 1)
@@ -548,7 +545,7 @@ createPDF <- function(patData, param, hfData, file, lang=1) {
   plot(NA, xlim = c(0, 20), ylim = c(0, 10), xaxs = "i", yaxs = "i",
        axes = FALSE, frame.plot = FALSE, xlab = "", ylab = "")
   rect(0, 0, 20, 10, col = "skyblue", border = FALSE)
-  title(main = paste("coroVis Report vom",  # translate
+  title(main = paste(translate("reportHeader", lang),
                      strftime(Sys.Date(), format = "%d.%m.%Y")),
         line = -1.5, cex = 2)
   
@@ -559,7 +556,7 @@ createPDF <- function(patData, param, hfData, file, lang=1) {
   txtX <- rep(1, 9)
   txtY <- seq(9, 1, -1)
   txtT <- c(
-    paste0(translate("patientData", lang), ":"),
+    translate("patientData", lang),
     paste0(translate("salutation", lang), ":"),
     paste0(translate("Name", lang), ":"),
     paste0(translate("Vorname", lang), ":"),
@@ -582,18 +579,18 @@ createPDF <- function(patData, param, hfData, file, lang=1) {
   txtX <- rep(1, 9)
   txtY <- seq(9, 1, -1)
   txtT <- c(
-    "Parameter und Ergebnisse",  # translate
-    "Herzfrequenzgrenzen:",  # translate
-    "Trainingsintensität:",  # translate
-    "Optimaler Trainingsbereich:",  # translate
-    "Trainingseinheiten:",  # translate
-    "Trainingsdauer (gesamt):",  # translate
-    "Unterhalb Optimum:",  # translate
-    "Innerhalb Optimum:",  # translate
-    "Oberhalb Optimum:"  # translate
+    translate("parameterHeader", lang),
+    paste0(translate("Maximale Herzfrequenz", lang), ":"),
+    paste0(translate("Belastungsintensitaet", lang), ":"),
+    paste0(translate("Frequenzbereich", lang), ":"),
+    paste0(translate("trainingSessions", lang), ":"),
+    paste0(translate("trainingTime", lang), ":"),
+    paste0(translate("belowOpt", lang), ":"),
+    paste0(translate("inOpt", lang), ":"),
+    paste0(translate("aboveOpt", lang), ":")
   )
   text(txtX, txtY, txtT, adj = c(0, 0.5))
-  txtX <- rep(11, 8)
+  txtX <- rep(12, 8)
   txtT <- c(
     "",
     paste(param[6], "...", param[7]),
@@ -610,9 +607,9 @@ createPDF <- function(patData, param, hfData, file, lang=1) {
   
   # --- summary plot -----------------------------------------------------------
   par(mai = c(0.8, 37.5/25.4, 0.2, 25/25.4))
-  xlab <- paste0("Kumulative Trainingszeit [", unitT, "]")  # translate
-  ylab = "Herzfrequenz"  # translate
-  main = "Übersicht"  # translate
+  xlab <- paste0(translate("trainingTime", lang), " [", unitT, "]")
+  ylab <- translate("HFq", lang)
+  main <- translate("Zusammenfassung", lang)
   plot(hfData$cs, hfData$HR, xaxs = "i", yaxs = "i", axes = TRUE,
        frame.plot = TRUE, xlab = xlab, ylab = ylab, pch = 16,
        col = hfData$groupCol, type = "n", main = main)
@@ -637,9 +634,9 @@ createPDF <- function(patData, param, hfData, file, lang=1) {
   levels(cuts)[1] <- param[3]
   levels(cuts)[2] <- param[4]
   levels(cuts)[3] <- param[5]
-  plot(h, col=as.character(cuts), xlab = "Herzfrequenz",  # translate
-       ylab = "Häufigkeit",  # translate
-       main = "Herzfrequenzklassen")  # translate
+  plot(h, col=as.character(cuts), xlab = translate("HFq", lang),
+       ylab = translate("yaxis", lang),
+       main = translate("heartRateClasses", lang))
   box()
   
   # --- summary stacked barplot ------------------------------------------------
@@ -661,8 +658,8 @@ createPDF <- function(patData, param, hfData, file, lang=1) {
   }
   myBarData <- myBarData[myOrder, , drop=FALSE]
   barplot(myBarData, horiz = TRUE, las = 1, col = rownames(myBarData),
-          xlab = "Anteile [%]",  # translate
-          main = "Trainingseinheiten")  # translate
+          xlab = translate("percentage", lang),
+          main = translate("trainingSessions", lang))
   box()
   
   # --- finish PDF document ----------------------------------------------------

@@ -631,17 +631,16 @@ shinyServer(function(input, output, session) {
                      input$groesse, input$gewicht, input$language)
       )
       myParameter <- c(
-        100,  # lLimit
-        120,  # uLimit
-        "cornflowerblue",  # lCol
-        "limegreen",  # iCol
-        "orange",  # uCol
-        65,  # HFmin
-        170,  # HFmax
-        "schwer"  # intensity
+        input$hfBer[1],  # lLimit
+        input$hfBer[2],  # uLimit
+        input$cpUnder,  # lCol
+        input$cpRight,  # iCol
+        input$cpAbove,  # uCol
+        input$hfMax[1],  # HFmin
+        input$hfMax[2],  # HFmax
+        input$intensity  # intensity
       )
-      myCoroSimuData <- createTestdata()
-      createPDF(myPatient, myParameter, myCoroSimuData, file, input$language)
+      createPDF(myPatient, myParameter, values$coroRawData, file, input$language)
     }
   )
 

@@ -3,9 +3,10 @@ flag;iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAANklEQVRIie3NMQ0AMBDDQPPHVk4
 greeting;Herzlich willkommen;Welcome;Bienvenue
 greetingSubtitle;zu CoroVis - der Reha-App des Kardiologen; to CoroVis - the App for cardiac rehabilitation; a CoroVis - l'App pour la rehabilitation cardiaque
 error;Fehler;Error;Erreur
-yaxis;Häufigkeit;Frequency;
+yaxis;Häufigkeit;Frequency;Fréquence
 histogramTitle;Histogramm;Histogram of x;
 sliderTitle;Klassenanzahl:;Number of bins:;
+heartRateClasses;Herzfrequenzklassen;Heart rate classes;Classes de fréquence cardiaque
 CoroVisTitle;CoroVis - Reha leicht gemacht;CoroVis - Rehabilitation at once;CoroVis - Rehabilitation immediatement
 Trainingsdaten suchen ...;Trainingsdaten suchen;Search for exercises;Chercher les donnees du patient
 Name;Name;Lastname;Nom de famille
@@ -18,9 +19,16 @@ salutationM;Herr;Mr;Monsieur
 salutationF;Frau;Ms;Madame
 salutation;Anrede;Salutation;Titre
 patientData;Patientendaten;Patient records;Données du patient
+reportHeader;coroVis Bericht vom;coroVis report as of;coroVis rapport du
+parameterHeader;Parameter und Ergebnisse;Parameter and results;Paramètre et résultats
 Maximale Herzfrequenz;Herzfrequenzgrenzen;Range of heart rate;Limites de fréquence cardiaque
 Belastungsintensitaet;Belastungsintensität;Stress level;L'intensite du stress
-Frequenzbereich;Trainingsfrequenzbereich;Best range of Heart rate;Meilleur gamme de frequences
+Frequenzbereich;Trainingsfrequenzbereich;Desired range of heart rate;Meilleur gamme de frequences
+trainingSessions;Trainingseinheiten;Training sessions;Sessions de formation
+trainingTime;Kumulative Trainingsdauer;Cumulative training time;Durée d'entraînement cumulative
+belowOpt;Unterhalb Optimalbereich;Below optimum range;Dessous de la plage optimale
+inOpt;Innerhalb Optimalbereich;Within optimum range;Dans la plage optimale
+aboveOpt;Oberhalb Optimalbereich;Above optimum range;Ci-dessus plage optimale
 dd.mm.yyyy;dd.mm.yyyy;yyyy-mm-dd;dd.mm.yyyy
 formatDate;%d.%m.%Y;%Y-%m-%d;%d.%m.%Y
 de;de;en;fr
@@ -68,7 +76,7 @@ Bitte beachten;Bitte beachten;Please note;Notez, s'il vous plait
 IncHilfe;Help_DE.html;Help_GB.html;Help_FR.html
 IncImpressum;Imprint_DE.html;Imprint_GB.html;Imprint_FR.html
 Zur?ck;Zurück;Back;Retour
-HFq;Herzfrequenz;Heartrate;Frequence cardiaque
+HFq;Herzfrequenz;Heart rate;Frequence cardiaque
 Optimale Belastung;Optimale Belastung;Optimal Intensity;Intensite optimale
 XAchse;X-Achse;X-Axis;X-Axe
 YAchse;Y-Achse;Y-Axis;Y-Axe
@@ -94,6 +102,7 @@ Farbwerte;Farbwerte für den Referenzbereich;Colors for reference area;Coleurs d
 UnterRef;Unter dem Referenzwert...;Under the reference...;Sous la reference...
 ImRef;Im Referenzbereich...;In the reference...;Dans la reference...
 ÜberRef;Über dem Referenzbereich...; Above the reference...;Sur la reference...
+percentage;Prozentanteil;Percentage;Pourcentage
 FarbenZurück;Farben zurücksetzen;Reset colors;Retour couleurs
 filesLoaded0;Keine Dateien geladen;No files loaded;Aucun sont charges
 filesLoaded1;1 Datei geladen;1 file loaded;1 fichier charge
@@ -122,6 +131,10 @@ no;Nein;No;Non
 question;Eine Frage ...;Just a question ...;Reste à savoir si ...
 nd;keine Angaben;no data;non disponible
 bmi;BMI;BMI;IMC
+seconds;Sekunden;seconds;secondes
+minutes;Minuten;minutes;minutes
+hours;Stunden;hours;heures
+bpm;SpM;bpm;bpm
 SelectMapLayer;Karte auswählen;Select Map Layer;Selectionner une couche de la carte
 ZeitVCSV;Zeitverschiebung von CSV-Dateien;Time shift of CSV files;Decalage des fichiers CSV
 PunktGr;Punktgröße;Spot size;La taille du spot
