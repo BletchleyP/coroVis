@@ -101,7 +101,7 @@ Fehlermeldung;Ein Fehler ist aufgetreten:;An error occured:;Texte du message d'e
 Farbwerte;Farbwerte für den Referenzbereich;Colors for reference area;Coleurs de zone referencee
 UnterRef;Unter dem Referenzwert...;Under the reference...;Sous la reference...
 ImRef;Im Referenzbereich...;In the reference...;Dans la reference...
-ÜberRef;Über dem Referenzbereich...; Above the reference...;Sur la reference...
+ÜberRef;Über dem Referenzbereich...;Above the reference...;Sur la reference...
 percentage;Prozentanteil;Percentage;Pourcentage
 FarbenZurück;Farben zurücksetzen;Reset colors;Retour couleurs
 filesLoaded0;Keine Dateien geladen;No files loaded;Aucun sont charges
@@ -143,3 +143,4 @@ Report;Report erstellen;Download report;Télécharger le rapport
 PlotSize;Größe der Balken ändern;Change Plot Size;Redimensionner la barre
 riskfactorTitle;Risikofaktoren; Risk factors;Les facteurs de risque
 hrTitle;Herzfrequenzbereiche wählen;Select the heart rate range;Sélectionnez la plage de fréquence cardiaque
+Legende;Legende;Legend;Légende

@@ -569,7 +569,10 @@ shinyServer(function(input, output, session) {
          cex.lab = input$plotTextsize, cex.main = input$plotTextsize)
     if ("2" %in% input$plotInclude0) {lines(x, y, pch=16)}
   })
-  
+  output$colorLegend <- renderText({translate("Legende", input$language)})
+  output$uRef <- renderText({translate("UnterRef", input$language)})
+  output$iRef <- renderText({translate("ImRef", input$language)})
+  output$ueRef <- renderText({translate("ÜberRef", input$language)})
   
   # workingPanel > mainPanel > tp3 MAP
   # TODO
