@@ -208,13 +208,16 @@ shinyUI(fluidPage(
                   ),
                   hr()
                 ),
+                tags$label(textOutput("riskfactorTitle")),
                 fluidRow(
                   column(4, align="center", h5(textOutput("ageTitle")),
                          verbatimTextOutput("alterausgabe", placeholder = TRUE)),
                   column(4, align="center", h5(textOutput("bmiTitle")), verbatimTextOutput("bmi")),
                   column(4, align="center", h5(textOutput("sex_t")), verbatimTextOutput("sex"))
                 ),
+                hr(),
                 # Herzfrequenzgrenzen
+                #tags$label(textOutput("hrTitle")),
                 sliderInput("hfMax", label = textOutput("hfMax_t"),
                             min = 45, max = 200, value = c(60, 180)),
                 

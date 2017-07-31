@@ -506,6 +506,8 @@ shinyServer(function(input, output, session) {
     }
   })
   output$filterTitle <- renderText({translate("filterTitle", input$language)})
+  output$riskfactorTitle <- renderText({translate("riskfactorTitle", input$language)})
+  #output$hrTitle <- renderText({translate("hrTitle", input$language)})
   output$bmiTitle <- renderText({translate("bmi", input$language)})
   output$bmi <- renderText({
       calculateBMI(input$groesseKA, input$gewichtKA,
