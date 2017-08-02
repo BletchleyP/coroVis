@@ -255,14 +255,7 @@ shinyUI(fluidPage(
                                checkboxGroupInput("plotInclude0", "Optionen",
                                                   choices = c("ymin <= 0" = 1,
                                                               "Linie" = 2)))
-                      ),
-                      textOutput("colorLegend"),
-                      div(id = "bCols1", style = "background-color: orange",
-                          textOutput("uRef")),
-                      div(id = "bCols2", style = "background-color: green",
-                          textOutput("iRef")),
-                      div(id = "bCols3", style = "background-color: red",
-                          textOutput("ueRef"))
+                      )
                    )
           ),
           tabPanel(textOutput("karte_t"), icon = icon("road"), value = "tP3",

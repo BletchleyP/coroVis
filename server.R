@@ -445,17 +445,19 @@ shinyServer(function(input, output, session) {
                    min(y, na.rm = TRUE))
     ylim <- c(ylim, max(y, na.rm = TRUE))
 
-    par(mar = c(5, 5, 0.2, 2))
+    par(mar = c(5, 5, 2, 2))
     plot(x, y, pch = 16, col=z, main = NULL, xlab = input$axisXSelect,
          ylab = input$axisYSelect, ylim = ylim,
          cex = input$plotPointsize, las = 1,
          cex.lab = input$plotTextsize, cex.main = input$plotTextsize)
+    legend("top", legend=c(translate("UnterRef", input$language),
+                               translate("ImRef", input$language),
+                               translate("ÜberRef", input$language)),
+           col=c(input$cpUnder, input$cpRight, input$cpAbove), pch = 16,
+           xpd = TRUE, horiz = TRUE, bty = 'n', cex = input$plotTextsize,
+           inset = c(0, -0.1))
     if ("2" %in% input$plotInclude0) {lines(x, y, pch=16)}
   })
-  output$colorLegend <- renderText({translate("Legende", input$language)})
-  output$uRef <- renderText({translate("UnterRef", input$language)})
-  output$iRef <- renderText({translate("ImRef", input$language)})
-  output$ueRef <- renderText({translate("ÜberRef", input$language)})
   
   # --- workingPanel > mainPanel > tp3 MAP -------------------------------------
   output$karte_t <- renderText({translate("Karte", input$language)})
