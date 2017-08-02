@@ -174,7 +174,21 @@ calculateBMI <- function(cbGroesse, cbGewicht, groesse, gewicht, lang) {
 #'
 calculateAge <- function(cbDOB, DOB, lang) {
   if (cbDOB==TRUE && !is.null(DOB)) {
-    return(round(difftime(Sys.time(), DOB)/365 , 1))
+    d1 <- as.integer(as.character(DOB, format = "%d"))
+    m1 <- as.integer(as.character(DOB, format = "%m"))
+    y1 <- as.integer(as.character(DOB, format = "%Y"))
+    d2 <- as.integer(as.character(Sys.Date(), format = "%d"))
+    m2 <- as.integer(as.character(Sys.Date(), format = "%m"))
+    y2 <- as.integer(as.character(Sys.Date(), format = "%Y"))
+    age <- y2 - y1
+    if (m1>m2 || (m1==m2 && d1>d2)) {
+      age <- age - 1
+    }
+    if (age<0) {
+      return(translate("nd", lang))
+    } else {
+      return(paste(age, translate("years", lang)))
+    }
   } else {
     return(translate("nd", lang))
   }

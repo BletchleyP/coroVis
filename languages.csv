@@ -138,6 +138,7 @@ seconds;Sekunden;seconds;secondes
 minutes;Minuten;minutes;minutes
 hours;Stunden;hours;heures
 bpm;SpM;bpm;bpm
+years;Jahre;years;ans
 SelectMapLayer;Karte auswählen;Select Map Layer;Selectionner une couche de la carte
 ZeitVCSV;Zeitverschiebung von CSV-Dateien;Time shift of CSV files;Decalage des fichiers CSV
 PunktGr;Punktgröße;Spot size;La taille du spot
