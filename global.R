@@ -375,6 +375,53 @@ mergeDF <- function(old, new, mergeBy) {
 
 
 # ##############################################################################
+#' Fuegt hinzu bzw. aktualisiert eine Spalte Group mit der Zuordnung der Farbe
+#' entsprechend Bewertung unter / in / ueber Trainingsfrequenzbereich
+#'
+#' @param df zu bewertende Daten
+#' @param hrmin minimale Trainingsherzfrequenz
+#' @param hrmax maximale Trainingsherzfrequenz
+#' @param col1 Farbcode unter Bereich
+#' @param col2  Farbcode in Bereich
+#' @param col3  Farbcode oberhalb Bereich
+#' @param lang aktuelle Sprache
+#'
+#' @return
+#'
+assignGroups <- function(df, hrmin, hrmax, col1, col2, col3, lang) {
+  if (is.null(df)) {return(NULL)}
+  df$Group <- ifelse(df[,c(translate("HeartRateBpm", lang))]<hrmin, col1,
+                     ifelse(df[,c(translate("HeartRateBpm", lang))]>hrmax, col3, col2))
+  return(df)
+}
+# ##############################################################################
+
+
+
+# ##############################################################################
+#' Erstellt aus dem uebergebenen Dataframe eine Zusammenfassungstabelle
+#'
+#' @param dfauszuwertender Dataframe
+#' @param hrmin minimale Trainingsherzfrequenz
+#' @param hrmax maximale Trainingsherzfrequenz
+#'
+#' @return aggregierter Datensatz
+#'
+calculateSummary <- function(df, hrmin, hrmax) {
+  if (is.null(df)) {return(NULL)}
+  df$Group1 <- ifelse(df[,c("HR")]<hrmin, 1, 0)
+  df$Group2 <- ifelse(df[,c("HR")]<=hrmax, 1, 0)
+  df$Group2 <- df$Group2 - df$Group1
+  df$Group3 <- ifelse(df[,c("HR")]>hrmax, 1, 0)
+  mydf <- aggregate(df[,c("Group1", "Group2", "Group3")],
+                    by=list(Date=df$Date), FUN=sum, na.rm=TRUE)
+  return(mydf)
+}
+# ##############################################################################
+
+
+
+# ##############################################################################
 #' Extrahiert aus CSV-Datei einen Dataframe
 #'
 #' @param myFile datapath zu CSV-Datei
@@ -681,9 +728,9 @@ createPDF <- function(patData, param, hfData, file, lang=1) {
   txtY <- seq(9, 1, -1)
   txtT <- c(
     translate("parameterHeader", lang),
-    paste0(translate("Maximale Herzfrequenz", lang), ":"),
-    paste0(translate("Belastungsintensitaet", lang), ":"),
-    paste0(translate("Frequenzbereich", lang), ":"),
+    paste0(translate("reportHR", lang), ":"),
+    paste0(translate("reportSL", lang), ":"),
+    paste0(translate("reportTR", lang), ":"),
     paste0(translate("trainingSessions", lang), ":"),
     paste0(translate("trainingTime", lang), ":"),
     paste0(translate("belowOpt", lang), ":"),

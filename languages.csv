@@ -18,6 +18,9 @@ Gewicht;Gewicht [kg];Weight [kg];Poids corporel [kg]
 salutationM;Herr;Mr;Monsieur
 salutationF;Frau;Ms;Madame
 salutation;Anrede;Salutation;Titre
+reportHR;Herzfrequenzgrenzen;Range of heart rate;Limites de fréquence cardiaque
+reportSL;Belastungsintensität;Stress level;L'intensite du stress
+reportTR;Trainingsfrequenzbereich;Desired range of heart rate;Meilleur gamme de frequences
 patientData;Patientendaten;Patient records;Données du patient
 reportHeader;coroVis Bericht vom;coroVis report as of;coroVis rapport du
 parameterHeader;Parameter und Ergebnisse;Parameter and results;Paramètre et résultats
