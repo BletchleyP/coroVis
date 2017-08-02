@@ -123,7 +123,7 @@ LatitudeDegrees;Breitengrad;LatitudeDegrees;degré de latitude
 LongitudeDegrees;Längengrad;LongitudeDegrees;degré de longitude
 AltitudeMeters;Höhe;AltitudeMeters;Altitude
 Speed;Geschwindigkeit;Speed;Vitesse
-DistanceMeters;Entfernung;DistanceMeters;Distance
+DistanceMeters;Entfernung;Distance;Distance
 maximaleHF;Maximale Herzfrequenz korrigieren;Override maximum heart rate;Corriger la frequence cardiaque
 filterTitle;Welche Messwerte sollen angezeigt werden?;Which training data should be shown?;Quelles sont les donnees de formation a afficher?
 filterId;Werte nach Trainingseinheit;Values by training unit;Les valeurs après l'entraînement
