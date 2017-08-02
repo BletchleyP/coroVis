@@ -23,7 +23,7 @@ reportHeader;coroVis Bericht vom;coroVis report as of;coroVis rapport du
 parameterHeader;Parameter und Ergebnisse;Parameter and results;Paramètre et résultats
 Maximale Herzfrequenz;Minimal und maximal zulässige Herzfrequenz wählen;Select the minimum and maximum permissible heart rate;Sélectionnez la fréquence cardiaque minimale et maximale
 Belastungsintensitaet;Belastungsintensität wählen;Select stress level;Selectionze l'intensité du stress
-Frequenzbereich;Optimalen Trainingsherzfrequenzbereich einstellen;Set the optimal training heartrate range;Réglage de la gamme de fréquences cardiaques de formation optimale
+Frequenzbereich;Optimalen Trainingsherzfrequenzbereich ggf. anpassen;Set optimal training heart rate range if necessary;Ajuster la zone de fréquence cardiaque d'entraînement optimal si nécessaire
 trainingSessions;Trainingseinheiten;Training sessions;Sessions de formation
 trainingTime;Kumulative Trainingsdauer;Cumulative training time;Durée d'entraînement cumulative
 belowOpt;Unterhalb Optimalbereich;Below optimum range;Dessous de la plage optimale
