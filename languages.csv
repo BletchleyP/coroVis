@@ -35,6 +35,9 @@ aboveOpt;Oberhalb Optimalbereich;Above optimum range;Ci-dessus plage optimale
 dd.mm.yyyy;dd.mm.yyyy;yyyy-mm-dd;dd.mm.yyyy
 formatDate;%d.%m.%Y;%Y-%m-%d;%d.%m.%Y
 de;de;en;fr
+options;Optionen;Options;Options
+optY;Y=0 anzeigen;include Y=0;Afficher Y=0
+optL;Linie einblenden;show line;Afficher la ligne
 maennlich;männlich;male;male
 weiblich;weiblich;female;femelle
 Trainingsdaten analysieren ...;Trainingsdaten analysieren;Analyse Training Data;Analyser donnees d'exercise

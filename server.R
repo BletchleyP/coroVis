@@ -436,6 +436,7 @@ shinyServer(function(input, output, session) {
   output$zeit_t <- renderText({translate("Plot", input$language)})
   output$axisXSelectLabel <- renderText({translate("XAchse", input$language)})
   output$axisYSelectLabel <- renderText({translate("YAchse", input$language)})
+  output$optPlot <- renderText({translate("options", input$language)})
   output$explorationPlot <- renderPlot({
     if (is.null(coroDataPlot())) {return(NULL)}
     
@@ -660,6 +661,11 @@ shinyServer(function(input, output, session) {
                                      "level5", "level6"), lang)
     updateSelectInput(session, "intensity", choices = newChoices,
                       selected = input$intensity)
+    
+    newChoices <- list(1, 2)
+    names(newChoices) <- translate(c("optY", "optL"), lang)
+    updateCheckboxGroupInput(session, "plotInclude0", choices = newChoices,
+                             selected = input$plotInclude0)
   })
   
   # --- Datei-Upload -----------------------------------------------------------

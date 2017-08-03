@@ -253,7 +253,8 @@ shinyUI(fluidPage(
                                                        "Entfernung"))
                                ),
                         column(3, align="left",
-                               checkboxGroupInput("plotInclude0", "Optionen",
+                               checkboxGroupInput("plotInclude0",
+                                                  textOutput("optPlot"),
                                                   choices = c("ymin <= 0" = 1,
                                                               "Linie" = 2)))
                       )
