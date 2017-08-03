@@ -438,8 +438,15 @@ shinyServer(function(input, output, session) {
   output$axisYSelectLabel <- renderText({translate("YAchse", input$language)})
   output$explorationPlot <- renderPlot({
     if (is.null(coroDataPlot())) {return(NULL)}
-    x <- times(coroDataPlot()[,input$axisXSelect])
-    y <- as.numeric(coroDataPlot()[,input$axisYSelect])
+    
+    myChoice <- c("Time", "DistanceMeters")
+    newSelection <- getNewSelection(input$axisXSelect, input$language, myChoice)
+    x <- times(coroDataPlot()[,newSelection])
+    
+    myChoice <- c("HeartRateBpm", "AltitudeMeters", "DistanceMeters", "Speed")
+    newSelection <- getNewSelection(input$axisYSelect, input$language, myChoice)
+    y <- as.numeric(coroDataPlot()[,newSelection])
+    
     z <- coroDataPlot()[,c("Group")]
     ylim <- ifelse("1" %in% input$plotInclude0 && 0<min(y, na.rm = TRUE), 0,
                    min(y, na.rm = TRUE))
