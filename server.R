@@ -676,10 +676,18 @@ shinyServer(function(input, output, session) {
       } else {
         updateCheckboxInput(session, "mapAvailable", value = FALSE)
       }
+      myText <- paste(input$nachname, input$vorname, sep = ", ")
+      myText <- gsub("^, ", "", myText)
+      myText <- gsub(", $", "", myText)
+      if (nchar(myText)>0) {
+        myText <- paste0(translate("PersonenDaten3", input$language),
+                         myText, "?")
+      } else {
+        myText <- translate("PersonenDaten", input$language)
+      }
       showModal(modalDialog(title = translate("question",
                                               isolate(input$language)),
-                            translate("PersonenDaten",
-                                      isolate(input$language)),
+                            myText,
                             footer = tagList(
                               modalButton(translate("yes",
                                                     isolate(input$language))),

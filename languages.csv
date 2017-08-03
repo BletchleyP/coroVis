@@ -75,6 +75,7 @@ Falsches Format;Falsches Format;Wrong file format;Format de fichier incorrect
 Zeitraum analysieren;Zeitraum analysieren?;Analyse Range of Training Data ...;Analyser periode de donnees d'exercise ...
 bis;bis;to;a
 PersonenDaten;Gehören die neu geladenen Daten zum aktuellen Patienten?;Do the newly loaded data belong to the current patient?;Inclure les nouvelles donnees chargees pour les patients actuels?
+PersonenDaten3;Gehören die neu geladenen Daten zu ;Do the newly loaded data belong to ;Inclure les nouvelles donnees chargees pour 
 Bitte beachten;Bitte beachten;Please note;Notez, s'il vous plait
 IncHilfe;Help_DE.html;Help_GB.html;Help_FR.html
 IncImpressum;Imprint_DE.html;Imprint_GB.html;Imprint_FR.html
