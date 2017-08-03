@@ -113,7 +113,8 @@ shinyUI(fluidPage(
                         c("Start" = 0, "Daten" = 1, "Plots" = 2, "Karten" = 3,
                           "Zusammenfassung" = 4, "Einstellungen" = 5),
                         selected = c(0, 1, 2, 3, 4, 5)),
-     checkboxInput("dataAvailable", "Datensatz geladen?", value = FALSE)
+     checkboxInput("dataAvailable", "Datensatz geladen?", value = FALSE),
+     checkboxInput("mapAvailable", "GPS vorhanden?", value = FALSE)
   ),
 
 # --- Kopfzeile mit gefloateten Panels -----------------------------------------

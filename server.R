@@ -241,7 +241,7 @@ shinyServer(function(input, output, session) {
   #' @export
   #'
   #' @examples
-  hideTab <- function(mytabsetName, child, selectInstead = NULL, status) {
+  hideTab <- function(mytabsetName, child, selectInstead = NULL, status = 0) {
     session$sendCustomMessage(type = "hideTab",
                               message = list(tabsetName = mytabsetName,
                                              number = child, hide = status))
@@ -467,11 +467,11 @@ shinyServer(function(input, output, session) {
     } else {
       cols <- colnames(coroDataPlot())
       i <- match(translate("LatitudeDegrees", input$language), cols)
-      myLat <- coroDataPlot()[,i]
+      myLat <- coroDataPlot()[coroDataPlot()$GPS=="+",i]
       i <- match(translate("LongitudeDegrees", input$language), cols)
-      myLng <- coroDataPlot()[,i]
+      myLng <- coroDataPlot()[coroDataPlot()$GPS=="+",i]
       i <- match(translate("HeartRateBpm", input$language), cols)
-      myHR <- coroDataPlot()[,i]
+      myHR <- coroDataPlot()[coroDataPlot()$GPS=="+",i]
       m <- leaflet() %>% addProviderTiles(input$mapTilesSelect) %>%
         addCircles(data = coroDataPlot(),
                    lat = ~myLat, lng = ~myLng, popup= ~myHR, radius=5,
@@ -657,7 +657,9 @@ shinyServer(function(input, output, session) {
   
   # --- Datei-Upload -----------------------------------------------------------
   observeEvent(input$userfiles, {
+    updateCheckboxInput(session, "dataAvailable", value = FALSE)
     values$coroRawData <- importFiles(input$userfiles)
+    
     # entferne bei neu geladenen Daten immer alle globalen Filter
     updateCheckboxInput(session, "filterById", value = FALSE)
     updateCheckboxInput(session, "filterByDate", value = FALSE)
@@ -667,9 +669,13 @@ shinyServer(function(input, output, session) {
     updateSelectInput(session, "filterByDateSelect",
                       choices = unique(values$coroRawData[,match("Date",
                                        colnames(values$coroRawData))]))
-    
     if (!is.null(values$coroRawData)) {
       updateCheckboxInput(session, "dataAvailable", value = TRUE)
+      if (nrow(values$coroRawData[values$coroRawData$GPS=="+",])>0) {
+        updateCheckboxInput(session, "mapAvailable", value = TRUE)
+      } else {
+        updateCheckboxInput(session, "mapAvailable", value = FALSE)
+      }
       showModal(modalDialog(title = translate("question",
                                               isolate(input$language)),
                             translate("PersonenDaten",
@@ -684,6 +690,38 @@ shinyServer(function(input, output, session) {
       ))
     } else {
       updateCheckboxInput(session, "dataAvailable", value = FALSE)
+      updateCheckboxInput(session, "mapAvailable", value = FALSE)
+    }
+  })
+  
+  # --- Aenderung dataAvailable ------------------------------------------------
+  observeEvent(input$dataAvailable, {
+    if (is.null(values$coroRawData)) {
+          for (i in c(1:2, 4)) {
+            hideTab(mytabsetName = "tP", child = i, "tP0", status = 0)
+          }
+        } else {
+          for (i in c(1:2, 4)) {
+            hideTab(mytabsetName = "tP", child = i, "tP1", status = 1)
+          }
+        }
+  })
+  
+  # --- Aenderung mapAvailable -------------------------------------------------
+  observeEvent(input$mapAvailable, {
+    if (input$mapAvailable) {
+      hideTab(mytabsetName = "tP", child = 3, status = 1)
+    } else {
+      if (input$tP == "tP3") {
+        if (input$dataAvailable) {
+          newTab <- "tP1"
+        } else {
+          newTab <- "tP0"
+        }
+      } else {
+        newTab <- NULL
+      }
+      hideTab(mytabsetName = "tP", child = 3, newTab, status = 0)
     }
   })
   
@@ -706,17 +744,6 @@ shinyServer(function(input, output, session) {
   observeEvent(input$overrideMaxHF, {
     updateSliderInput(session, "hfMax", value = input$hfMax,
                       max = input$overrideMaxHF)
-  })  
-  
-  # --- Aenderung coroRawData --------------------------------------------------
-  observe({
-    if (is.null(values$coroRawData)) {
-      updateTabsetPanel(session, "tP", selected = "tP0")
-      for (i in 1:4) {hideTab(mytabsetName = "tP", child = i, status = 0)}
-    } else {
-      for (i in 1:4) {hideTab(mytabsetName = "tP", child = i, status = 1)}
-      updateTabsetPanel(session, "tP", selected = "tP1")
-    }
   })
 
   # --- Hinweis: neuer Patient -------------------------------------------------
